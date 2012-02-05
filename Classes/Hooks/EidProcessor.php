@@ -9,7 +9,7 @@ class Tx_Tinyurls_Hooks_EidProcessor {
 
 		try {
 			$targetUrl = $this->getTargetUrl();
-			t3lib_utility_http::redirect($targetUrl, t3lib_utility_http::HTTP_STATUS_301);
+			t3lib_utility_Http::redirect($targetUrl, t3lib_utility_http::HTTP_STATUS_301);
 		} catch (Exception $exception) {
 			$tsfe = t3lib_div::makeInstance('tslib_fe', $GLOBALS['TYPO3_CONF_VARS'], 0, 0);
 
@@ -45,17 +45,30 @@ class Tx_Tinyurls_Hooks_EidProcessor {
 		$tinyUrlData = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result);
 
 		if ($tinyUrlData['delete_on_use']) {
+
 			$GLOBALS['TYPO3_DB']->exec_DELETEquery(
 				'tx_tinyurls_urls',
 				'urlkey=' . $GLOBALS['TYPO3_DB']->fullQuoteStr($tinyUrlData['urlkey'], 'tx_tinyurls_urls')
 			);
+
+			$this->sendNoCacheHeaders();
 		}
 
 		return $tinyUrlData['target_url'];
 	}
 
+	/**
+	 * Sends headers that the user does not cache the page
+	 */
+	protected function sendNoCacheHeaders() {
+		header('Expires: 0');
+		header('Last-Modified: ' . gmdate('D, d M Y H:i:s') . ' GMT');
+		header('Cache-Control: no-cache, must-revalidate');
+		header('Pragma: no-cache');
+	}
 }
 
 $eidProcessor  = t3lib_div::makeInstance('tx_tinyurls_hooks_eidprocessor');
 $eidProcessor->main();
+
 ?>
