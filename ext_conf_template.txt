@@ -1,0 +1,6 @@
+
+# cat=basic/config; type=string; label=Create speaking URLs: Hint! If you enable this you need to add a rewrite rule to you webserver!
+createSpeakingURLs = 0
+
+# cat=basic/config; type=string; label=Speaking url template: You can use all available keys for t3lib_div::getIndpEnv() as template markers (e.g. ###TYPO3_SITE_URL### and the ###TINY_URL_KEY### template marker will be replaced with the shortened URL key
+speakingUrlTemplate = ###TYPO3_SITE_URL###tinyurl/###TINY_URL_KEY###
