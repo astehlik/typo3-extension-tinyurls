@@ -4,3 +4,12 @@ createSpeakingURLs = 0
 
 # cat=basic/config; type=string; label=Speaking url template: You can use all available keys for t3lib_div::getIndpEnv() as template markers (e.g. ###TYPO3_SITE_URL### and the ###TINY_URL_KEY### template marker will be replaced with the shortened URL key
 speakingUrlTemplate = ###TYPO3_SITE_URL###tinyurl/###TINY_URL_KEY###
+
+# cat=basic/config; type=string; label=Dictionary for creating bas 62 based integers (see http://jeremygibbs.com/2012/01/16/how-to-make-a-url-shortener)), use random string to increase security (e.g. http://textmechanic.com/String-Randomizer.html)
+base62Dictionary = abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789
+
+# cat=basic/config; type=string; label=The minimum length that the random part of the tinyurl can have
+minimalRandomKeyLength = 2
+
+# cat=basic/config; type=string; label=The minimum length that the whole tinyurl can have
+minimalTinyurlKeyLength => 8
