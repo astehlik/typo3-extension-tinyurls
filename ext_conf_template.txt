@@ -1,15 +1,18 @@
 
-# cat=basic/config; type=string; label=Create speaking URLs: Hint! If you enable this you need to add a rewrite rule to you webserver!
+# cat=basic/config; type=string; label=Create speaking URLs: If true (1) then the tiny URL will be generated depending on the speakingUrlTemplate. Hint! If you enable this you might need to add a rewrite rule to you webserver!
 createSpeakingURLs = 0
 
-# cat=basic/config; type=string; label=Speaking url template: You can use all available keys for t3lib_div::getIndpEnv() as template markers (e.g. ###TYPO3_SITE_URL### and the ###TINY_URL_KEY### template marker will be replaced with the shortened URL key
+# cat=basic/config; type=string; label=Speaking url template: The template that is used for creating a speaking URL (only relevant if createSpeakingURLs is set to 1). You can use all available keys for t3lib_div::getIndpEnv() as template markers (e.g. ###TYPO3_SITE_URL### and the ###TINY_URL_KEY### template marker will be replaced with the shortened URL key
 speakingUrlTemplate = ###TYPO3_SITE_URL###tinyurl/###TINY_URL_KEY###
 
-# cat=basic/config; type=string; label=Dictionary for creating bas 62 based integers (see http://jeremygibbs.com/2012/01/16/how-to-make-a-url-shortener)), use random string to increase security (e.g. http://textmechanic.com/String-Randomizer.html)
+# cat=basic/config; type=string; label=base63 dictionary: Dictionary for creating bas 62 based integers (see http://jeremygibbs.com/2012/01/16/how-to-make-a-url-shortener)), use random string to increase security (e.g. http://textmechanic.com/String-Randomizer.html)
 base62Dictionary = abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789
 
-# cat=basic/config; type=string; label=The minimum length that the random part of the tinyurl can have
+# cat=basic/config; type=string; label=Minimal random key length: The minimum length that the random part of the tiny URL must have
 minimalRandomKeyLength = 2
 
-# cat=basic/config; type=string; label=The minimum length that the whole tinyurl can have
-minimalTinyurlKeyLength => 8
+# cat=basic/config; type=string; label=Minimal tiny URL key length: The minimum length that the whole tiny URL key must have
+minimalTinyurlKeyLength = 8
+
+# cat=basic/config; type=string; label=URL record storage PID: The PID where the tiny URL records are stored, use 0 to store them in the TYPO3 root
+urlRecordStoragePID = 0

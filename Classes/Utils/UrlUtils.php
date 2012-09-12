@@ -12,7 +12,21 @@
 /**
  * Contains utilities for creating tiny url keys and url hashes
  */
-class Tx_Tinyurls_Utils_UrlUtils {
+class Tx_Tinyurls_Utils_UrlUtils implements t3lib_Singleton {
+
+	/**
+	 * Contains the extension configration
+	 *
+	 * @var Tx_Tinyurls_Utils_ConfigUtils
+	 */
+	var $configUtils;
+
+	/**
+	 * Initializes the extension configuration
+	 */
+	public function __construct() {
+		$this->configUtils = t3lib_div::makeInstance('Tx_Tinyurls_Utils_ConfigUtils');
+	}
 
 	/**
 	 * This mehtod converts the given base 10 integer to a base62
@@ -23,7 +37,7 @@ class Tx_Tinyurls_Utils_UrlUtils {
 	 * @param string $base62Dictionary the dictionary for generating the base62 integer
 	 * @return string A base62 encoded integer using a custom dictionary
 	 */
-	protected static function convertIntToBase62($base10Integer, $base62Dictionary) {
+	protected function convertIntToBase62($base10Integer, $base62Dictionary) {
 
 		$base62Integer = '';
 		$base = 62;
@@ -42,17 +56,16 @@ class Tx_Tinyurls_Utils_UrlUtils {
 	 * Generates a unique tinyurl key for the record with the given UID
 	 *
 	 * @param int $insertedUid
-	 * @param array $extensionConfiguration
 	 * @return array
 	 */
-	public static function generateTinyurlKeyForUid($insertedUid, $extensionConfiguration) {
+	public function generateTinyurlKeyForUid($insertedUid) {
 
-		$tinyUrlKey = self::convertIntToBase62($insertedUid, $extensionConfiguration['base62Dictionary']);
+		$tinyUrlKey = $this->convertIntToBase62($insertedUid, $this->configUtils->getExtensionConfigurationValue('base62Dictionary'));
 
-		$numberOfFillupChars = $extensionConfiguration['minimalTinyurlKeyLength'] - strlen($tinyUrlKey);
+		$numberOfFillupChars = $this->configUtils->getExtensionConfigurationValue('minimalTinyurlKeyLength') - strlen($tinyUrlKey);
 
-		if ($numberOfFillupChars < $extensionConfiguration['minimalRandomKeyLength']) {
-			$numberOfFillupChars = $extensionConfiguration['minimalRandomKeyLength'];
+		if ($numberOfFillupChars < $this->configUtils->getExtensionConfigurationValue('minimalRandomKeyLength')) {
+			$numberOfFillupChars = $this->configUtils->getExtensionConfigurationValue('minimalRandomKeyLength');
 		}
 
 		if ($numberOfFillupChars < 1) {
@@ -70,7 +83,7 @@ class Tx_Tinyurls_Utils_UrlUtils {
 	 * @param string $url
 	 * @return string
 	 */
-	public static function generateTinyurlHash($url) {
+	public function generateTinyurlHash($url) {
 		return sha1($url);
 	}
 }

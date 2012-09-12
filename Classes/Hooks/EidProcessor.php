@@ -15,6 +15,20 @@
 class Tx_Tinyurls_Hooks_EidProcessor {
 
 	/**
+	 * Contains the extension configration
+	 *
+	 * @var Tx_Tinyurls_Utils_ConfigUtils
+	 */
+	var $configUtils;
+
+	/**
+	 * Initializes the extension configuration
+	 */
+	public function __construct() {
+		$this->configUtils = t3lib_div::makeInstance('Tx_Tinyurls_Utils_ConfigUtils');
+	}
+
+	/**
 	 * Redirects the user to the target url if a valid tinyurl was
 	 * submitted, otherwise the default 404 (not found) page is displayed
 	 */
@@ -51,10 +65,13 @@ class Tx_Tinyurls_Hooks_EidProcessor {
 			throw new RuntimeException('No tinyurl key was submitted.');
 		}
 
+		$selctWhereStatement = 'urlkey=' . $GLOBALS['TYPO3_DB']->fullQuoteStr($tinyUrlKey, 'tx_tinyurls_urls');
+		$selctWhereStatement = $this->configUtils->appendPidQuery($selctWhereStatement);
+
 		$result = $GLOBALS['TYPO3_DB']->exec_SELECTquery(
 			'urlkey,target_url,delete_on_use',
 			'tx_tinyurls_urls',
-			'urlkey=' . $GLOBALS['TYPO3_DB']->fullQuoteStr($tinyUrlKey, 'tx_tinyurls_urls')
+			$selctWhereStatement
 		);
 
 		if (!$GLOBALS['TYPO3_DB']->sql_num_rows($result)) {
@@ -65,9 +82,12 @@ class Tx_Tinyurls_Hooks_EidProcessor {
 
 		if ($tinyUrlData['delete_on_use']) {
 
+			$deleteWhereStatement = 'urlkey=' . $GLOBALS['TYPO3_DB']->fullQuoteStr($tinyUrlData['urlkey'], 'tx_tinyurls_urls');
+			$deleteWhereStatement = $this->configUtils->appendPidQuery($deleteWhereStatement);
+
 			$GLOBALS['TYPO3_DB']->exec_DELETEquery(
 				'tx_tinyurls_urls',
-				'urlkey=' . $GLOBALS['TYPO3_DB']->fullQuoteStr($tinyUrlData['urlkey'], 'tx_tinyurls_urls')
+				$deleteWhereStatement
 			);
 
 			$this->sendNoCacheHeaders();
@@ -81,9 +101,12 @@ class Tx_Tinyurls_Hooks_EidProcessor {
 	 */
 	protected function purgeInvalidUrls() {
 
+		$purgeWhereStatement = 'valid_until>0 AND valid_until<' . time();
+		$purgeWhereStatement = $this->configUtils->appendPidQuery($purgeWhereStatement);
+
 		$GLOBALS['TYPO3_DB']->exec_DELETEquery(
 			'tx_tinyurls_urls',
-				'valid_until>0 AND valid_until<' . time()
+			$purgeWhereStatement
 		);
 	}
 

@@ -15,6 +15,20 @@
 class Tx_Tinyurls_Hooks_Tce {
 
 	/**
+	 * Tiny URL utilities
+	 *
+	 * @var Tx_Tinyurls_Utils_UrlUtils
+	 */
+	var $urlUtils;
+
+	/**
+	 * Initializes the URL utils
+	 */
+	public function __construct() {
+		$this->urlUtils = t3lib_div::makeInstance('Tx_Tinyurls_Utils_UrlUtils');
+	}
+
+	/**
 	 * When a user stores a tinyurl record in the Backend the urlkey and the target_url_hash will be updated
 	 *
 	 * @param string $status (reference) Status of the current operation, 'new' or 'update
@@ -24,7 +38,7 @@ class Tx_Tinyurls_Hooks_Tce {
 	 * @param t3lib_TCEmain $tcemain Reference to the TCEmain object that calls this hook
 	 * @see t3lib_TCEmain::hook_processDatamap_afterDatabaseOperations()
 	 */
-	public function processDatamap_afterDatabaseOperations($status, $table, $id, $fieldArray, $tcemain) {
+	public function processDatamap_afterDatabaseOperations($status, $table, $id, &$fieldArray, $tcemain) {
 
 		if ($table != 'tx_tinyurls_urls') {
 			return;
@@ -35,11 +49,10 @@ class Tx_Tinyurls_Hooks_Tce {
 		}
 
 		$tinyUrlData = t3lib_BEfunc::getRecord('tx_tinyurls_urls', $id);
-		$extensionConfiguration = Tx_Tinyurls_Utils_ConfigUtils::getExtensionConfiguration();
 
 		$updateArray = array(
-			'urlkey' => Tx_Tinyurls_Utils_UrlUtils::generateTinyurlKeyForUid($id, $extensionConfiguration),
-			'target_url_hash' => Tx_Tinyurls_Utils_UrlUtils::generateTinyurlHash($tinyUrlData['target_url']),
+			'urlkey' => $this->urlUtils->generateTinyurlKeyForUid($id),
+			'target_url_hash' => $this->urlUtils->generateTinyurlHash($tinyUrlData['target_url']),
 		);
 
 		$fieldArray = array_merge($fieldArray, $updateArray);
