@@ -11,6 +11,7 @@
 
 /**
  * Use this class for generating tiny URLs in your own extension
+ *
  * @api
  */
 class Tx_Tinyurls_TinyUrl_Api {
@@ -87,3 +88,5 @@ class Tx_Tinyurls_TinyUrl_Api {
 		$this->tinyUrlGenerator->setOptionValidUntil($validUntil);
 	}
 }
+
+?>

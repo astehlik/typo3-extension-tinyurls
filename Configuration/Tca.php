@@ -1,8 +1,6 @@
 <?php
 
-if (!defined('TYPO3_MODE')) {
-	die ('Access denied.');
-}
+if (!defined('TYPO3_MODE')) die ('Access denied.');
 
 $TCA['tx_tinyurls_urls'] = array(
 	'ctrl' => $TCA['tx_tinyurls_urls']['ctrl'],
@@ -65,3 +63,5 @@ $TCA['tx_tinyurls_urls'] = array(
 	),
 	'palettes' => array(),
 );
+
+?>

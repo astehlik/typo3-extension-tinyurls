@@ -87,3 +87,5 @@ class Tx_Tinyurls_Utils_UrlUtils implements t3lib_Singleton {
 		return sha1($url);
 	}
 }
+
+?>

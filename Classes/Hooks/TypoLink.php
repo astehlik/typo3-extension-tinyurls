@@ -56,3 +56,5 @@ class Tx_Tinyurls_Hooks_TypoLink {
 		$contentObject->lastTypoLinkUrl = $tinyUrl;
 	}
 }
+
+?>

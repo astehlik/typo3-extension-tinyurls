@@ -126,3 +126,5 @@ class Tx_Tinyurls_Hooks_EidProcessor {
  */
 $eidProcessor  = t3lib_div::makeInstance('tx_tinyurls_hooks_eidprocessor');
 $eidProcessor->main();
+
+?>

@@ -65,3 +65,5 @@ class Tx_Tinyurls_Hooks_Tce {
 	}
 
 }
+
+?>

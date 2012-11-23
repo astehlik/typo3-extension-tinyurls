@@ -255,3 +255,5 @@ class Tx_Tinyurls_TinyUrl_TinyUrlGenerator {
 		}
 	}
 }
+
+?>

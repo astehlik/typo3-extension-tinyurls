@@ -201,3 +201,5 @@ class Tx_Tinyurls_Utils_ConfigUtils implements t3lib_Singleton {
 		}
 	}
 }
+
+?>
