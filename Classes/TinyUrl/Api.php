@@ -71,6 +71,15 @@ class Tx_Tinyurls_TinyUrl_Api {
 	}
 
 	/**
+	 * Sets the marketing option
+	 *
+	 * @param int $marketing
+	 */
+	public function setMarketing($marketing) {
+		$this->tinyUrlGenerator->setOptionMarketing($marketing);
+	}
+
+	/**
 	 * Sets a custom URL key, must be unique
 	 *
 	 * @param string $urlKey

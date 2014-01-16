@@ -69,7 +69,7 @@ class Tx_Tinyurls_Hooks_EidProcessor {
 		$selctWhereStatement = $this->configUtils->appendPidQuery($selctWhereStatement);
 
 		$result = $GLOBALS['TYPO3_DB']->exec_SELECTquery(
-			'urlkey,target_url,delete_on_use',
+			'urlkey,target_url,delete_on_use,counter',
 			'tx_tinyurls_urls',
 			$selctWhereStatement
 		);
@@ -91,6 +91,22 @@ class Tx_Tinyurls_Hooks_EidProcessor {
 			);
 
 			$this->sendNoCacheHeaders();
+		} else {
+
+			// Implementation of Counter
+
+			$updateWhereStatement = 'urlkey=' . $GLOBALS['TYPO3_DB']->fullQuoteStr($tinyUrlData['urlkey'], 'tx_tinyurls_urls');
+			$updateWhereStatement = $this->configUtils->appendPidQuery($updateWhereStatement);
+		
+			// http://lists.typo3.org/pipermail/typo3-dev/2007-December/026936.html
+			// Use of "set counter=counter+1" - avoiding race conditions
+			$GLOBALS['TYPO3_DB']->exec_UPDATEquery(
+				'tx_tinyurls_urls',
+				$updateWhereStatement,
+				 array('counter' => 'counter + 1'),
+				 array('counter')
+				);
+			// END - Implementation of Counter
 		}
 
 		return $tinyUrlData['target_url'];

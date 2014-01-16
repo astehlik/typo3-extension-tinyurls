@@ -44,14 +44,25 @@ class Tx_Tinyurls_Hooks_Tce {
 			return;
 		}
 
+		// newRecord is used for detection of an update or newly created record
+		// on Update do not change the urlkey.
+		$newRecord=false;
+		
 		if (t3lib_div::isFirstPartOfStr($id, 'NEW')) {
 			$id = $tcemain->substNEWwithIDs[$id];
+			$newRecord=true;
 		}
 
 		$tinyUrlData = t3lib_BEfunc::getRecord('tx_tinyurls_urls', $id);
 
+		if ($newRecord) {
+			$urlKey=$this->urlUtils->generateTinyurlKeyForUid($id);
+		} else {
+			$urlKey=$tinyUrlData['urlkey'];
+		}
+		
 		$updateArray = array(
-			'urlkey' => $this->urlUtils->generateTinyurlKeyForUid($id),
+			'urlkey' => $urlKey,
 			'target_url_hash' => $this->urlUtils->generateTinyurlHash($tinyUrlData['target_url']),
 		);
 

@@ -49,6 +49,7 @@ class Tx_Tinyurls_Hooks_TypoLink {
 		 */
 		$tinyUrlApi = t3lib_div::makeInstance('Tx_Tinyurls_TinyUrl_Api');
 		$tinyUrlApi->initializeConfigFromTyposcript($config, $contentObject);
+		$tinyUrl = $tinyUrlApi->setMarketing(false);		// when called from this hook it´s never a marketing URL
 		$tinyUrl = $tinyUrlApi->getTinyUrl($targetUrl);
 
 		$parameters['finalTag'] = str_replace(htmlspecialchars($targetUrl), htmlspecialchars($tinyUrl), $parameters['finalTag']);
