@@ -31,6 +31,15 @@ class Tx_Tinyurls_TinyUrl_TinyUrlGenerator {
 	var $optionDeleteOnUse =  0;
 
 	/**
+	 * If this option is 1 (true) the URL is a "marketing" URL and
+	 * will not be used for Permalinks - even if the url is the same.
+	 * Marketing URLs must be unique because of the counter of each URL.
+	 *
+	 * @var bool
+	 */
+	private $optionMarketing =  0;
+
+	/**
 	 * With this option the user can specify a custom URL key
 	 *
 	 * @var bool
@@ -72,7 +81,7 @@ class Tx_Tinyurls_TinyUrl_TinyUrlGenerator {
 		if (empty($targetUrl)) {
 			return $targetUrl;
 		}
-
+		
 		$targetUrlHash = $this->urlUtils->generateTinyurlHash($targetUrl);
 
 		$tinyUrlData = $this->getExistingTinyurl($targetUrlHash);
@@ -99,6 +108,15 @@ class Tx_Tinyurls_TinyUrl_TinyUrlGenerator {
 	 */
 	public function setOptionDeleteOnUse($deleteOnUse) {
 		$this->optionDeleteOnUse = intval($deleteOnUse);
+	}
+
+	/**
+	 * Sets the marketing option
+	 *
+	 * @param int $marketing
+	 */
+	public function setOptionMarketing($marketing) {
+		$this->optionMarketing = intval($marketing);
 	}
 
 	/**
@@ -166,6 +184,11 @@ class Tx_Tinyurls_TinyUrl_TinyUrlGenerator {
 			'target_url_hash' => $targetUrlHash,
 			'delete_on_use' => $this->optionDeleteOnUse,
 			'valid_until' => $this->optionValidUntil,
+			'tstamp' => 'UNIX_TIMESTAMP(now())',
+			'marketing' => $this->optionMarketing,
+		);
+		$no_quote_fields = array(
+			'tstamp'
 		);
 
 		$customUrlKey = $this->getCustomUrlKey($targetUrlHash);
@@ -175,7 +198,8 @@ class Tx_Tinyurls_TinyUrl_TinyUrlGenerator {
 
 		$GLOBALS['TYPO3_DB']->exec_INSERTquery(
 			'tx_tinyurls_urls',
-			$insertArray
+			$insertArray,
+			$no_quote_fields
 		);
 
 		// if no custom URL key was set, the key is generated using the
@@ -240,6 +264,7 @@ class Tx_Tinyurls_TinyUrl_TinyUrlGenerator {
 	protected function getExistingTinyurl($targetUrlHash) {
 
 		$whereStatement = 'target_url_hash=' . $GLOBALS['TYPO3_DB']->fullQuoteStr($targetUrlHash, 'tx_tinyurls_urls');
+		$whereStatement.= ' AND marketing=' . $this->optionMarketing;
 		$whereStatement = $this->configUtils->appendPidQuery($whereStatement);
 
 		$result = $GLOBALS['TYPO3_DB']->exec_SELECTquery(

@@ -5,7 +5,7 @@ if (!defined('TYPO3_MODE')) die ('Access denied.');
 $TCA['tx_tinyurls_urls'] = array(
 	'ctrl' => $TCA['tx_tinyurls_urls']['ctrl'],
 	'interface' => array(
-		'showRecordFieldList' => 'urlkey,target_url,target_url_hash,delete_on_use,valid_until'
+		'showRecordFieldList' => 'urlkey,target_url,target_url_hash,delete_on_use,valid_until,marketing,comment,counter'
 	),
 	'feInterface' => $TCA['tx_tinyurls_urls']['interface'],
 	'columns' => array(
@@ -24,7 +24,7 @@ $TCA['tx_tinyurls_urls'] = array(
 			'config' => array(
 				'type' => 'input',
 				'size' => 50,
-				'eval' => 'required,trim,nospace,unique',
+				'eval' => 'required,trim,nospace',
 			),
 		),
 		'target_url_hash' => array(
@@ -55,10 +55,37 @@ $TCA['tx_tinyurls_urls'] = array(
 				'default'  => 0,
 			)
 		),
+		'comment' => array(
+			'exclude' => 0,
+			'label' => 'Comment',
+			'config' => array(
+				'type' => 'input',
+				'size' => 50,
+				'max' => 50,
+				'eval' => 'trim',
+			),
+		),
+		'marketing' => array(
+			'exclude' => 0,
+			'label' => 'For marketing use',
+			'config'  => array(
+				'type'    => 'check',
+				'default' => 0
+			)
+		),
+		'counter' => array(
+			'exclude' => 0,
+			'label' => 'Counter',
+			'config' => array(
+				'type' => 'input',
+				'size' => 6,
+				'readOnly' => 1,
+			)
+		),
 	),
 	'types' => array(
 		'0' => array(
-			'showitem' => 'urlkey,target_url,target_url_hash,delete_on_use,valid_until'
+			'showitem' => 'urlkey,target_url,target_url_hash,delete_on_use,valid_until,marketing,comment,counter'
 		),
 	),
 	'palettes' => array(),
