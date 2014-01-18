@@ -9,6 +9,15 @@ $TCA['tx_tinyurls_urls'] = array(
 	),
 	'feInterface' => $TCA['tx_tinyurls_urls']['interface'],
 	'columns' => array(
+		'counter' => array(
+			'exclude' => 0,
+			'label' => 'Counter',
+			'config' => array(
+				'type' => 'input',
+				'size' => 6,
+				'readOnly' => 1,
+			)
+		),
 		'urlkey' => array(
 			'exclude' => 0,
 			'label' => 'URL key',
@@ -58,7 +67,7 @@ $TCA['tx_tinyurls_urls'] = array(
 	),
 	'types' => array(
 		'0' => array(
-			'showitem' => 'urlkey,target_url,target_url_hash,delete_on_use,valid_until'
+			'showitem' => 'urlkey,counter,target_url,target_url_hash,delete_on_use,valid_until'
 		),
 	),
 	'palettes' => array(),
