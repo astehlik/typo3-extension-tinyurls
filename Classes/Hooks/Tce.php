@@ -11,8 +11,11 @@
 
 /**
  * Hooks for the TYPO3 core engine
+ *
+ * @author Alexander Stehlik <alexander.stehlik.deleteme@gmail.com>
+ * @author Sebastian Lemke <s.lemke.deleteme@infoworxx.de>
  */
-class Tx_Tinyurls_Hooks_Tce {
+class Tx_Tinyurls_Hooks_TceDataMap {
 
 	/**
 	 * Tiny URL utilities
@@ -44,17 +47,27 @@ class Tx_Tinyurls_Hooks_Tce {
 			return;
 		}
 
+		$regenerateUrlKey = FALSE;
+
 		if (t3lib_div::isFirstPartOfStr($id, 'NEW')) {
 			$id = $tcemain->substNEWwithIDs[$id];
+			$regenerateUrlKey = TRUE;
 		}
 
 		$tinyUrlData = t3lib_BEfunc::getRecord('tx_tinyurls_urls', $id);
+		$updateArray['target_url_hash'] = $this->urlUtils->generateTinyurlHash($tinyUrlData['target_url']);
 
-		$updateArray = array(
-			'urlkey' => $this->urlUtils->generateTinyurlKeyForUid($id),
-			'target_url_hash' => $this->urlUtils->generateTinyurlHash($tinyUrlData['target_url']),
-		);
+		// If the hash has changed we regenerate the URL key
+		if ($updateArray['target_url_hash'] !== $tinyUrlData['target_url_hash']) {
+			$regenerateUrlKey = TRUE;
+		}
 
+		if ($regenerateUrlKey) {
+			$updateArray['urlkey'] = $this->urlUtils->generateTinyurlKeyForUid($id);
+		}
+
+		// Update the data in the field array so that it is consistent
+		// with the data in the database.
 		$fieldArray = array_merge($fieldArray, $updateArray);
 
 		/**
