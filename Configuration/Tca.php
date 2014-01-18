@@ -18,6 +18,15 @@ $TCA['tx_tinyurls_urls'] = array(
 				'readOnly' => 1,
 			)
 		),
+		'comment' => array(
+			'exclude' => 0,
+			'label' => 'Comment',
+			'config' => array(
+				'type' => 'text',
+				'cols' => '30',
+				'rows' => '3',
+			)
+		),
 		'urlkey' => array(
 			'exclude' => 0,
 			'label' => 'URL key',
@@ -67,7 +76,7 @@ $TCA['tx_tinyurls_urls'] = array(
 	),
 	'types' => array(
 		'0' => array(
-			'showitem' => 'urlkey,counter,target_url,target_url_hash,delete_on_use,valid_until'
+			'showitem' => 'urlkey,counter,target_url,target_url_hash,comment,delete_on_use,valid_until'
 		),
 	),
 	'palettes' => array(),
