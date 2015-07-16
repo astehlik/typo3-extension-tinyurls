@@ -1,0 +1,15 @@
+{
+	"name": "de-swebhosting-typo3-extension/tinyurls",
+	"description": "This extensions allows you to cut down long URLs. It basically works like bitly or TinyURL.",
+	"type": "typo3-cms-extension",
+	"license": "GPL-3.0+",
+	"authors": [
+		{
+			"name": "Alexander Stehlik",
+			"email": "alexander.stehlik@gmail.com"
+		}
+	],
+	"require": {
+
+	}
+}
