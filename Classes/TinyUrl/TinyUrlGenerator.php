@@ -11,6 +11,11 @@ namespace Tx\Tinyurls\TinyUrl;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
+use Tx\Tinyurls\Utils\ConfigUtils;
+use Tx\Tinyurls\Utils\UrlUtils;
+use TYPO3\CMS\Core\Html\HtmlParser;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+
 /**
  * This class is responsible for generating tiny Urls based on configuration
  * options and extension configuration
@@ -20,7 +25,7 @@ class TinyUrlGenerator {
 	/**
 	 * Contains the configuration that can be set in the extension manager
 	 *
-	 * @var Tx\Tinyurls\Utils\ConfigUtils
+	 * @var ConfigUtils
 	 */
 	protected $configUtils;
 
@@ -50,7 +55,7 @@ class TinyUrlGenerator {
 	/**
 	 * Tiny URL utilities
 	 *
-	 * @var Tx\Tinyurls\Utils\UrlUtils
+	 * @var UrlUtils
 	 */
 	var $urlUtils;
 
@@ -58,8 +63,8 @@ class TinyUrlGenerator {
 	 * Initializes the config utils
 	 */
 	public function __construct() {
-		$this->configUtils = t3lib_div::makeInstance('Tx\Tinyurls\Utils\ConfigUtils');
-		$this->urlUtils = t3lib_div::makeInstance('Tx\Tinyurls\Utils\UrlUtils');
+		$this->configUtils = GeneralUtility::makeInstance(ConfigUtils::class);
+		$this->urlUtils = GeneralUtility::makeInstance(UrlUtils::class);
 	}
 
 	/**
@@ -86,7 +91,7 @@ class TinyUrlGenerator {
 		if ($this->configUtils->getExtensionConfigurationValue('createSpeakingURLs')) {
 			$tinyUrl = $this->createSpeakingTinyUrl($tinyUrlKey);
 		} else {
-			$tinyUrl = t3lib_div::getIndpEnv('TYPO3_SITE_URL');
+			$tinyUrl = GeneralUtility::getIndpEnv('TYPO3_SITE_URL');
 			$tinyUrl .= '?eID=tx_tinyurls&tx_tinyurls[key]=' . $tinyUrlKey;
 		}
 
@@ -141,11 +146,11 @@ class TinyUrlGenerator {
 			$templateMarker = '###' . strtoupper($indpEnvKey) . '###';
 
 			if (strstr($speakingUrl, $templateMarker)) {
-				$speakingUrl = t3lib_parsehtml::substituteMarker($speakingUrl, $templateMarker, t3lib_div::getIndpEnv($indpEnvKey));
+				$speakingUrl = HtmlParser::substituteMarker($speakingUrl, $templateMarker, GeneralUtility::getIndpEnv($indpEnvKey));
 			}
 		}
 
-		$speakingUrl = t3lib_parsehtml::substituteMarker($speakingUrl, '###TINY_URL_KEY###', $tinyUrlKey);
+		$speakingUrl = HtmlParser::substituteMarker($speakingUrl, '###TINY_URL_KEY###', $tinyUrlKey);
 
 		return $speakingUrl;
 	}
@@ -175,7 +180,7 @@ class TinyUrlGenerator {
 			$insertArray['urlkey'] = $customUrlKey;
 		}
 
-		$GLOBALS['TYPO3_DB']->exec_INSERTquery(
+		$this->getDatabaseConnection()->exec_INSERTquery(
 			'tx_tinyurls_urls',
 			$insertArray
 		);
@@ -183,9 +188,9 @@ class TinyUrlGenerator {
 		// if no custom URL key was set, the key is generated using the
 		// uid from the database
 		if ($customUrlKey === FALSE) {
-			$insertedUid = $GLOBALS['TYPO3_DB']->sql_insert_id();
+			$insertedUid = $this->getDatabaseConnection()->sql_insert_id();
 			$tinyUrlKey = $this->urlUtils->generateTinyurlKeyForUid($insertedUid);
-			$GLOBALS['TYPO3_DB']->exec_UPDATEquery('tx_tinyurls_urls', 'uid=' . $insertedUid, array('urlkey' => $tinyUrlKey));
+			$this->getDatabaseConnection()->exec_UPDATEquery('tx_tinyurls_urls', 'uid=' . $insertedUid, array('urlkey' => $tinyUrlKey));
 			$insertArray['urlkey'] = $tinyUrlKey;
 		}
 
@@ -198,7 +203,7 @@ class TinyUrlGenerator {
 	 *
 	 * @param string $targetUrlHash The target url hash is needed to check if the custom key matches the target url
 	 * @return bool|string FALSE if no custom key was set, otherwise the custom key
-	 * @throws Exception If custom url key was set but empty or if the key already existed with a different URL
+	 * @throws \Exception If custom url key was set but empty or if the key already existed with a different URL
 	 */
 	protected function getCustomUrlKey($targetUrlHash) {
 
@@ -209,28 +214,35 @@ class TinyUrlGenerator {
 		}
 
 		if (empty($customUrlKey)) {
-			throw new Exception('An empty url key was set.');
+			throw new \Exception('An empty url key was set.');
 		}
 
-		$customUrlKeyWhere = 'urlkey=' . $GLOBALS['TYPO3_DB']->fullQuoteStr($customUrlKey, 'tx_tinyurls_urls');
+		$customUrlKeyWhere = 'urlkey=' . $this->getDatabaseConnection()->fullQuoteStr($customUrlKey, 'tx_tinyurls_urls');
 		$customUrlKeyWhere = $this->configUtils->appendPidQuery($customUrlKeyWhere);
 
-		$customUrlKeyResult = $GLOBALS['TYPO3_DB']->exec_SELECTquery(
+		$customUrlKeyResult = $this->getDatabaseConnection()->exec_SELECTquery(
 			'target_url',
 			'tx_tinyurls_urls',
 			$customUrlKeyWhere
 		);
 
-		if ($GLOBALS['TYPO3_DB']->sql_num_rows($customUrlKeyResult)) {
+		if ($this->getDatabaseConnection()->sql_num_rows($customUrlKeyResult)) {
 
-			$existingUrlData = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($customUrlKeyResult);
+			$existingUrlData = $this->getDatabaseConnection()->sql_fetch_assoc($customUrlKeyResult);
 
 			if ($existingUrlData['target_url_hash'] !== $targetUrlHash) {
-				throw new Exception('A url key was set that already exists in the database and points to a different URL.');
+				throw new \Exception('A url key was set that already exists in the database and points to a different URL.');
 			}
 		}
 
 		return $customUrlKey;
+	}
+
+	/**
+	 * @return \TYPO3\CMS\Core\Database\DatabaseConnection
+	 */
+	protected function getDatabaseConnection() {
+		return $GLOBALS['TYPO3_DB'];
 	}
 
 	/**
@@ -241,21 +253,19 @@ class TinyUrlGenerator {
 	 */
 	protected function getExistingTinyurl($targetUrlHash) {
 
-		$whereStatement = 'target_url_hash=' . $GLOBALS['TYPO3_DB']->fullQuoteStr($targetUrlHash, 'tx_tinyurls_urls');
+		$whereStatement = 'target_url_hash=' . $this->getDatabaseConnection()->fullQuoteStr($targetUrlHash, 'tx_tinyurls_urls');
 		$whereStatement = $this->configUtils->appendPidQuery($whereStatement);
 
-		$result = $GLOBALS['TYPO3_DB']->exec_SELECTquery(
+		$result = $this->getDatabaseConnection()->exec_SELECTquery(
 			'*',
 			'tx_tinyurls_urls',
 			$whereStatement
 		);
 
-		if (!$GLOBALS['TYPO3_DB']->sql_num_rows($result)) {
+		if (!$this->getDatabaseConnection()->sql_num_rows($result)) {
 			return FALSE;
 		} else {
-			return $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result);
+			return $this->getDatabaseConnection()->sql_fetch_assoc($result);
 		}
 	}
 }
-
-?>
