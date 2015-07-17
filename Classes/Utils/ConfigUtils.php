@@ -1,4 +1,6 @@
 <?php
+namespace Tx\Tinyurls\Utils;
+
 /*                                                                        *
  * This script belongs to the TYPO3 extension "tinyurls".                 *
  *                                                                        *
@@ -9,10 +11,12 @@
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
+use TYPO3\CMS\Core\SingletonInterface;
+
 /**
  * Contains utilities for getting configuration
  */
-class Tx_Tinyurls_Utils_ConfigUtils implements t3lib_Singleton {
+class ConfigUtils implements SingletonInterface {
 
 	/**
 	 * Contains all valid keys for t3lib_div::getIndpEnv()
@@ -152,7 +156,7 @@ class Tx_Tinyurls_Utils_ConfigUtils implements t3lib_Singleton {
 	 *
 	 * @param string $key the configuration key
 	 * @return mixed the configuration value
-	 * @throws InvalidArgumentException if the configuration key does not exist
+	 * @throws \InvalidArgumentException if the configuration key does not exist
 	 */
 	public function getExtensionConfigurationValue($key) {
 
@@ -161,7 +165,7 @@ class Tx_Tinyurls_Utils_ConfigUtils implements t3lib_Singleton {
 		}
 
 		if (!array_key_exists($key, $this->extensionConfiguration)) {
-			throw new InvalidArgumentException('The key ' . $key . ' does not exists in the extension configuration');
+			throw new \InvalidArgumentException('The key ' . $key . ' does not exists in the extension configuration');
 		}
 
 		return $this->extensionConfiguration[$key];
@@ -172,8 +176,8 @@ class Tx_Tinyurls_Utils_ConfigUtils implements t3lib_Singleton {
 	 * if the user set his own values they are parsed through stdWrap
 	 *
 	 * @param array $config
-	 * @param tslib_cObj $contentObject
-	 * @param Tx_Tinyurls_TinyUrl_TinyUrlGenerator $tinyUrlGenerator
+	 * @param \TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer $contentObject
+	 * @param \Tx\Tinyurls\TinyUrl\TinyUrlGenerator $tinyUrlGenerator
 	 */
 	public function initializeConfigFromTyposcript($config, $contentObject, $tinyUrlGenerator) {
 
@@ -201,5 +205,3 @@ class Tx_Tinyurls_Utils_ConfigUtils implements t3lib_Singleton {
 		}
 	}
 }
-
-?>

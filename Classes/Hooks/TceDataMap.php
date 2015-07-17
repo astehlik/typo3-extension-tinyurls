@@ -1,4 +1,6 @@
 <?php
+namespace Tx\Tinyurls\Hooks;
+
 /*                                                                        *
  * This script belongs to the TYPO3 extension "tinyurls".                 *
  *                                                                        *
@@ -9,18 +11,22 @@
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
+use Tx\Tinyurls\Utils\UrlUtils;
+use TYPO3\CMS\Backend\Utility\BackendUtility;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+
 /**
  * Hooks for the TYPO3 core engine
  *
  * @author Alexander Stehlik <alexander.stehlik.deleteme@gmail.com>
  * @author Sebastian Lemke <s.lemke.deleteme@infoworxx.de>
  */
-class Tx_Tinyurls_Hooks_TceDataMap {
+class TceDataMap {
 
 	/**
 	 * Tiny URL utilities
 	 *
-	 * @var Tx_Tinyurls_Utils_UrlUtils
+	 * @var UrlUtils
 	 */
 	var $urlUtils;
 
@@ -28,7 +34,7 @@ class Tx_Tinyurls_Hooks_TceDataMap {
 	 * Initializes the URL utils
 	 */
 	public function __construct() {
-		$this->urlUtils = t3lib_div::makeInstance('Tx_Tinyurls_Utils_UrlUtils');
+		$this->urlUtils = GeneralUtility::makeInstance(UrlUtils::class);
 	}
 
 	/**
@@ -38,10 +44,13 @@ class Tx_Tinyurls_Hooks_TceDataMap {
 	 * @param string $table (refrence) The table currently processing data for
 	 * @param string $id (reference) The record uid currently processing data for, [integer] or [string] (like 'NEW...')
 	 * @param array $fieldArray (reference) The field array of a record
-	 * @param t3lib_TCEmain $tcemain Reference to the TCEmain object that calls this hook
+	 * @param \TYPO3\CMS\Core\DataHandling\DataHandler $tcemain Reference to the TCEmain object that calls this hook
 	 * @see t3lib_TCEmain::hook_processDatamap_afterDatabaseOperations()
 	 */
-	public function processDatamap_afterDatabaseOperations($status, $table, $id, &$fieldArray, $tcemain) {
+	public function processDatamap_afterDatabaseOperations(
+		/** @noinspection PhpUnusedParameterInspection */
+		$status, $table, $id, &$fieldArray, $tcemain
+	) {
 
 		if ($table != 'tx_tinyurls_urls') {
 			return;
@@ -49,12 +58,12 @@ class Tx_Tinyurls_Hooks_TceDataMap {
 
 		$regenerateUrlKey = FALSE;
 
-		if (t3lib_div::isFirstPartOfStr($id, 'NEW')) {
+		if (GeneralUtility::isFirstPartOfStr($id, 'NEW')) {
 			$id = $tcemain->substNEWwithIDs[$id];
 			$regenerateUrlKey = TRUE;
 		}
 
-		$tinyUrlData = t3lib_BEfunc::getRecord('tx_tinyurls_urls', $id);
+		$tinyUrlData = BackendUtility::getRecord('tx_tinyurls_urls', $id);
 		$updateArray['target_url_hash'] = $this->urlUtils->generateTinyurlHash($tinyUrlData['target_url']);
 
 		// If the hash has changed we regenerate the URL key
@@ -70,13 +79,13 @@ class Tx_Tinyurls_Hooks_TceDataMap {
 		// with the data in the database.
 		$fieldArray = array_merge($fieldArray, $updateArray);
 
-		/**
-		 * @var t3lib_db $db
-		 */
-		$db = $GLOBALS['TYPO3_DB'];
-		$db->exec_UPDATEquery('tx_tinyurls_urls', 'uid=' . $id, $updateArray);
+		$this->getDatabaseConnection()->exec_UPDATEquery('tx_tinyurls_urls', 'uid=' . $id, $updateArray);
 	}
 
+	/**
+	 * @return \TYPO3\CMS\Core\Database\DatabaseConnection
+	 */
+	protected function getDatabaseConnection() {
+		return $GLOBALS['TYPO3_DB'];
+	}
 }
-
-?>

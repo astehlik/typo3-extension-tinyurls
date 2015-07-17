@@ -1,4 +1,6 @@
 <?php
+namespace Tx\Tinyurls\Hooks;
+
 /*                                                                        *
  * This script belongs to the TYPO3 extension "tinyurls".                 *
  *                                                                        *
@@ -9,18 +11,23 @@
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
+use Tx\Tinyurls\Utils\ConfigUtils;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Core\Utility\HttpUtility;
+use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
+
 /**
  * Handles tiny URLs with the TYPO3 eID mechanism
  *
  * @author Alexander Stehlik <alexander.stehlik.deleteme@gmail.com>
  * @author Sebastian Lemke <s.lemke.deleteme@infoworxx.de>
  */
-class Tx_Tinyurls_Hooks_EidProcessor {
+class EidProcessor {
 
 	/**
 	 * Contains the extension configration
 	 *
-	 * @var Tx_Tinyurls_Utils_ConfigUtils
+	 * @var \Tx\Tinyurls\Utils\ConfigUtils
 	 */
 	var $configUtils;
 
@@ -28,7 +35,7 @@ class Tx_Tinyurls_Hooks_EidProcessor {
 	 * Initializes the extension configuration
 	 */
 	public function __construct() {
-		$this->configUtils = t3lib_div::makeInstance('Tx_Tinyurls_Utils_ConfigUtils');
+		$this->configUtils = GeneralUtility::makeInstance(ConfigUtils::class);
 	}
 
 	/**
@@ -38,16 +45,12 @@ class Tx_Tinyurls_Hooks_EidProcessor {
 	public function main() {
 
 		try {
-			tslib_eidtools::connectDB();
 			$this->purgeInvalidUrls();
 			$tinyUrlData = $this->getTinyUrlData();
 			$this->countUrlHit($tinyUrlData);
-			t3lib_utility_Http::redirect($tinyUrlData['target_url'], t3lib_utility_http::HTTP_STATUS_301);
-		} catch (Exception $exception) {
-			/**
-			 * @var $tsfe tslib_fe
-			 */
-			$tsfe = t3lib_div::makeInstance('tslib_fe', $GLOBALS['TYPO3_CONF_VARS'], 0, 0);
+			HttpUtility::redirect($tinyUrlData['target_url'], HttpUtility::HTTP_STATUS_301);
+		} catch (\Exception $exception) {
+			$tsfe = GeneralUtility::makeInstance(TypoScriptFrontendController::class, $GLOBALS['TYPO3_CONF_VARS'], 0, 0);
 			$tsfe->pageNotFoundAndExit($exception->getMessage());
 		}
 	}
@@ -66,7 +69,7 @@ class Tx_Tinyurls_Hooks_EidProcessor {
 
 		// http://lists.typo3.org/pipermail/typo3-dev/2007-December/026936.html
 		// Use of "set counter=counter+1" - avoiding race conditions
-		$GLOBALS['TYPO3_DB']->exec_UPDATEquery(
+		$this->getDatabaseConnection()->exec_UPDATEquery(
 			'tx_tinyurls_urls',
 			'uid=' . (integer)$tinyUrlData['uid'],
 			array('counter' => 'counter + 1'),
@@ -75,43 +78,50 @@ class Tx_Tinyurls_Hooks_EidProcessor {
 	}
 
 	/**
+	 * @return \TYPO3\CMS\Core\Database\DatabaseConnection
+	 */
+	protected function getDatabaseConnection() {
+		return $GLOBALS['TYPO3_DB'];
+	}
+
+	/**
 	 * Returns the data of the tiny URL record that was found by the submitted tinyurl key.
 	 *
 	 * @return array
-	 * @throws RuntimeException If the target url can not be resolved
+	 * @throws \RuntimeException If the target url can not be resolved
 	 */
 	protected function getTinyUrlData() {
 
-		$getVariables = t3lib_div::_GET('tx_tinyurls');
+		$getVariables = GeneralUtility::_GET('tx_tinyurls');
 		$tinyUrlKey = NULL;
 
 		if (is_array($getVariables) && array_key_exists('key', $getVariables)) {
 			$tinyUrlKey = $getVariables['key'];
 		} else {
-			throw new RuntimeException('No tinyurl key was submitted.');
+			throw new \RuntimeException('No tinyurl key was submitted.');
 		}
 
-		$selctWhereStatement = 'urlkey=' . $GLOBALS['TYPO3_DB']->fullQuoteStr($tinyUrlKey, 'tx_tinyurls_urls');
+		$selctWhereStatement = 'urlkey=' . $this->getDatabaseConnection()->fullQuoteStr($tinyUrlKey, 'tx_tinyurls_urls');
 		$selctWhereStatement = $this->configUtils->appendPidQuery($selctWhereStatement);
 
-		$result = $GLOBALS['TYPO3_DB']->exec_SELECTquery(
+		$result = $this->getDatabaseConnection()->exec_SELECTquery(
 			'uid,urlkey,target_url,delete_on_use',
 			'tx_tinyurls_urls',
 			$selctWhereStatement
 		);
 
-		if (!$GLOBALS['TYPO3_DB']->sql_num_rows($result)) {
-			throw new RuntimeException('The given tinyurl key was not found in the database.');
+		if (!$this->getDatabaseConnection()->sql_num_rows($result)) {
+			throw new \RuntimeException('The given tinyurl key was not found in the database.');
 		}
 
-		$tinyUrlData = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result);
+		$tinyUrlData = $this->getDatabaseConnection()->sql_fetch_assoc($result);
 
 		if ($tinyUrlData['delete_on_use']) {
 
-			$deleteWhereStatement = 'urlkey=' . $GLOBALS['TYPO3_DB']->fullQuoteStr($tinyUrlData['urlkey'], 'tx_tinyurls_urls');
+			$deleteWhereStatement = 'urlkey=' . $this->getDatabaseConnection()->fullQuoteStr($tinyUrlData['urlkey'], 'tx_tinyurls_urls');
 			$deleteWhereStatement = $this->configUtils->appendPidQuery($deleteWhereStatement);
 
-			$GLOBALS['TYPO3_DB']->exec_DELETEquery(
+			$this->getDatabaseConnection()->exec_DELETEquery(
 				'tx_tinyurls_urls',
 				$deleteWhereStatement
 			);
@@ -130,7 +140,7 @@ class Tx_Tinyurls_Hooks_EidProcessor {
 		$purgeWhereStatement = 'valid_until>0 AND valid_until<' . time();
 		$purgeWhereStatement = $this->configUtils->appendPidQuery($purgeWhereStatement);
 
-		$GLOBALS['TYPO3_DB']->exec_DELETEquery(
+		$this->getDatabaseConnection()->exec_DELETEquery(
 			'tx_tinyurls_urls',
 			$purgeWhereStatement
 		);
@@ -147,10 +157,5 @@ class Tx_Tinyurls_Hooks_EidProcessor {
 	}
 }
 
-/**
- * @var Tx_Tinyurls_Hooks_EidProcessor $eidProcessor
- */
-$eidProcessor  = t3lib_div::makeInstance('tx_tinyurls_hooks_eidprocessor');
+$eidProcessor = GeneralUtility::makeInstance(EidProcessor::class);
 $eidProcessor->main();
-
-?>

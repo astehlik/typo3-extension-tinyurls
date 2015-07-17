@@ -9,7 +9,12 @@
 			"email": "alexander.stehlik@gmail.com"
 		}
 	],
+	"autoload": {
+		"psr-4": {
+			"Tx\\Tinyurls\\": "Classes/"
+		}
+	},
 	"require": {
-
+		"php" : ">=5.5.0"
 	}
 }

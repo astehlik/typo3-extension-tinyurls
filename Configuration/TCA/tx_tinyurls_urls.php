@@ -1,13 +1,20 @@
 <?php
-
-if (!defined('TYPO3_MODE')) die ('Access denied.');
-
-$TCA['tx_tinyurls_urls'] = array(
-	'ctrl' => $TCA['tx_tinyurls_urls']['ctrl'],
+return array(
+	'ctrl' => array(
+		'title' => 'Tiny URL',
+		'label' => 'target_url',
+		'tstamp' => 'tstamp',
+		'default_sortby' => 'ORDER BY target_url',
+		'enablecolumns' => array(
+			'endtime' => 'valid_until',
+		),
+		'iconfile' => \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extRelPath('tinyurls') . 'ext_icon.gif',
+		'searchFields' => 'urlkey,target_url,target_url_hash',
+		'rootLevel' => -1,
+	),
 	'interface' => array(
 		'showRecordFieldList' => 'urlkey,target_url,target_url_hash,delete_on_use,valid_until'
 	),
-	'feInterface' => $TCA['tx_tinyurls_urls']['interface'],
 	'columns' => array(
 		'counter' => array(
 			'exclude' => 0,
@@ -58,19 +65,19 @@ $TCA['tx_tinyurls_urls'] = array(
 		'delete_on_use' => array(
 			'exclude' => 0,
 			'label' => 'Delete on use',
-			'config'  => array(
-				'type'    => 'check',
+			'config' => array(
+				'type' => 'check',
 				'default' => 0
 			)
 		),
 		'valid_until' => array(
-			'label'   => 'Valid until',
-			'config'  => array(
-				'type'     => 'input',
-				'size'     => 10,
-				'max'      => 20,
-				'eval'     => 'datetime',
-				'default'  => 0,
+			'label' => 'Valid until',
+			'config' => array(
+				'type' => 'input',
+				'size' => 10,
+				'max' => 20,
+				'eval' => 'datetime',
+				'default' => 0,
 			)
 		),
 	),
@@ -81,5 +88,3 @@ $TCA['tx_tinyurls_urls'] = array(
 	),
 	'palettes' => array(),
 );
-
-?>

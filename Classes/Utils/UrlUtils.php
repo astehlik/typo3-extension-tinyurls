@@ -1,4 +1,6 @@
 <?php
+namespace Tx\Tinyurls\Utils;
+
 /*                                                                        *
  * This script belongs to the TYPO3 extension "tinyurls".                 *
  *                                                                        *
@@ -9,15 +11,18 @@
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
+use TYPO3\CMS\Core\SingletonInterface;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+
 /**
  * Contains utilities for creating tiny url keys and url hashes
  */
-class Tx_Tinyurls_Utils_UrlUtils implements t3lib_Singleton {
+class UrlUtils implements SingletonInterface {
 
 	/**
 	 * Contains the extension configration
 	 *
-	 * @var Tx_Tinyurls_Utils_ConfigUtils
+	 * @var ConfigUtils
 	 */
 	var $configUtils;
 
@@ -25,7 +30,7 @@ class Tx_Tinyurls_Utils_UrlUtils implements t3lib_Singleton {
 	 * Initializes the extension configuration
 	 */
 	public function __construct() {
-		$this->configUtils = t3lib_div::makeInstance('Tx_Tinyurls_Utils_ConfigUtils');
+		$this->configUtils = GeneralUtility::makeInstance(ConfigUtils::class);
 	}
 
 	/**
@@ -72,7 +77,7 @@ class Tx_Tinyurls_Utils_UrlUtils implements t3lib_Singleton {
 			return $tinyUrlKey;
 		}
 
-		$tinyUrlKey .= '-' . t3lib_div::getRandomHexString($numberOfFillupChars);
+		$tinyUrlKey .= '-' . GeneralUtility::getRandomHexString($numberOfFillupChars);
 
 		return $tinyUrlKey;
 	}
@@ -87,5 +92,3 @@ class Tx_Tinyurls_Utils_UrlUtils implements t3lib_Singleton {
 		return sha1($url);
 	}
 }
-
-?>

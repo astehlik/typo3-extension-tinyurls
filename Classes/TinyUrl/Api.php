@@ -1,4 +1,6 @@
 <?php
+namespace Tx\Tinyurls\TinyUrl;
+
 /*                                                                        *
  * This script belongs to the TYPO3 extension "tinyurls".                 *
  *                                                                        *
@@ -9,20 +11,24 @@
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
+use Tx\Tinyurls\Utils\ConfigUtils;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
+
 /**
  * Use this class for generating tiny URLs in your own extension
  *
  * @api
  */
-class Tx_Tinyurls_TinyUrl_Api {
+class Api {
 
 	/**
-	 * @var Tx_Tinyurls_TinyUrl_TinyUrlGenerator
+	 * @var TinyUrlGenerator
 	 */
 	var $tinyUrlGenerator;
 
 	/**
-	 * @var Tx_Tinyurls_Utils_ConfigUtils
+	 * @var ConfigUtils
 	 */
 	var $tinyUrlConfigUtils;
 
@@ -30,8 +36,8 @@ class Tx_Tinyurls_TinyUrl_Api {
 	 * Initializes the tinyUrl generator
 	 */
 	public function __construct() {
-		$this->tinyUrlGenerator = t3lib_div::makeInstance('Tx_Tinyurls_TinyUrl_TinyUrlGenerator');
-		$this->tinyUrlConfigUtils = t3lib_div::makeInstance('Tx_Tinyurls_Utils_ConfigUtils');
+		$this->tinyUrlGenerator = GeneralUtility::makeInstance(TinyUrlGenerator::class);
+		$this->tinyUrlConfigUtils = GeneralUtility::makeInstance(ConfigUtils::class);
 	}
 
 	/**
@@ -53,7 +59,7 @@ class Tx_Tinyurls_TinyUrl_Api {
 	 * stdWrap
 	 *
 	 * @param array $config the TypoScript configuration of a typolink, the config options must be set within the tinyurl. namespace
-	 * @param tslib_cObj $contentObject The parent content object (used for running stdWrap)
+	 * @param ContentObjectRenderer $contentObject The parent content object (used for running stdWrap)
 	 * @api
 	 */
 	public function initializeConfigFromTyposcript($config, $contentObject) {
@@ -88,5 +94,3 @@ class Tx_Tinyurls_TinyUrl_Api {
 		$this->tinyUrlGenerator->setOptionValidUntil($validUntil);
 	}
 }
-
-?>

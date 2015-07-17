@@ -1,4 +1,6 @@
 <?php
+namespace Tx\Tinyurls\TinyUrl;
+
 /*                                                                        *
  * This script belongs to the TYPO3 extension "tinyurls".                 *
  *                                                                        *
@@ -13,12 +15,12 @@
  * This class is responsible for generating tiny Urls based on configuration
  * options and extension configuration
  */
-class Tx_Tinyurls_TinyUrl_TinyUrlGenerator {
+class TinyUrlGenerator {
 
 	/**
 	 * Contains the configuration that can be set in the extension manager
 	 *
-	 * @var Tx_Tinyurls_Utils_ConfigUtils
+	 * @var Tx\Tinyurls\Utils\ConfigUtils
 	 */
 	protected $configUtils;
 
@@ -48,7 +50,7 @@ class Tx_Tinyurls_TinyUrl_TinyUrlGenerator {
 	/**
 	 * Tiny URL utilities
 	 *
-	 * @var Tx_Tinyurls_Utils_UrlUtils
+	 * @var Tx\Tinyurls\Utils\UrlUtils
 	 */
 	var $urlUtils;
 
@@ -56,8 +58,8 @@ class Tx_Tinyurls_TinyUrl_TinyUrlGenerator {
 	 * Initializes the config utils
 	 */
 	public function __construct() {
-		$this->configUtils = t3lib_div::makeInstance('Tx_Tinyurls_Utils_ConfigUtils');
-		$this->urlUtils = t3lib_div::makeInstance('Tx_Tinyurls_Utils_UrlUtils');
+		$this->configUtils = t3lib_div::makeInstance('Tx\Tinyurls\Utils\ConfigUtils');
+		$this->urlUtils = t3lib_div::makeInstance('Tx\Tinyurls\Utils\UrlUtils');
 	}
 
 	/**

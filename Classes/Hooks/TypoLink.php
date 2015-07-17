@@ -1,4 +1,6 @@
 <?php
+namespace Tx\Tinyurls\Hooks;
+
 /*                                                                        *
  * This script belongs to the TYPO3 extension "tinyurls".                 *
  *                                                                        *
@@ -9,12 +11,16 @@
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
+use Tx\Tinyurls\TinyUrl\Api;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
+
 /**
  * Contains a hook for the typolink generation to convert a typolink
  * in a tinyurl. Additionally, it contains a public api for generating
  * a tinyurl in another extension.
  */
-class Tx_Tinyurls_Hooks_TypoLink {
+class TypoLink {
 
 	/**
 	 * Will be called by the typolink hook and replace the original url
@@ -27,7 +33,7 @@ class Tx_Tinyurls_Hooks_TypoLink {
 	 * finalTag: reference to the final link tag
 	 * finalTagParts: reference to the array that contains the tag parts (aTagParams, url, TYPE, targetParams, TAG)
 	 *
-	 * @param tslib_cObj $contentObject The parent content object
+	 * @param ContentObjectRenderer $contentObject The parent content object
 	 */
 	public function convertTypolinkToTinyUrl($parameters, $contentObject) {
 
@@ -44,10 +50,7 @@ class Tx_Tinyurls_Hooks_TypoLink {
 
 		$targetUrl = $finalTagParts['url'];
 
-		/**
-		 * @var Tx_Tinyurls_TinyUrl_Api $tinyUrlApi
-		 */
-		$tinyUrlApi = t3lib_div::makeInstance('Tx_Tinyurls_TinyUrl_Api');
+		$tinyUrlApi = GeneralUtility::makeInstance(Api::class);
 		$tinyUrlApi->initializeConfigFromTyposcript($config, $contentObject);
 		$tinyUrl = $tinyUrlApi->getTinyUrl($targetUrl);
 
@@ -56,5 +59,3 @@ class Tx_Tinyurls_Hooks_TypoLink {
 		$contentObject->lastTypoLinkUrl = $tinyUrl;
 	}
 }
-
-?>
