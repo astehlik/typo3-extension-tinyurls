@@ -28,7 +28,7 @@ class TypoScriptTest extends FunctionalTestCase {
 	/**
 	 * Imports the pages database fixture.
 	 */
-	protected function setUp() {
+	public function setUp() {
 		parent::setUp();
 		$this->importDataSet(ORIGINAL_ROOT . 'typo3/sysext/core/Tests/Functional/Fixtures/pages.xml');
 	}
