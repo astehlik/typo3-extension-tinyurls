@@ -29,6 +29,6 @@ class TinyurlsApiTest extends FunctionalTestCase {
 	 * @test
 	 */
 	public function dummyTest() {
-
+		$this->assertTrue(TRUE);
 	}
 }
