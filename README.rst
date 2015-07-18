@@ -2,7 +2,8 @@
 tinyurls TYPO3 Extension
 ========================
 
-.. image:: https://travis-ci.org/astehlik/typo3-extension-tinyurls.svg?branch=master
+.. image:: https://travis-ci.org/astehlik/typo3-extension-tinyurls.svg?branch=feature%2Ftravis-integration
+    :target: https://travis-ci.org/astehlik/typo3-extension-tinyurls
 
 This is a TYPO3 Extension for converting a normal URL to a tiny URL.
 
