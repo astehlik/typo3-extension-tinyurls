@@ -11,12 +11,12 @@ namespace Tx\Tinyurls\Tests\TinyUrl;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
-use TYPO3\CMS\Core\Tests\UnitTestCase;
+use PHPUnit_Framework_TestCase as PHPUnitTestCase;
 
 /**
  * Tests for the tinyurls API.
  */
-class ApiTest extends UnitTestCase {
+class ApiTest extends PHPUnitTestCase {
 
 	/**
 	 * @test
