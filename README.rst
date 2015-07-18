@@ -2,6 +2,8 @@
 tinyurls TYPO3 Extension
 ========================
 
+.. image:: https://travis-ci.org/astehlik/typo3-extension-tinyurls.svg?branch=master
+
 This is a TYPO3 Extension for converting a normal URL to a tiny URL.
 
 It works similar as services provided by https://bitly.com/ or http://tinyurl.com/.
