@@ -67,10 +67,10 @@ class Api {
 	}
 
 	/**
-	 * Sets the deleteOnUse option, if 1 the URL will be deleted from
+	 * Sets the deleteOnUse option, if TRUE the URL will be deleted from
 	 * the database on the first hit
 	 *
-	 * @param int $deleteOnUse
+	 * @param bool $deleteOnUse
 	 */
 	public function setDeleteOnUse($deleteOnUse) {
 		$this->tinyUrlGenerator->setOptionDeleteOnUse($deleteOnUse);
