@@ -19,37 +19,6 @@ use TYPO3\CMS\Core\SingletonInterface;
 class ConfigUtils implements SingletonInterface {
 
 	/**
-	 * Contains all valid keys for t3lib_div::getIndpEnv()
-	 *
-	 * @var array
-	 */
-	protected $availableIndpEnvKeys = array(
-		'REQUEST_URI',
-		'HTTP_HOST',
-		'SCRIPT_NAME',
-		'PATH_INFO',
-		'QUERY_STRING',
-		'HTTP_REFERER',
-		'REMOTE_ADDR',
-		'REMOTE_HOST',
-		'HTTP_USER_AGENT',
-		'HTTP_ACCEPT_LANGUAGE',
-		'SCRIPT_FILENAME',
-		'TYPO3_HOST_ONLY',
-		'TYPO3_PORT',
-		'TYPO3_REQUEST_HOST',
-		'TYPO3_REQUEST_URL',
-		'TYPO3_REQUEST_SCRIPT',
-		'TYPO3_REQUEST_DIR',
-		'TYPO3_SITE_URL',
-		'TYPO3_SITE_PATH',
-		'TYPO3_SITE_SCRIPT',
-		'TYPO3_DOCUMENT_ROOT',
-		'TYPO3_SSL',
-		'TYPO3_PROXY',
-	);
-
-	/**
 	 * Contains the default values for the extension configuration
 	 *
 	 * @var array
@@ -126,15 +95,6 @@ class ConfigUtils implements SingletonInterface {
 		$whereStatement .= 'pid=' . intval($this->getExtensionConfigurationValue('urlRecordStoragePID'));
 
 		return $whereStatement;
-	}
-
-	/**
-	 * Returns all valid keys for t3lib_div::getIndpEnv()
-	 *
-	 * @return array
-	 */
-	public function getAvailableIndpEnvKeys() {
-		return $this->availableIndpEnvKeys;
 	}
 
 	/**
