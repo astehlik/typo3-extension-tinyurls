@@ -13,7 +13,6 @@ namespace Tx\Tinyurls\TinyUrl;
 
 use Tx\Tinyurls\Utils\ConfigUtils;
 use Tx\Tinyurls\Utils\UrlUtils;
-use TYPO3\CMS\Core\Html\HtmlParser;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
@@ -89,7 +88,7 @@ class TinyUrlGenerator {
 
 		$tinyUrlKey = $tinyUrlData['urlkey'];
 		if ($this->configUtils->getExtensionConfigurationValue('createSpeakingURLs')) {
-			$tinyUrl = $this->createSpeakingTinyUrl($tinyUrlKey);
+			$tinyUrl = $this->urlUtils->generateTinyurlHash($tinyUrlKey);
 		} else {
 			$tinyUrl = GeneralUtility::getIndpEnv('TYPO3_SITE_URL');
 			$tinyUrl .= '?eID=tx_tinyurls&tx_tinyurls[key]=' . $tinyUrlKey;
@@ -129,30 +128,6 @@ class TinyUrlGenerator {
 	 */
 	public function setOptionValidUntil($validUntil) {
 		$this->optionValidUntil = intval($validUntil);
-	}
-
-	/**
-	 * Generates a speaking tinyurl based on the speaking url template
-	 *
-	 * @param $tinyUrlKey
-	 * @return string
-	 */
-	protected function createSpeakingTinyUrl($tinyUrlKey) {
-
-		$speakingUrl = $this->configUtils->getExtensionConfigurationValue('speakingUrlTemplate');
-
-		foreach ($this->configUtils->getAvailableIndpEnvKeys() as $indpEnvKey) {
-
-			$templateMarker = '###' . strtoupper($indpEnvKey) . '###';
-
-			if (strstr($speakingUrl, $templateMarker)) {
-				$speakingUrl = HtmlParser::substituteMarker($speakingUrl, $templateMarker, GeneralUtility::getIndpEnv($indpEnvKey));
-			}
-		}
-
-		$speakingUrl = HtmlParser::substituteMarker($speakingUrl, '###TINY_URL_KEY###', $tinyUrlKey);
-
-		return $speakingUrl;
 	}
 
 	/**

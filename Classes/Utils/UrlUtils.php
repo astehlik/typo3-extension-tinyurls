@@ -56,6 +56,32 @@ class UrlUtils implements SingletonInterface {
 	}
 
 	/**
+	 * Generates a speaking tinyurl based on the speaking url template
+	 *
+	 * @param $tinyUrlKey
+	 * @return string
+	 */
+	public function createSpeakingTinyUrl($tinyUrlKey) {
+
+		$speakingUrl = $this->configUtils->getExtensionConfigurationValue('speakingUrlTemplate');
+
+		$speakingUrl = HtmlParser::substituteMarker($speakingUrl, '###TINY_URL_KEY###', $tinyUrlKey);
+
+		$matches = array();
+		preg_match_all('/###(.*?)###/', $speakingUrl, $matches);
+
+		if (empty($matches[1])) {
+			return $speakingUrl;
+		}
+
+		foreach ($matches[1] as $match) {
+			$speakingUrl = HtmlParser::substituteMarker($speakingUrl, '###' . $match . '###', $this->getIndependentEnvironmentVariable($match));
+		}
+
+		return $speakingUrl;
+	}
+
+	/**
 	 * Generates a unique tinyurl key for the record with the given UID
 	 *
 	 * @param int $insertedUid
@@ -89,4 +115,13 @@ class UrlUtils implements SingletonInterface {
 	public function generateTinyurlHash($url) {
 		return sha1($url);
 	}
+
+	/**
+	 * @param string $indpEnvKey
+	 * @return string
+	 */
+	protected function getIndependentEnvironmentVariable($indpEnvKey) {
+		return GeneralUtility::getIndpEnv($indpEnvKey);
+	}
+
 }
