@@ -28,7 +28,7 @@ class TinyUrlGenerator {
 	 *
 	 * @var bool
 	 */
-	var $optionDeleteOnUse =  0;
+	var $optionDeleteOnUse = FALSE;
 
 	/**
 	 * With this option the user can specify a custom URL key
@@ -102,10 +102,10 @@ class TinyUrlGenerator {
 	 * Sets the deleteOnUse option, if 1 the URL will be deleted from
 	 * the database on the first hit
 	 *
-	 * @param int $deleteOnUse
+	 * @param bool $deleteOnUse
 	 */
 	public function setOptionDeleteOnUse($deleteOnUse) {
-		$this->optionDeleteOnUse = intval($deleteOnUse);
+		$this->optionDeleteOnUse = (bool)$deleteOnUse;
 	}
 
 	/**
@@ -171,7 +171,7 @@ class TinyUrlGenerator {
 			'pid' => $this->configUtils->getExtensionConfigurationValue('urlRecordStoragePID'),
 			'target_url' => $targetUrl,
 			'target_url_hash' => $targetUrlHash,
-			'delete_on_use' => $this->optionDeleteOnUse,
+			'delete_on_use' => (int)$this->optionDeleteOnUse,
 			'valid_until' => $this->optionValidUntil,
 		);
 
