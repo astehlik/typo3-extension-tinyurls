@@ -200,8 +200,11 @@ class ConfigUtils implements SingletonInterface {
 				}
 			}
 
-			$configSetter = 'set' . ucfirst($configKey);
-			$tinyUrlGenerator->$configSetter($configValue);
+			$configSetter = 'setOption' . ucfirst($configKey);
+
+			if (method_exists($tinyUrlGenerator, $configSetter)) {
+				$tinyUrlGenerator->$configSetter($configValue);
+			}
 		}
 	}
 }
