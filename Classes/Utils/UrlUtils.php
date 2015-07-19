@@ -11,6 +11,7 @@ namespace Tx\Tinyurls\Utils;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
+use TYPO3\CMS\Core\Html\HtmlParser;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -30,7 +31,7 @@ class UrlUtils implements SingletonInterface {
 	 * Initializes the extension configuration
 	 */
 	public function __construct() {
-		$this->configUtils = GeneralUtility::makeInstance(ConfigUtils::class);
+		$this->configUtils = $this->getConfigUtils();
 	}
 
 	/**
@@ -124,4 +125,10 @@ class UrlUtils implements SingletonInterface {
 		return GeneralUtility::getIndpEnv($indpEnvKey);
 	}
 
+	/**
+	 * @return ConfigUtils
+	 */
+	protected function getConfigUtils() {
+		return GeneralUtility::makeInstance(ConfigUtils::class);
+	}
 }
