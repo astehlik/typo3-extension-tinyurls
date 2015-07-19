@@ -47,12 +47,10 @@ class UrlUtils implements SingletonInterface {
 		$base62Integer = '';
 		$base = 62;
 
-		do
-		{
+		do {
 			$base62Integer = $base62Dictionary[($base10Integer % $base)] . $base62Integer;
 			$base10Integer = floor($base10Integer / $base);
-		}
-		while ($base10Integer > 0);
+		} while ($base10Integer > 0);
 
 		return $base62Integer;
 	}

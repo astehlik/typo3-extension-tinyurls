@@ -57,7 +57,7 @@ class ConfigUtils implements SingletonInterface {
 	protected $extensionConfigurationDefaults = array(
 		'createSpeakingURLs' => FALSE,
 		'speakingUrlTemplate' => '###TYPO3_SITE_URL###tinyurl/###TINY_URL_KEY###',
-		'base62Dictionary'  => 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789',
+		'base62Dictionary' => 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789',
 		'minimalRandomKeyLength' => 2,
 		'minimalTinyurlKeyLength' => 8,
 		'urlRecordStoragePID' => 0,
