@@ -23,13 +23,6 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 class TinyUrlGenerator {
 
 	/**
-	 * Contains the configuration that can be set in the extension manager
-	 *
-	 * @var ConfigUtils
-	 */
-	protected $configUtils;
-
-	/**
 	 * If this option is 1 the URL will be deleted from the database
 	 * on the first hit
 	 *
@@ -58,6 +51,13 @@ class TinyUrlGenerator {
 	 * @var UrlUtils
 	 */
 	var $urlUtils;
+
+	/**
+	 * Contains the configuration that can be set in the extension manager
+	 *
+	 * @var ConfigUtils
+	 */
+	protected $configUtils;
 
 	/**
 	 * Initializes the config utils
