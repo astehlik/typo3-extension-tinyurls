@@ -88,7 +88,7 @@ class TinyUrlGenerator {
 
 		$tinyUrlKey = $tinyUrlData['urlkey'];
 		if ($this->configUtils->getExtensionConfigurationValue('createSpeakingURLs')) {
-			$tinyUrl = $this->urlUtils->generateTinyurlHash($tinyUrlKey);
+			$tinyUrl = $this->urlUtils->createSpeakingTinyUrl($tinyUrlKey);
 		} else {
 			$tinyUrl = GeneralUtility::getIndpEnv('TYPO3_SITE_URL');
 			$tinyUrl .= '?eID=tx_tinyurls&tx_tinyurls[key]=' . $tinyUrlKey;
