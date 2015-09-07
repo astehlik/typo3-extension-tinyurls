@@ -1,5 +1,5 @@
 
-# cat=basic/config; type=string; label=Create speaking URLs: If true (1) then the tiny URL will be generated depending on the speakingUrlTemplate. Hint! If you enable this you might need to add a rewrite rule to you webserver!
+# cat=basic/config; type=boolean; label=Create speaking URLs: If enable the tiny URL will be generated depending on the speakingUrlTemplate. Hint! If you enable this you might need to add a rewrite rule to you webserver!
 createSpeakingURLs = 0
 
 # cat=basic/config; type=string; label=Speaking url template: The template that is used for creating a speaking URL (only relevant if createSpeakingURLs is set to 1). You can use all available keys for t3lib_div::getIndpEnv() as template markers (e.g. ###TYPO3_SITE_URL### and the ###TINY_URL_KEY### template marker will be replaced with the shortened URL key
