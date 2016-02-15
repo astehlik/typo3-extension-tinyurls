@@ -12,10 +12,12 @@ matrix:
       env: TYPO3_BRANCH="TYPO3_7-6"
     - php: 7
       env: TYPO3_BRANCH="TYPO3_7-6"
-
-  allow_failures:
     - php: 7
       env: TYPO3_BRANCH="master"
+
+  allow_failures:
+    - env: TYPO3_BRANCH="master"
+
 
 sudo: false
 
