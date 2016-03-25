@@ -16,13 +16,39 @@
 	},
 	"autoload-dev": {
 		"psr-4": {
-			"Tx\\Tinyurls\\Tests\\": "Tests/"
+			"Tx\\Tinyurls\\Tests\\": "Tests/",
+			"TYPO3\\CMS\\Core\\Tests\\": ".Build/vendor/typo3/cms/typo3/sysext/core/Tests/"
 		}
 	},
 	"require": {
-		"php" : ">=5.5.0"
+		"typo3/cms-core": "^7.6|^8.0",
+		"typo3/cms": "dev-master"
+	},
+	"require-dev": {
+		"namelesscoder/typo3-repository-client": "1.1.x-dev",
+		"phpunit/phpunit": "~4.8.0"
 	},
 	"replace": {
-		"tinyurls" : "self.version"
+		"tinyurls" : "self.version",
+		"typo3-ter/tinyurls": "self.version"
+	},
+	"config": {
+		"vendor-dir": ".Build/vendor",
+		"bin-dir": ".Build/bin"
+	},
+	"scripts": {
+		"post-autoload-dump": [
+			"mkdir -p .Build/Web/typo3conf/ext/",
+			"[ -L .Build/Web/typo3conf/ext/tinyurls ] || ln -snvf ../../../../. .Build/Web/typo3conf/ext/tinyurls"
+		]
+	},
+	"extra": {
+		"typo3/cms": {
+			"cms-package-dir": "{$vendor-dir}/typo3/cms",
+			"web-dir": ".Build/Web",
+			"Package": {
+				"partOfMinimalUsableSystem": true
+			}
+		}
 	}
 }
