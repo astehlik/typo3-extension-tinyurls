@@ -12,6 +12,7 @@ namespace Tx\Tinyurls\Utils;
  *                                                                        */
 
 use TYPO3\CMS\Core\Html\HtmlParser;
+use TYPO3\CMS\Core\Service\MarkerBasedTemplateService;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -66,7 +67,7 @@ class UrlUtils implements SingletonInterface {
 
 		$speakingUrl = $this->configUtils->getExtensionConfigurationValue('speakingUrlTemplate');
 
-		$speakingUrl = HtmlParser::substituteMarker($speakingUrl, '###TINY_URL_KEY###', $tinyUrlKey);
+		$speakingUrl = $this->getMarkerBasedTemplateService()->substituteMarker($speakingUrl, '###TINY_URL_KEY###', $tinyUrlKey);
 
 		$matches = array();
 		preg_match_all('/###(.*?)###/', $speakingUrl, $matches);
@@ -76,7 +77,7 @@ class UrlUtils implements SingletonInterface {
 		}
 
 		foreach ($matches[1] as $match) {
-			$speakingUrl = HtmlParser::substituteMarker($speakingUrl, '###' . $match . '###', $this->getIndependentEnvironmentVariable($match));
+			$speakingUrl = $this->getMarkerBasedTemplateService()->substituteMarker($speakingUrl, '###' . $match . '###', $this->getIndependentEnvironmentVariable($match));
 		}
 
 		return $speakingUrl;
@@ -130,5 +131,12 @@ class UrlUtils implements SingletonInterface {
 	 */
 	protected function getConfigUtils() {
 		return GeneralUtility::makeInstance(ConfigUtils::class);
+	}
+
+	/**
+	 * @return MarkerBasedTemplateService
+	 */
+	protected function getMarkerBasedTemplateService() {
+		return GeneralUtility::makeInstance(MarkerBasedTemplateService::class);
 	}
 }
