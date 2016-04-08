@@ -42,6 +42,13 @@ return array(
 				'size' => 30,
 				'readOnly' => 1,
 			)
+		),'urldisplay' => array(
+			'exclude' => 0,
+			'label' => 'Url Display',
+			'config' => array(
+				'type' => 'input',
+				'size' => 30
+			)
 		),
 		'target_url' => array(
 			'exclude' => 0,
@@ -83,7 +90,7 @@ return array(
 	),
 	'types' => array(
 		'0' => array(
-			'showitem' => 'urlkey,counter,target_url,target_url_hash,comment,delete_on_use,valid_until'
+			'showitem' => 'urlkey,counter,urldisplay,target_url,target_url_hash,comment,delete_on_use,valid_until'
 		),
 	),
 	'palettes' => array(),
