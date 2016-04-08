@@ -86,12 +86,7 @@ class TinyUrlGenerator {
 			$tinyUrlData = $this->generateNewTinyurl($targetUrl, $targetUrlHash);
 		}
 
-		if ($this->configUtils->getExtensionConfigurationValue('createSpeakingURLs')) {
-			$tinyUrl = $tinyUrlData['urldisplay'];
-		} else {
-			$tinyUrl = GeneralUtility::getIndpEnv('TYPO3_SITE_URL');
-			$tinyUrl .= '?eID=tx_tinyurls&tx_tinyurls[key]=' . $tinyUrlData['urlkey'];
-		}
+		$tinyUrl = $this->buildTinyUrl($tinyUrlData['urlkey']);
 
 		return $tinyUrl;
 	}
@@ -165,10 +160,8 @@ class TinyUrlGenerator {
 		if ($customUrlKey === FALSE) {
 			$insertedUid = $this->getDatabaseConnection()->sql_insert_id();
 			$tinyUrlKey = $this->urlUtils->generateTinyurlKeyForUid($insertedUid);
-			$tinyUrlDisplay = $this->urlUtils->createSpeakingTinyUrl($tinyUrlKey);
-			$this->getDatabaseConnection()->exec_UPDATEquery('tx_tinyurls_urls', 'uid=' . $insertedUid, array('urlkey' => $tinyUrlKey,'urldisplay' => $tinyUrlDisplay));
+			$this->getDatabaseConnection()->exec_UPDATEquery('tx_tinyurls_urls', 'uid=' . $insertedUid, array('urlkey' => $tinyUrlKey));
 			$insertArray['urlkey'] = $tinyUrlKey;
-			$insertArray['urldisplay'] = $tinyUrlDisplay;
 		}
 
 		return $insertArray;
@@ -243,6 +236,22 @@ class TinyUrlGenerator {
 			return FALSE;
 		} else {
 			return $this->getDatabaseConnection()->sql_fetch_assoc($result);
+		}
+	}
+
+	/**
+	 * @param $tinyUrlData
+	 * @return string
+	 */
+	public function buildTinyUrl($tinyUrlKey)
+	{
+		if ($this->configUtils->getExtensionConfigurationValue('createSpeakingURLs')) {
+			$tinyUrl = $this->urlUtils->createSpeakingTinyUrl($tinyUrlKey);
+			return $tinyUrl;
+		} else {
+			$tinyUrl = GeneralUtility::getIndpEnv('TYPO3_SITE_URL');
+			$tinyUrl .= '?eID=tx_tinyurls&tx_tinyurls[key]=' . $tinyUrlKey;
+			return $tinyUrl;
 		}
 	}
 }

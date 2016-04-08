@@ -42,11 +42,12 @@ return array(
 				'size' => 30,
 				'readOnly' => 1,
 			)
-		),'urldisplay' => array(
+		),
+		'urldisplay' => array(
 			'exclude' => 0,
 			'label' => 'Url Display',
 			'config' => array(
-				'type' => 'input',
+				'type' => 'tx_tinyurls_urldisplay',
 				'size' => 30
 			)
 		),
