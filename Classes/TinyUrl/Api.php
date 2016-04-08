@@ -76,6 +76,22 @@ class Api {
 		$this->tinyUrlGenerator->setOptionDeleteOnUse($deleteOnUse);
 	}
 
+	public function tx_url_with_key($fObj) {
+		$formField  = "<input type='text' name='url_with_key' value=' " .
+			$this->getUrlWithKey($fObj['row']['uid']) . " ' size = 60 />";
+		return $formField;
+	}
+
+	/**
+	 * @var array data_array
+	 * @return mixed
+	 */
+	public function getUrlWithKey($id)
+	{
+		$data_array = $this->tinyUrlGenerator->getTinyUrlDataById($id);
+		$result_url = $this->tinyUrlGenerator->getTinyUrlById($data_array['urlkey']);
+		return $result_url;
+	}
 	/**
 	 * Sets a custom URL key, must be unique
 	 *
@@ -84,7 +100,6 @@ class Api {
 	public function setUrlKey($urlKey) {
 		$this->tinyUrlGenerator->setOptionUrlKey($urlKey);
 	}
-
 	/**
 	 * Sets the timestamp until the generated URL is valid
 	 *
