@@ -42,7 +42,7 @@ Extension configuration
          template marker will be replaced with the shortened URL key.
 
    Default
-         :code:`###TYPO3_SITE_URL###tinyurl/###TINY_URL_KEY###`
+         :code:`###TYPO3_SITE_URL###goto/###TINY_URL_KEY###`
 
 .. container:: table-row
 
