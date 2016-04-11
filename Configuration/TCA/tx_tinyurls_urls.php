@@ -13,7 +13,7 @@ return array(
 		'rootLevel' => -1,
 	),
 	'interface' => array(
-		'showRecordFieldList' => 'urlkey,target_url,target_url_hash,delete_on_use,valid_until'
+		'showRecordFieldList' => 'urlkey,target_url,target_url_hash,delete_on_use,valid_until,url_with_url_key'
 	),
 	'columns' => array(
 		'counter' => array(
@@ -47,10 +47,19 @@ return array(
 			'exclude' => 0,
 			'label' => 'Target URL',
 			'config' => array(
-				'type' => 'input',
+				'type' => 'user',
 				'size' => 50,
 				'eval' => 'required,trim,nospace,unique',
 			),
+		),
+		'url_with_url_key' => array (
+			'exclude' => 0,
+			'label' => 'URL with key',
+			'config' => array (
+				'type' => 'user',
+				'size' => 80,
+				'userFunc' => 'Tx\\Tinyurls\\TinyUrl\\Api->tx_url_with_key',
+			)
 		),
 		'target_url_hash' => array(
 			'exclude' => 0,
@@ -83,7 +92,7 @@ return array(
 	),
 	'types' => array(
 		'0' => array(
-			'showitem' => 'urlkey,counter,target_url,target_url_hash,comment,delete_on_use,valid_until'
+			'showitem' => 'urlkey,counter,target_url,target_url_hash,comment,delete_on_use,valid_until,url_with_url_key'
 		),
 	),
 	'palettes' => array(),

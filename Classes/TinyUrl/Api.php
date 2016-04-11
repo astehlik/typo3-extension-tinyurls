@@ -76,6 +76,45 @@ class Api {
 		$this->tinyUrlGenerator->setOptionDeleteOnUse($deleteOnUse);
 	}
 
+	public function tx_url_with_key($fObj) {
+
+		$url = $this->getUrlWithKey($fObj['row']['uid']);
+		$renderer = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\TYPO3\CMS\Core\Page\PageRenderer::class);
+		$renderer->addJsInlineCode('effects',
+			'function clipboard(){
+                document.getElementById("url_key").select();
+                document.getElementById("url_key").focus();
+                document.execCommand(\'Copy\');
+		    };
+		');
+		$iconFactory = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(
+			\TYPO3\CMS\Core\Imaging\IconFactory::class
+		);
+		$icon = $iconFactory->getIcon(
+			'tx-myext-action-preview',
+			\TYPO3\CMS\Core\Imaging\Icon::SIZE_SMALL,
+			'overlay-identifier'
+		);
+		$formField = "<input type='text' id='url_key' name='url_with_key' value=' " .
+			$url. " ' size = 60 />";
+
+		$formField .= "
+        <span onclick='clipboard()' style='cursor: pointer'>
+            ".$icon."
+        </span>";
+		return $formField;
+	}
+
+	/**
+	 * @var array data_array
+	 * @return mixed
+	 */
+	public function getUrlWithKey($id)
+	{
+		$data_array = $this->tinyUrlGenerator->getTinyUrlDataById($id);
+		$result_url = $this->tinyUrlGenerator->getTinyUrlById($data_array['urlkey']);
+		return $result_url;
+	}
 	/**
 	 * Sets a custom URL key, must be unique
 	 *
@@ -84,7 +123,6 @@ class Api {
 	public function setUrlKey($urlKey) {
 		$this->tinyUrlGenerator->setOptionUrlKey($urlKey);
 	}
-
 	/**
 	 * Sets the timestamp until the generated URL is valid
 	 *
