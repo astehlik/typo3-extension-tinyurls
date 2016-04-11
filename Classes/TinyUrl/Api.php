@@ -77,8 +77,31 @@ class Api {
 	}
 
 	public function tx_url_with_key($fObj) {
-		$formField  = "<input type='text' name='url_with_key' value=' " .
-			$this->getUrlWithKey($fObj['row']['uid']) . " ' size = 60 />";
+
+		$url = $this->getUrlWithKey($fObj['row']['uid']);
+		$renderer = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\TYPO3\CMS\Core\Page\PageRenderer::class);
+		$renderer->addJsInlineCode('effects',
+			'function clipboard(){
+                document.getElementById("url_key").select();
+                document.getElementById("url_key").focus();
+                document.execCommand(\'Copy\');
+		    };
+		');
+		$iconFactory = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(
+			\TYPO3\CMS\Core\Imaging\IconFactory::class
+		);
+		$icon = $iconFactory->getIcon(
+			'tx-myext-action-preview',
+			\TYPO3\CMS\Core\Imaging\Icon::SIZE_SMALL,
+			'overlay-identifier'
+		);
+		$formField = "<input type='text' id='url_key' name='url_with_key' value=' " .
+			$url. " ' size = 60 />";
+
+		$formField .= "
+        <span onclick='clipboard()' style='cursor: pointer'>
+            ".$icon."
+        </span>";
 		return $formField;
 	}
 
