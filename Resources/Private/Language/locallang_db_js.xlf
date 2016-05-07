@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff version="1.0" xmlns:t3="http://typo3.org/schemas/xliff">
+    <file t3:id="1462641092" source-language="en" datatype="plaintext" original="messages" product-name="tinyurls">
+        <header />
+        <body>
+            <trans-unit id="tx_tinyurls.copy_to_clipboard.error.title">
+                <source>Error copying value</source>
+            </trans-unit>
+            <trans-unit id="tx_tinyurls.copy_to_clipboard.error.message">
+                <source>The value could not be copied to the clipboard</source>
+            </trans-unit>
+            <trans-unit id="tx_tinyurls.copy_to_clipboard.success.title">
+                <source>Copied to clipboard</source>
+            </trans-unit>
+            <trans-unit id="tx_tinyurls.copy_to_clipboard.success.message">
+                <source>The value was successfully copied to the clipboard.</source>
+            </trans-unit>
+        </body>
+    </file>
+</xliff>

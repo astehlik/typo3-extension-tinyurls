@@ -15,3 +15,9 @@ $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['tslib/class.tslib_content.php']['typo
 // Register the TYPO3 Backend hook class.
 $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['t3lib/class.t3lib_tcemain.php']['processDatamapClass'][] =
     Tx\Tinyurls\Hooks\TceDataMap::class;
+
+$GLOBALS['TYPO3_CONF_VARS']['SYS']['formEngine']['nodeRegistry'][1460107841] = [
+    'nodeName' => 'tx_tinyurls_copyable_field',
+    'priority' => 40,
+    'class' => \Tx\Tinyurls\FormEngine\CopyableFieldElement::class,
+];

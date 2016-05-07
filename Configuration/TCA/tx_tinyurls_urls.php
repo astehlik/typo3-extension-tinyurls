@@ -43,6 +43,15 @@ return array(
 				'readOnly' => 1,
 			)
 		),
+		'urldisplay' => array(
+			'exclude' => 0,
+			'label' => 'Tiny URL',
+			'config' => array(
+				'type' => 'tx_tinyurls_copyable_field',
+				'valueFunc' => \Tx\Tinyurls\FormEngine\TinyUrlDispay::class . '->buildTinyUrlFormFormElementData',
+				'size' => 30
+			)
+		),
 		'target_url' => array(
 			'exclude' => 0,
 			'label' => 'Target URL',
@@ -83,7 +92,7 @@ return array(
 	),
 	'types' => array(
 		'0' => array(
-			'showitem' => 'urlkey,counter,target_url,target_url_hash,comment,delete_on_use,valid_until'
+			'showitem' => 'urldisplay,counter,target_url,target_url_hash,comment,delete_on_use,valid_until'
 		),
 	),
 	'palettes' => array(),
