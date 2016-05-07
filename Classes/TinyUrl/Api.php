@@ -25,12 +25,12 @@ class Api
     /**
      * @var TinyUrlGenerator
      */
-    var $tinyUrlGenerator;
+    protected $tinyUrlGenerator;
 
     /**
      * @var ConfigUtils
      */
-    var $tinyUrlConfigUtils;
+    protected $tinyUrlConfigUtils;
 
     /**
      * Initializes the tinyUrl generator

@@ -28,7 +28,7 @@ class TceDataMap
      *
      * @var UrlUtils
      */
-    var $urlUtils;
+    protected $urlUtils;
 
     /**
      * Initializes the URL utils

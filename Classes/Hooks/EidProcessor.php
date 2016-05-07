@@ -29,7 +29,7 @@ class EidProcessor
      *
      * @var \Tx\Tinyurls\Utils\ConfigUtils
      */
-    var $configUtils;
+    protected $configUtils;
 
     /**
      * Initializes the extension configuration
@@ -169,4 +169,3 @@ class EidProcessor
         header('Pragma: no-cache');
     }
 }
-

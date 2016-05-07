@@ -27,14 +27,14 @@ class TinyUrlGenerator
      *
      * @var bool
      */
-    var $optionDeleteOnUse = false;
+    protected $optionDeleteOnUse = false;
 
     /**
      * With this option the user can specify a custom URL key
      *
      * @var bool
      */
-    var $optionUrlKey = false;
+    protected $optionUrlKey = false;
 
     /**
      * If this value is set to a timestamp the URL will be invalid
@@ -42,14 +42,14 @@ class TinyUrlGenerator
      *
      * @var int
      */
-    var $optionValidUntil = 0;
+    protected $optionValidUntil = 0;
 
     /**
      * Tiny URL utilities
      *
      * @var UrlUtils
      */
-    var $urlUtils;
+    protected $urlUtils;
 
     /**
      * Contains the configuration that can be set in the extension manager
