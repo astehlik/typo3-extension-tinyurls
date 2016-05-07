@@ -16,155 +16,157 @@ use TYPO3\CMS\Core\SingletonInterface;
 /**
  * Contains utilities for getting configuration
  */
-class ConfigUtils implements SingletonInterface {
+class ConfigUtils implements SingletonInterface
+{
 
-	/**
-	 * Contains the default values for the extension configuration
-	 *
-	 * @var array
-	 */
-	protected $extensionConfigurationDefaults = array(
-		'createSpeakingURLs' => FALSE,
-		'speakingUrlTemplate' => '###TYPO3_SITE_URL###tinyurl/###TINY_URL_KEY###',
-		'base62Dictionary' => 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789',
-		'minimalRandomKeyLength' => 2,
-		'minimalTinyurlKeyLength' => 8,
-		'urlRecordStoragePID' => 0,
-	);
+    /**
+     * Contains the default values for the extension configuration
+     *
+     * @var array
+     */
+    protected $extensionConfigurationDefaults = array(
+        'createSpeakingURLs' => false,
+        'speakingUrlTemplate' => '###TYPO3_SITE_URL###tinyurl/###TINY_URL_KEY###',
+        'base62Dictionary' => 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789',
+        'minimalRandomKeyLength' => 2,
+        'minimalTinyurlKeyLength' => 8,
+        'urlRecordStoragePID' => 0,
+    );
 
-	/**
-	 * The initialized extension configuration
-	 *
-	 * @var array
-	 */
-	protected $extensionConfiguration = NULL;
+    /**
+     * The initialized extension configuration
+     *
+     * @var array
+     */
+    protected $extensionConfiguration = null;
 
-	/**
-	 * Contains the default values for the tinyurl configuration
-	 *
-	 * @var array
-	 */
-	protected $tinyurlConfigDefaults = array(
-		'deleteOnUse' => 0,
-		'validUntil' => 0,
-		'urlKey' => FALSE,
-	);
+    /**
+     * Contains the default values for the tinyurl configuration
+     *
+     * @var array
+     */
+    protected $tinyurlConfigDefaults = array(
+        'deleteOnUse' => 0,
+        'validUntil' => 0,
+        'urlKey' => false,
+    );
 
-	/**
-	 * Initializes the extension configuration array, merging the default config and the config
-	 * defined by the user
-	 */
-	protected function initializeExtensionConfiguration() {
+    /**
+     * Initializes the extension configuration array, merging the default config and the config
+     * defined by the user
+     */
+    protected function initializeExtensionConfiguration()
+    {
 
-		$extensionConfiguration = array();
-		$finalConfiguration = array();
+        $extensionConfiguration = array();
+        $finalConfiguration = array();
 
-		if (isset($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['tinyurls'])) {
+        if (isset($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['tinyurls'])) {
+            $extensionConfigurationData = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['tinyurls']);
 
-			$extensionConfigurationData = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['tinyurls']);
+            if (is_array($extensionConfigurationData)) {
+                $extensionConfiguration = $extensionConfigurationData;
+            }
+        }
 
-			if (is_array($extensionConfigurationData)) {
-				$extensionConfiguration = $extensionConfigurationData;
-			}
-		}
+        foreach ($this->extensionConfigurationDefaults as $configKey => $defaultValue) {
+            if (array_key_exists($configKey, $extensionConfiguration)) {
+                $finalConfiguration[$configKey] = $extensionConfiguration[$configKey];
+            } else {
+                $finalConfiguration[$configKey] = $defaultValue;
+            }
+        }
 
-		foreach ($this->extensionConfigurationDefaults as $configKey => $defaultValue) {
+        $this->extensionConfiguration = $finalConfiguration;
+    }
 
-			if (array_key_exists($configKey, $extensionConfiguration)) {
-				$finalConfiguration[$configKey] = $extensionConfiguration[$configKey];
-			} else {
-				$finalConfiguration[$configKey] = $defaultValue;
-			}
-		}
+    /**
+     * Appends a PID query to the given where statement
+     *
+     * @param string $whereStatement The where statement where the PID query should be appended to
+     * @return string The where statement with the appended PID query
+     */
+    public function appendPidQuery($whereStatement)
+    {
 
-		$this->extensionConfiguration = $finalConfiguration;
-	}
+        if (!empty($whereStatement)) {
+            $whereStatement .= ' AND ';
+        }
 
-	/**
-	 * Appends a PID query to the given where statement
-	 *
-	 * @param string $whereStatement The where statement where the PID query should be appended to
-	 * @return string The where statement with the appended PID query
-	 */
-	public function appendPidQuery($whereStatement) {
+        $whereStatement .= 'pid=' . intval($this->getExtensionConfigurationValue('urlRecordStoragePID'));
 
-		if (!empty($whereStatement)) {
-			$whereStatement .= ' AND ';
-		}
+        return $whereStatement;
+    }
 
-		$whereStatement .= 'pid=' . intval($this->getExtensionConfigurationValue('urlRecordStoragePID'));
+    /**
+     * Returns the extension configuration
+     *
+     * @return array
+     */
+    public function getExtensionConfiguration()
+    {
 
-		return $whereStatement;
-	}
+        if ($this->extensionConfiguration === null) {
+            $this->initializeExtensionConfiguration();
+        }
 
-	/**
-	 * Returns the extension configuration
-	 *
-	 * @return array
-	 */
-	public function getExtensionConfiguration() {
+        return $this->extensionConfiguration;
+    }
 
-		if ($this->extensionConfiguration === NULL) {
-			$this->initializeExtensionConfiguration();
-		}
+    /**
+     * Returns an extension configuration value
+     *
+     * @param string $key the configuration key
+     * @return mixed the configuration value
+     * @throws \InvalidArgumentException if the configuration key does not exist
+     */
+    public function getExtensionConfigurationValue($key)
+    {
 
-		return $this->extensionConfiguration;
-	}
+        if ($this->extensionConfiguration === null) {
+            $this->initializeExtensionConfiguration();
+        }
 
-	/**
-	 * Returns an extension configuration value
-	 *
-	 * @param string $key the configuration key
-	 * @return mixed the configuration value
-	 * @throws \InvalidArgumentException if the configuration key does not exist
-	 */
-	public function getExtensionConfigurationValue($key) {
+        if (!array_key_exists($key, $this->extensionConfiguration)) {
+            throw new \InvalidArgumentException('The key ' . $key . ' does not exists in the extension configuration');
+        }
 
-		if ($this->extensionConfiguration === NULL) {
-			$this->initializeExtensionConfiguration();
-		}
+        return $this->extensionConfiguration[$key];
+    }
 
-		if (!array_key_exists($key, $this->extensionConfiguration)) {
-			throw new \InvalidArgumentException('The key ' . $key . ' does not exists in the extension configuration');
-		}
+    /**
+     * Initializes the tinyurl configuration with default values and
+     * if the user set his own values they are parsed through stdWrap
+     *
+     * @param array $config
+     * @param \TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer $contentObject
+     * @param \Tx\Tinyurls\TinyUrl\TinyUrlGenerator $tinyUrlGenerator
+     */
+    public function initializeConfigFromTyposcript($config, $contentObject, $tinyUrlGenerator)
+    {
 
-		return $this->extensionConfiguration[$key];
-	}
+        if (!array_key_exists('tinyurl.', $config)) {
+            return;
+        }
 
-	/**
-	 * Initializes the tinyurl configuration with default values and
-	 * if the user set his own values they are parsed through stdWrap
-	 *
-	 * @param array $config
-	 * @param \TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer $contentObject
-	 * @param \Tx\Tinyurls\TinyUrl\TinyUrlGenerator $tinyUrlGenerator
-	 */
-	public function initializeConfigFromTyposcript($config, $contentObject, $tinyUrlGenerator) {
+        $tinyUrlConfig = $config['tinyurl.'];
 
-		if (!array_key_exists('tinyurl.', $config)) {
-			return;
-		}
+        foreach ($this->tinyurlConfigDefaults as $configKey => $defaultValue) {
+            $configValue = $defaultValue;
 
-		$tinyUrlConfig = $config['tinyurl.'];
+            if (array_key_exists($configKey, $tinyUrlConfig)) {
+                $configValue = $tinyUrlConfig[$configKey];
 
-		foreach ($this->tinyurlConfigDefaults as $configKey => $defaultValue) {
+                if (array_key_exists($configValue . '.', $tinyUrlConfig)) {
+                    $configValue = $contentObject->stdWrap($configValue, $tinyUrlConfig[$configKey . '.']);
+                }
+            }
 
-			$configValue = $defaultValue;
+            $configSetter = 'setOption' . ucfirst($configKey);
 
-			if (array_key_exists($configKey, $tinyUrlConfig)) {
-
-				$configValue = $tinyUrlConfig[$configKey];
-
-				if (array_key_exists($configValue . '.', $tinyUrlConfig)) {
-					$configValue = $contentObject->stdWrap($configValue, $tinyUrlConfig[$configKey . '.']);
-				}
-			}
-
-			$configSetter = 'setOption' . ucfirst($configKey);
-
-			if (method_exists($tinyUrlGenerator, $configSetter)) {
-				$tinyUrlGenerator->$configSetter($configValue);
-			}
-		}
-	}
+            if (method_exists($tinyUrlGenerator, $configSetter)) {
+                $tinyUrlGenerator->$configSetter($configValue);
+            }
+        }
+    }
 }

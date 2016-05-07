@@ -1,53 +1,53 @@
 {
-	"name": "de-swebhosting-typo3-extension/tinyurls",
-	"description": "This extensions allows you to cut down long URLs. It basically works like bitly or TinyURL.",
-	"type": "typo3-cms-extension",
-	"license": "GPL-3.0+",
-	"authors": [
-		{
-			"name": "Alexander Stehlik",
-			"email": "alexander.stehlik@gmail.com"
-		}
-	],
-	"autoload": {
-		"psr-4": {
-			"Tx\\Tinyurls\\": "Classes/"
-		}
-	},
-	"autoload-dev": {
-		"psr-4": {
-			"Tx\\Tinyurls\\Tests\\": "Tests/",
-			"TYPO3\\CMS\\Core\\Tests\\": ".Build/vendor/typo3/cms/typo3/sysext/core/Tests/"
-		}
-	},
-	"require": {
-		"typo3/cms-core": "^7.6|^8.0"
-	},
-	"require-dev": {
-		"namelesscoder/typo3-repository-client": "1.1.x-dev",
-		"phpunit/phpunit": "~4.8.0"
-	},
-	"replace": {
-		"tinyurls" : "self.version",
-		"typo3-ter/tinyurls": "self.version"
-	},
-	"config": {
-		"vendor-dir": ".Build/vendor",
-		"bin-dir": ".Build/bin"
-	},
-	"scripts": {
-		"post-autoload-dump": [
-			"mkdir -p .Build/Web/typo3conf/ext/",
-			"[ -L .Build/Web/typo3conf/ext/tinyurls ] || ln -snvf ../../../../. .Build/Web/typo3conf/ext/tinyurls"
-		]
-	},
-	"extra": {
-		"typo3/cms": {
-			"cms-package-dir": "{$vendor-dir}/typo3/cms",
-			"web-dir": ".Build/Web",
-			"Package": {
-				"partOfMinimalUsableSystem": true
-			}
-		}
-	}
+    "name": "de-swebhosting-typo3-extension/tinyurls",
+    "description": "This extensions allows you to cut down long URLs. It basically works like bitly or TinyURL.",
+    "type": "typo3-cms-extension",
+    "license": "GPL-3.0+",
+    "authors": [
+        {
+            "name": "Alexander Stehlik",
+            "email": "alexander.stehlik@gmail.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Tx\\Tinyurls\\": "Classes/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tx\\Tinyurls\\Tests\\": "Tests/",
+            "TYPO3\\CMS\\Core\\Tests\\": ".Build/vendor/typo3/cms/typo3/sysext/core/Tests/"
+        }
+    },
+    "require": {
+        "typo3/cms-core": "^7.6|^8.0"
+    },
+    "require-dev": {
+        "namelesscoder/typo3-repository-client": "1.1.x-dev",
+        "phpunit/phpunit": "~4.8.0"
+    },
+    "replace": {
+        "tinyurls": "self.version",
+        "typo3-ter/tinyurls": "self.version"
+    },
+    "config": {
+        "vendor-dir": ".Build/vendor",
+        "bin-dir": ".Build/bin"
+    },
+    "scripts": {
+        "post-autoload-dump": [
+            "mkdir -p .Build/Web/typo3conf/ext/",
+            "[ -L .Build/Web/typo3conf/ext/tinyurls ] || ln -snvf ../../../../. .Build/Web/typo3conf/ext/tinyurls"
+        ]
+    },
+    "extra": {
+        "typo3/cms": {
+            "cms-package-dir": "{$vendor-dir}/typo3/cms",
+            "web-dir": ".Build/Web",
+            "Package": {
+                "partOfMinimalUsableSystem": true
+            }
+        }
+    }
 }

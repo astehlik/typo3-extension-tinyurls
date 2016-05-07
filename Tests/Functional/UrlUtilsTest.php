@@ -18,22 +18,25 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 /**
  * Functional tests for the tinyurls API.
  */
-class UrlUtilsTest extends FunctionalTestCase {
+class UrlUtilsTest extends FunctionalTestCase
+{
+    /**
+     * @var array
+     */
+    protected $testExtensionsToLoad = array(
+        'typo3conf/ext/tinyurls',
+    );
 
-	/**
-	 * @var array
-	 */
-	protected $testExtensionsToLoad = array(
-		'typo3conf/ext/tinyurls',
-	);
-
-	/**
-	 * @test
-	 */
-	public function createSpeakingTinyUrlReplacesGeneralUtilityMarkers() {
-		$_SERVER['REMOTE_ADDR'] = '127.0.0.1';
-		$GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['tinyurls'] = serialize(array('speakingUrlTemplate' => '###REMOTE_ADDR###'));
-		$urlUtils = GeneralUtility::makeInstance(UrlUtils::class);
-		$this->assertEquals('127.0.0.1', $urlUtils->createSpeakingTinyUrl('test'));
-	}
+    /**
+     * @test
+     */
+    public function createSpeakingTinyUrlReplacesGeneralUtilityMarkers()
+    {
+        $_SERVER['REMOTE_ADDR'] = '127.0.0.1';
+        $GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['tinyurls'] = serialize(
+            array('speakingUrlTemplate' => '###REMOTE_ADDR###')
+        );
+        $urlUtils = GeneralUtility::makeInstance(UrlUtils::class);
+        $this->assertEquals('127.0.0.1', $urlUtils->createSpeakingTinyUrl('test'));
+    }
 }

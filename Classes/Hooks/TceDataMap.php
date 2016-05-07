@@ -21,71 +21,77 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  * @author Alexander Stehlik <alexander.stehlik.deleteme@gmail.com>
  * @author Sebastian Lemke <s.lemke.deleteme@infoworxx.de>
  */
-class TceDataMap {
+class TceDataMap
+{
+    /**
+     * Tiny URL utilities
+     *
+     * @var UrlUtils
+     */
+    var $urlUtils;
 
-	/**
-	 * Tiny URL utilities
-	 *
-	 * @var UrlUtils
-	 */
-	var $urlUtils;
+    /**
+     * Initializes the URL utils
+     */
+    public function __construct()
+    {
+        $this->urlUtils = GeneralUtility::makeInstance(UrlUtils::class);
+    }
 
-	/**
-	 * Initializes the URL utils
-	 */
-	public function __construct() {
-		$this->urlUtils = GeneralUtility::makeInstance(UrlUtils::class);
-	}
+    /**
+     * When a user stores a tinyurl record in the Backend the urlkey and the target_url_hash will be updated
+     *
+     * @param string $status (reference) Status of the current operation, 'new' or 'update
+     * @param string $table (refrence) The table currently processing data for
+     * @param string $id (reference) The record uid currently processing data for, [integer] or [string] (like 'NEW...')
+     * @param array $fieldArray (reference) The field array of a record
+     * @param \TYPO3\CMS\Core\DataHandling\DataHandler $tcemain Reference to the TCEmain object that calls this hook
+     * @see t3lib_TCEmain::hook_processDatamap_afterDatabaseOperations()
+     */
+    public function processDatamap_afterDatabaseOperations(
+        /** @noinspection PhpUnusedParameterInspection */
+        $status,
+        $table,
+        $id,
+        &$fieldArray,
+        $tcemain
+    ) {
 
-	/**
-	 * When a user stores a tinyurl record in the Backend the urlkey and the target_url_hash will be updated
-	 *
-	 * @param string $status (reference) Status of the current operation, 'new' or 'update
-	 * @param string $table (refrence) The table currently processing data for
-	 * @param string $id (reference) The record uid currently processing data for, [integer] or [string] (like 'NEW...')
-	 * @param array $fieldArray (reference) The field array of a record
-	 * @param \TYPO3\CMS\Core\DataHandling\DataHandler $tcemain Reference to the TCEmain object that calls this hook
-	 * @see t3lib_TCEmain::hook_processDatamap_afterDatabaseOperations()
-	 */
-	public function processDatamap_afterDatabaseOperations(
-		/** @noinspection PhpUnusedParameterInspection */
-		$status, $table, $id, &$fieldArray, $tcemain
-	) {
+        if ($table != 'tx_tinyurls_urls') {
+            return;
+        }
 
-		if ($table != 'tx_tinyurls_urls') {
-			return;
-		}
+        $regenerateUrlKey = false;
 
-		$regenerateUrlKey = FALSE;
+        if (GeneralUtility::isFirstPartOfStr($id, 'NEW')) {
+            $id = $tcemain->substNEWwithIDs[$id];
+            $regenerateUrlKey = true;
+        }
 
-		if (GeneralUtility::isFirstPartOfStr($id, 'NEW')) {
-			$id = $tcemain->substNEWwithIDs[$id];
-			$regenerateUrlKey = TRUE;
-		}
+        $tinyUrlData = BackendUtility::getRecord('tx_tinyurls_urls', $id);
+        $updateArray['target_url_hash'] = $this->urlUtils->generateTinyurlHash($tinyUrlData['target_url']);
 
-		$tinyUrlData = BackendUtility::getRecord('tx_tinyurls_urls', $id);
-		$updateArray['target_url_hash'] = $this->urlUtils->generateTinyurlHash($tinyUrlData['target_url']);
+        // If the hash has changed we regenerate the URL key
+        if ($updateArray['target_url_hash'] !== $tinyUrlData['target_url_hash']) {
+            $regenerateUrlKey = true;
+        }
 
-		// If the hash has changed we regenerate the URL key
-		if ($updateArray['target_url_hash'] !== $tinyUrlData['target_url_hash']) {
-			$regenerateUrlKey = TRUE;
-		}
+        if ($regenerateUrlKey) {
+            $updateArray['urlkey'] = $this->urlUtils->generateTinyurlKeyForUid($id);
+        }
 
-		if ($regenerateUrlKey) {
-			$updateArray['urlkey'] = $this->urlUtils->generateTinyurlKeyForUid($id);
-		}
+        // Update the data in the field array so that it is consistent
+        // with the data in the database.
+        $fieldArray = array_merge($fieldArray, $updateArray);
 
-		// Update the data in the field array so that it is consistent
-		// with the data in the database.
-		$fieldArray = array_merge($fieldArray, $updateArray);
+        $this->getDatabaseConnection()->exec_UPDATEquery('tx_tinyurls_urls', 'uid=' . $id, $updateArray);
+    }
 
-		$this->getDatabaseConnection()->exec_UPDATEquery('tx_tinyurls_urls', 'uid=' . $id, $updateArray);
-	}
-
-	/**
-	 * @return \TYPO3\CMS\Core\Database\DatabaseConnection
-	 */
-	protected function getDatabaseConnection() {
-		return $GLOBALS['TYPO3_DB'];
-	}
+    /**
+     * @return \TYPO3\CMS\Core\Database\DatabaseConnection
+     */
+    protected function getDatabaseConnection()
+    {
+        return $GLOBALS['TYPO3_DB'];
+    }
 }
