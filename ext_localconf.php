@@ -6,7 +6,7 @@ if (!defined('TYPO3_MODE')) {
 
 // Register the eID processor.
 $GLOBALS['TYPO3_CONF_VARS']['FE']['eID_include']['tx_tinyurls'] =
-    'EXT:' . $_EXTKEY . '/Classes/Hooks/EidProcessor.php';
+    'EXT:' . $_EXTKEY . '/Resources/Private/Eid/TinyUrlProcessorInclude.php';
 
 // Register the hook for converting typolinks to tinyurls.
 $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['tslib/class.tslib_content.php']['typoLink_PostProc']['tx_tinyurls'] =

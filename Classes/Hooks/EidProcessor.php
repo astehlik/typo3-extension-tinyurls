@@ -170,5 +170,3 @@ class EidProcessor
     }
 }
 
-$eidProcessor = GeneralUtility::makeInstance(EidProcessor::class);
-$eidProcessor->main();
