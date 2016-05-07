@@ -68,6 +68,24 @@ class TinyUrlGenerator
     }
 
     /**
+     * Builds a complete tiny URL based on the given URL key and the createSpeakingURLs setting.
+     *
+     * @param string $tinyUrlKey
+     * @return string
+     */
+    public function buildTinyUrl($tinyUrlKey)
+    {
+        if ($this->configUtils->getExtensionConfigurationValue('createSpeakingURLs')) {
+            $tinyUrl = $this->urlUtils->createSpeakingTinyUrl($tinyUrlKey);
+            return $tinyUrl;
+        } else {
+            $tinyUrl = GeneralUtility::getIndpEnv('TYPO3_SITE_URL');
+            $tinyUrl .= '?eID=tx_tinyurls&tx_tinyurls[key]=' . $tinyUrlKey;
+            return $tinyUrl;
+        }
+    }
+
+    /**
      * This method generates a tiny URL, stores it in the database
      * and returns the full URL
      *
@@ -88,13 +106,7 @@ class TinyUrlGenerator
             $tinyUrlData = $this->generateNewTinyurl($targetUrl, $targetUrlHash);
         }
 
-        $tinyUrlKey = $tinyUrlData['urlkey'];
-        if ($this->configUtils->getExtensionConfigurationValue('createSpeakingURLs')) {
-            $tinyUrl = $this->urlUtils->createSpeakingTinyUrl($tinyUrlKey);
-        } else {
-            $tinyUrl = GeneralUtility::getIndpEnv('TYPO3_SITE_URL');
-            $tinyUrl .= '?eID=tx_tinyurls&tx_tinyurls[key]=' . $tinyUrlKey;
-        }
+        $tinyUrl = $this->buildTinyUrl($tinyUrlData['urlkey']);
 
         return $tinyUrl;
     }
