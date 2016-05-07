@@ -41,8 +41,13 @@ before_script:
   - cd .. && mv typo3-extension-tinyurls tinyurls && cd tinyurls
   - composer require typo3/cms=$TYPO3_VERSION
   - export TYPO3_PATH_WEB=$PWD/.Build/Web
+  - .Build/bin/phpcs --config-set installed_paths Tests/CodeSniffer
 
 script:
+  - >
+    echo;
+    echo "Running phpcs"
+    .Build/bin/phpcs --standard=PSRDefault Classes Tests/Unit Tests/Functional ext_localconf.php ext_tables.php
   - >
     echo;
     echo "Running unit tests";

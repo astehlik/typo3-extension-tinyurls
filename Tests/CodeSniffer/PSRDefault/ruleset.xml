@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<ruleset name="PSRDefault">
+
+	<description>Includes all PSR coding standard and some additional checks.</description>
+
+	<rule ref="PSR1" />
+	<rule ref="PSR2" />
+	<rule ref="Squiz.Strings.DoubleQuoteUsage" />
+	<rule ref="Squiz.Commenting.InlineComment">
+		<exclude name="Squiz.Commenting.InlineComment.Empty" />
+		<exclude name="Squiz.Commenting.InlineComment.DocBlock" />
+		<exclude name="Squiz.Commenting.InlineComment.InvalidEndChar" />
+	</rule>
+	<rule ref="Squiz.Strings.ConcatenationSpacing">
+		<properties>
+			<property name="ignoreNewlines" value="true"/>
+			<property name="spacing" value="1" />
+		</properties>
+	</rule>
+	<rule ref="Squiz.Functions.MultiLineFunctionDeclaration">
+		<exclude name="Squiz.Functions.MultiLineFunctionDeclaration.FirstParamSpacing" />
+	</rule>
+
+    <!--
+        We disable the CamelCapsMethodName method name sniff for some files because we
+        need to implement API methdods that break this convention.
+    -->
+	<rule ref="PSR1.Methods.CamelCapsMethodName">
+        <exclude-pattern>Classes/Hooks/TceDataMap.php</exclude-pattern>
+	</rule>
+
+</ruleset>
