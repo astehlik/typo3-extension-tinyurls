@@ -94,7 +94,6 @@ class TinyUrlGenerator
      */
     public function getTinyUrl($targetUrl)
     {
-
         if (empty($targetUrl)) {
             return $targetUrl;
         }
@@ -158,7 +157,6 @@ class TinyUrlGenerator
      */
     protected function generateNewTinyurl($targetUrl, $targetUrlHash)
     {
-
         $insertArray = [
             'pid' => $this->configUtils->getExtensionConfigurationValue('urlRecordStoragePID'),
             'target_url' => $targetUrl,
@@ -203,7 +201,6 @@ class TinyUrlGenerator
      */
     protected function getCustomUrlKey($targetUrlHash)
     {
-
         $customUrlKey = $this->optionUrlKey;
 
         if ($customUrlKey === false) {
@@ -253,7 +250,6 @@ class TinyUrlGenerator
      */
     protected function getExistingTinyurl($targetUrlHash)
     {
-
         $whereStatement = 'target_url_hash=' .
             $this->getDatabaseConnection()->fullQuoteStr($targetUrlHash, 'tx_tinyurls_urls');
         $whereStatement = $this->configUtils->appendPidQuery($whereStatement);

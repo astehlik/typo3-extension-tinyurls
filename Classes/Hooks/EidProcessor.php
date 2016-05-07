@@ -45,7 +45,6 @@ class EidProcessor
      */
     public function main()
     {
-
         try {
             $this->purgeInvalidUrls();
             $tinyUrlData = $this->getTinyUrlData();
@@ -69,7 +68,6 @@ class EidProcessor
      */
     protected function countUrlHit($tinyUrlData)
     {
-
         // There is no point in counting the hit of a URL that is already deleted
         if ($tinyUrlData['delete_on_use']) {
             return;
@@ -101,7 +99,6 @@ class EidProcessor
      */
     protected function getTinyUrlData()
     {
-
         $getVariables = GeneralUtility::_GET('tx_tinyurls');
         $tinyUrlKey = null;
 
@@ -148,7 +145,6 @@ class EidProcessor
      */
     protected function purgeInvalidUrls()
     {
-
         $purgeWhereStatement = 'valid_until>0 AND valid_until<' . time();
         $purgeWhereStatement = $this->configUtils->appendPidQuery($purgeWhereStatement);
 

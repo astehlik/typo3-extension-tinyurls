@@ -37,7 +37,6 @@ class TypoLink
      */
     public function convertTypolinkToTinyUrl($parameters, $contentObject)
     {
-
         $config = $parameters['conf'];
         $finalTagParts = $parameters['finalTagParts'];
 

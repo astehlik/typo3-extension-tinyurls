@@ -56,7 +56,6 @@ class TceDataMap
         &$fieldArray,
         $tcemain
     ) {
-
         if ($table != 'tx_tinyurls_urls') {
             return;
         }

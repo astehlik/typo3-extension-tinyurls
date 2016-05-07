@@ -47,7 +47,6 @@ class UrlUtils implements SingletonInterface
      */
     protected function convertIntToBase62($base10Integer, $base62Dictionary)
     {
-
         $base62Integer = '';
         $base = 62;
 
@@ -67,7 +66,6 @@ class UrlUtils implements SingletonInterface
      */
     public function createSpeakingTinyUrl($tinyUrlKey)
     {
-
         $speakingUrl = $this->configUtils->getExtensionConfigurationValue('speakingUrlTemplate');
 
         $speakingUrl = $this->getMarkerBasedTemplateService()->substituteMarker(
@@ -102,7 +100,6 @@ class UrlUtils implements SingletonInterface
      */
     public function generateTinyurlKeyForUid($insertedUid)
     {
-
         $tinyUrlKey = $this->convertIntToBase62(
             $insertedUid,
             $this->configUtils->getExtensionConfigurationValue('base62Dictionary')

@@ -18,7 +18,6 @@ use TYPO3\CMS\Core\SingletonInterface;
  */
 class ConfigUtils implements SingletonInterface
 {
-
     /**
      * Contains the default values for the extension configuration
      *
@@ -57,7 +56,6 @@ class ConfigUtils implements SingletonInterface
      */
     protected function initializeExtensionConfiguration()
     {
-
         $extensionConfiguration = array();
         $finalConfiguration = array();
 
@@ -88,7 +86,6 @@ class ConfigUtils implements SingletonInterface
      */
     public function appendPidQuery($whereStatement)
     {
-
         if (!empty($whereStatement)) {
             $whereStatement .= ' AND ';
         }
@@ -105,7 +102,6 @@ class ConfigUtils implements SingletonInterface
      */
     public function getExtensionConfiguration()
     {
-
         if ($this->extensionConfiguration === null) {
             $this->initializeExtensionConfiguration();
         }
@@ -122,7 +118,6 @@ class ConfigUtils implements SingletonInterface
      */
     public function getExtensionConfigurationValue($key)
     {
-
         if ($this->extensionConfiguration === null) {
             $this->initializeExtensionConfiguration();
         }
@@ -144,7 +139,6 @@ class ConfigUtils implements SingletonInterface
      */
     public function initializeConfigFromTyposcript($config, $contentObject, $tinyUrlGenerator)
     {
-
         if (!array_key_exists('tinyurl.', $config)) {
             return;
         }
