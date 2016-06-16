@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff version="1.0">
+    <file source-language="en" target-language="de" datatype="plaintext" original="messages" product-name="tinyurls">
+        <header />
+        <body>
+            <trans-unit id="tx_tinyurls_urls.counter">
+                <source>Counter</source>
+                <target>Zähler</target>
+            </trans-unit>
+        </body>
+    </file>
+</xliff>

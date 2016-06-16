@@ -1,4 +1,6 @@
 <?php
+$languagePrefix = 'LLL:EXT:tinyurls/Resources/Private/Language/locallang_db.xlf:tx_tinyurls_urls.';
+
 return array(
 	'ctrl' => array(
 		'title' => 'Tiny URL',
@@ -18,7 +20,7 @@ return array(
 	'columns' => array(
 		'counter' => array(
 			'exclude' => 0,
-			'label' => 'Counter',
+			'label' => $languagePrefix . 'counter',
 			'config' => array(
 				'type' => 'input',
 				'size' => 6,
