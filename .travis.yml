@@ -38,9 +38,20 @@ before_install:
   - if [ "$GITHUB_COMPOSER_AUTH" ]; then composer config -g github-oauth.github.com $GITHUB_COMPOSER_AUTH; fi
 
 before_script:
+  # Rename our working directory, required for Extension upload to TER.
   - cd .. && mv typo3-extension-tinyurls tinyurls && cd tinyurls
-  - composer require typo3/cms=$TYPO3_VERSION
-  - export TYPO3_PATH_WEB=$PWD/.Build/Web
+  # First we install all required packages as dist versions.
+  - composer require typo3/cms=$TYPO3_VERSION --prefer-dist
+  # Now remove the TYPO3 core and all related symlinks.
+  - rm .Build/vendor/typo3/cms -Rf
+  - rm -f .Build/Web/typo3
+  - rm -f .Build/Web/index.php
+  # Finally we install the TYPO3 core as source version because we need some functional
+  # test classes that are not included in the dist versions.
+  - composer require typo3/cms=$TYPO3_VERSION --prefer-source
+  - export TYPO3_PATH_WEB="$PWD/.Build/Web"
+  - mkdir -p $TYPO3_PATH_WEB/typo3conf/ext
+  - ln -s $PWD $TYPO3_PATH_WEB/typo3conf/ext/tinyurls
   - .Build/bin/phpcs --config-set installed_paths Tests/CodeSniffer
 
 script:
@@ -62,7 +73,7 @@ script:
     export typo3DatabaseHost="localhost";
     export typo3DatabaseUsername="root";
     export typo3DatabasePassword="";
-    find . -wholename '*Tests/Functional/*Test.php' ! -path "./.Build/*" | parallel --gnu 'echo; echo "Running functional test suite {}"; .Build/bin/phpunit --colors -c .Build/vendor/typo3/cms/typo3/sysext/core/Build/FunctionalTests.xml {}'
+    find Tests -wholename '*Tests/Functional/*Test.php' | parallel --gnu 'echo; echo "Running functional test suite {}"; .Build/bin/phpunit --colors -c .Build/vendor/typo3/cms/typo3/sysext/core/Build/FunctionalTests.xml {}'
 
 after_script:
   - >
