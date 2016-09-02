@@ -14,6 +14,6 @@ CREATE TABLE tx_tinyurls_urls (
 	valid_until int(11) unsigned DEFAULT '0' NOT NULL,
 	PRIMARY KEY (uid),
 	KEY parent (pid),
-	KEY parent (target_url_hash),
+	KEY target_url_hash (target_url_hash),
 	UNIQUE KEY tinyurl (urlkey)
 );
