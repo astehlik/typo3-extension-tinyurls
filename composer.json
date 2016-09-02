@@ -24,7 +24,7 @@
         "typo3/cms-core": "^7.6|^8.0"
     },
     "require-dev": {
-        "namelesscoder/typo3-repository-client": "1.1.x-dev",
+        "namelesscoder/typo3-repository-client": "^1.2.0",
         "phpunit/phpunit": "~4.8.0",
         "squizlabs/php_codesniffer": "^2.6"
     },
