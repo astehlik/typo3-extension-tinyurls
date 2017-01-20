@@ -20,7 +20,7 @@ use TYPO3\CMS\Fluid\Core\ViewHelper\Exception;
  * (depending on the extension manager settings of tinyurl and viewhelper parameters)
  * </output>
  */
-class TinyurlViewhelper extends AbstractViewHelper implements CompilableInterface
+class TinyurlViewHelper extends AbstractViewHelper implements CompilableInterface
 {
     /**
      * @param string $url The Url to be shorting
