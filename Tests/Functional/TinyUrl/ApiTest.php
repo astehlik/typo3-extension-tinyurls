@@ -1,5 +1,5 @@
 <?php
-namespace Tx\Tinyurls\Tests\Functional;
+namespace Tx\Tinyurls\Tests\Functional\TinyUrl;
 
 /*                                                                        *
  * This script belongs to the TYPO3 extension "tinyurls".                 *
@@ -19,7 +19,7 @@ use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
 /**
  * Functional tests for the tinyurls API.
  */
-class TinyurlsApiTest extends FunctionalTestCase
+class ApiTest extends FunctionalTestCase
 {
     /**
      * @var array
