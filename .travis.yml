@@ -50,13 +50,13 @@ before_script:
   # test classes that are not included in the dist versions.
   - composer require typo3/cms=$TYPO3_VERSION --prefer-source
   - export TYPO3_PATH_WEB=$PWD/.Build/Web
-  - .Build/bin/phpcs --config-set installed_paths Tests/CodeSniffer
 
 script:
   - >
     echo;
     echo "Running phpcs"
-    .Build/bin/phpcs --standard=PSRDefault Classes Tests/Unit Tests/Functional ext_localconf.php ext_tables.php
+    .Build/bin/phpcs --config-set installed_paths $PWD/.Build/vendor/de-swebhosting/php-codestyle/PhpCodeSniffer,Tests/CodeSniffer
+    .Build/bin/phpcs --standard=PSRTinyurls Classes Tests/Unit Tests/Functional ext_localconf.php
   - >
     echo;
     echo "Running unit tests";
