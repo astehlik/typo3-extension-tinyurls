@@ -23,9 +23,7 @@ class UrlUtilsTest extends FunctionalTestCase
     /**
      * @var array
      */
-    protected $testExtensionsToLoad = array(
-        'typo3conf/ext/tinyurls',
-    );
+    protected $testExtensionsToLoad = ['typo3conf/ext/tinyurls'];
 
     /**
      * @test
@@ -34,7 +32,7 @@ class UrlUtilsTest extends FunctionalTestCase
     {
         $_SERVER['REMOTE_ADDR'] = '127.0.0.1';
         $GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['tinyurls'] = serialize(
-            array('speakingUrlTemplate' => '###REMOTE_ADDR###')
+            ['speakingUrlTemplate' => '###REMOTE_ADDR###']
         );
         $urlUtils = GeneralUtility::makeInstance(UrlUtils::class);
         $this->assertEquals('127.0.0.1', $urlUtils->createSpeakingTinyUrl('test'));

@@ -78,8 +78,8 @@ class EidProcessor
         $this->getDatabaseConnection()->exec_UPDATEquery(
             'tx_tinyurls_urls',
             'uid=' . (integer)$tinyUrlData['uid'],
-            array('counter' => 'counter + 1'),
-            array('counter')
+            ['counter' => 'counter + 1'],
+            ['counter']
         );
     }
 

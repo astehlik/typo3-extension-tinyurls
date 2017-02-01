@@ -24,9 +24,7 @@ class TinyurlsApiTest extends FunctionalTestCase
     /**
      * @var array
      */
-    protected $testExtensionsToLoad = array(
-        'typo3conf/ext/tinyurls',
-    );
+    protected $testExtensionsToLoad = ['typo3conf/ext/tinyurls'];
 
     /**
      * @var Api
@@ -85,11 +83,9 @@ class TinyurlsApiTest extends FunctionalTestCase
      */
     public function apiSetsDeleteOnUseIfConfiguredInTypoScript()
     {
-        $typoScript = array(
-            'tinyurl.' => array(
-                'deleteOnUse' => 1,
-            )
-        );
+        $typoScript = [
+            'tinyurl.' => ['deleteOnUse' => 1]
+        ];
         $contentObject = GeneralUtility::makeInstance(ContentObjectRenderer::class);
         $this->tinyUrlsApi->initializeConfigFromTyposcript($typoScript, $contentObject);
         $this->tinyUrlsApi->getTinyUrl('http://mydomain.tld');
@@ -122,11 +118,9 @@ class TinyurlsApiTest extends FunctionalTestCase
     public function apiSetsValidUntilIfConfiguredInTypoScript()
     {
         $validUntilTimestamp = 20000;
-        $typoScript = array(
-            'tinyurl.' => array(
-                'validUntil' => $validUntilTimestamp,
-            )
-        );
+        $typoScript = [
+            'tinyurl.' => ['validUntil' => $validUntilTimestamp]
+        ];
         $contentObject = GeneralUtility::makeInstance(ContentObjectRenderer::class);
         $this->tinyUrlsApi->initializeConfigFromTyposcript($typoScript, $contentObject);
         $this->tinyUrlsApi->getTinyUrl('http://mydomain.tld');

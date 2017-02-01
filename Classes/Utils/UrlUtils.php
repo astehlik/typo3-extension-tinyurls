@@ -74,7 +74,7 @@ class UrlUtils implements SingletonInterface
             $tinyUrlKey
         );
 
-        $matches = array();
+        $matches = [];
         preg_match_all('/###(.*?)###/', $speakingUrl, $matches);
 
         if (empty($matches[1])) {

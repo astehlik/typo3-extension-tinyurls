@@ -54,9 +54,7 @@ class DatabaseRecordList implements SingletonInterface
 
         if ($this->urlDisplayQuery === null) {
             $urlUtils = GeneralUtility::makeInstance(UrlUtils::class);
-            $this->urlDisplayQuery = "CONCAT('" . $urlUtils->createSpeakingTinyUrl(
-                    "', urlkey, '"
-                ) . "') as urldisplay";
+            $this->urlDisplayQuery = "CONCAT('" . $urlUtils->createSpeakingTinyUrl("', urlkey, '") . "') as urldisplay";
         }
 
         $queryParts['SELECT'] = str_replace('urldisplay', $this->urlDisplayQuery, $queryParts['SELECT']);
