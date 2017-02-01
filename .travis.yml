@@ -20,6 +20,7 @@ sudo: false
 cache:
   directories:
     - $HOME/.composer/cache
+    - $HOME/.cache/composer
 
 addons:
   apt:
