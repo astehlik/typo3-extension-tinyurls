@@ -95,7 +95,7 @@ class UrlUtils implements SingletonInterface
      * Generates a unique tinyurl key for the record with the given UID
      *
      * @param int $insertedUid
-     * @return array
+     * @return string
      */
     public function generateTinyurlKeyForUid($insertedUid)
     {
