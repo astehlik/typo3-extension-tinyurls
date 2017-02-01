@@ -11,7 +11,6 @@ namespace Tx\Tinyurls\Utils;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
-use TYPO3\CMS\Core\Html\HtmlParser;
 use TYPO3\CMS\Core\Service\MarkerBasedTemplateService;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -74,7 +73,7 @@ class UrlUtils implements SingletonInterface
             $tinyUrlKey
         );
 
-        $matches = array();
+        $matches = [];
         preg_match_all('/###(.*?)###/', $speakingUrl, $matches);
 
         if (empty($matches[1])) {
@@ -96,7 +95,7 @@ class UrlUtils implements SingletonInterface
      * Generates a unique tinyurl key for the record with the given UID
      *
      * @param int $insertedUid
-     * @return array
+     * @return string
      */
     public function generateTinyurlKeyForUid($insertedUid)
     {

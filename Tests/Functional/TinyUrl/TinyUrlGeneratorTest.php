@@ -1,5 +1,5 @@
 <?php
-namespace Tx\Tinyurls\Tests\Functional;
+namespace Tx\Tinyurls\Tests\Functional\TinyUrl;
 
 /*                                                                        *
  * This script belongs to the TYPO3 extension "tinyurls".                 *
@@ -11,14 +11,14 @@ namespace Tx\Tinyurls\Tests\Functional;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
-use Tx\Tinyurls\Utils\UrlUtils;
+use Tx\Tinyurls\TinyUrl\TinyUrlGenerator;
 use TYPO3\CMS\Core\Tests\FunctionalTestCase;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
- * Functional tests for the tinyurls API.
+ * Functional tests for the TinyUrlGenerator.
  */
-class UrlUtilsTest extends FunctionalTestCase
+class TinyUrlGeneratorTest extends FunctionalTestCase
 {
     /**
      * @var array
@@ -26,15 +26,30 @@ class UrlUtilsTest extends FunctionalTestCase
     protected $testExtensionsToLoad = ['typo3conf/ext/tinyurls'];
 
     /**
+     * @var TinyUrlGenerator
+     */
+    protected $tinyUrlGenerator;
+
+    /**
+     * Initializes the test subject.
+     */
+    public function setUp()
+    {
+        parent::setUp();
+        $this->tinyUrlGenerator = GeneralUtility::makeInstance(TinyUrlGenerator::class);
+    }
+
+    /**
      * @test
      */
-    public function createSpeakingTinyUrlReplacesGeneralUtilityMarkers()
+    public function getTinyUrlSetsTstampOfNewTinyUrl()
     {
-        $_SERVER['REMOTE_ADDR'] = '127.0.0.1';
-        $GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['tinyurls'] = serialize(
-            ['speakingUrlTemplate' => '###REMOTE_ADDR###']
+        $this->tinyUrlGenerator->getTinyUrl('http://mydomain.tld');
+        $tinyUrlRow = $this->getDatabaseConnection()->exec_SELECTgetSingleRow(
+            'tstamp',
+            'tx_tinyurls_urls',
+            'uid=1'
         );
-        $urlUtils = GeneralUtility::makeInstance(UrlUtils::class);
-        $this->assertEquals('127.0.0.1', $urlUtils->createSpeakingTinyUrl('test'));
+        $this->assertEquals($GLOBALS['EXEC_TIME'], $tinyUrlRow['tstamp']);
     }
 }

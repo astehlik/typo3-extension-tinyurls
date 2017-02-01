@@ -23,14 +23,14 @@ class ConfigUtils implements SingletonInterface
      *
      * @var array
      */
-    protected $extensionConfigurationDefaults = array(
+    protected $extensionConfigurationDefaults = [
         'createSpeakingURLs' => false,
         'speakingUrlTemplate' => '###TYPO3_SITE_URL###tinyurl/###TINY_URL_KEY###',
         'base62Dictionary' => 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789',
         'minimalRandomKeyLength' => 2,
         'minimalTinyurlKeyLength' => 8,
         'urlRecordStoragePID' => 0,
-    );
+    ];
 
     /**
      * The initialized extension configuration
@@ -44,11 +44,11 @@ class ConfigUtils implements SingletonInterface
      *
      * @var array
      */
-    protected $tinyurlConfigDefaults = array(
+    protected $tinyurlConfigDefaults = [
         'deleteOnUse' => 0,
         'validUntil' => 0,
         'urlKey' => false,
-    );
+    ];
 
     /**
      * Initializes the extension configuration array, merging the default config and the config
@@ -56,8 +56,8 @@ class ConfigUtils implements SingletonInterface
      */
     protected function initializeExtensionConfiguration()
     {
-        $extensionConfiguration = array();
-        $finalConfiguration = array();
+        $extensionConfiguration = [];
+        $finalConfiguration = [];
 
         if (isset($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['tinyurls'])) {
             $extensionConfigurationData = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['tinyurls']);

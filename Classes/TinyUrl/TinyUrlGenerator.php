@@ -22,6 +22,11 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 class TinyUrlGenerator
 {
     /**
+     * @var string
+     */
+    protected $comment = '';
+
+    /**
      * If this option is 1 the URL will be deleted from the database
      * on the first hit
      *
@@ -111,6 +116,16 @@ class TinyUrlGenerator
     }
 
     /**
+     * Sets the comment for the next tinyurl that is generated.
+     *
+     * @param string $comment
+     */
+    public function setComment(string $comment)
+    {
+        $this->comment = (string)$comment;
+    }
+
+    /**
      * Sets the deleteOnUse option, if 1 the URL will be deleted from
      * the database on the first hit
      *
@@ -163,6 +178,8 @@ class TinyUrlGenerator
             'target_url_hash' => $targetUrlHash,
             'delete_on_use' => (int)$this->optionDeleteOnUse,
             'valid_until' => $this->optionValidUntil,
+            'comment' => $this->comment,
+            'tstamp' => $GLOBALS['EXEC_TIME'],
         ];
 
         $customUrlKey = $this->getCustomUrlKey($targetUrlHash);

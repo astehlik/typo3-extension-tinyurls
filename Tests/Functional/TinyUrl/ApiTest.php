@@ -1,5 +1,5 @@
 <?php
-namespace Tx\Tinyurls\Tests\Functional;
+namespace Tx\Tinyurls\Tests\Functional\TinyUrl;
 
 /*                                                                        *
  * This script belongs to the TYPO3 extension "tinyurls".                 *
@@ -19,14 +19,12 @@ use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
 /**
  * Functional tests for the tinyurls API.
  */
-class TinyurlsApiTest extends FunctionalTestCase
+class ApiTest extends FunctionalTestCase
 {
     /**
      * @var array
      */
-    protected $testExtensionsToLoad = array(
-        'typo3conf/ext/tinyurls',
-    );
+    protected $testExtensionsToLoad = ['typo3conf/ext/tinyurls'];
 
     /**
      * @var Api
@@ -83,13 +81,26 @@ class TinyurlsApiTest extends FunctionalTestCase
     /**
      * @test
      */
+    public function apiSetsComment()
+    {
+        $this->tinyUrlsApi->setComment('My test comment');
+        $this->tinyUrlsApi->getTinyUrl('http://mydomain.tld');
+        $tinyUrlRow = $this->getDatabaseConnection()->exec_SELECTgetSingleRow(
+            'comment',
+            'tx_tinyurls_urls',
+            'uid=1'
+        );
+        $this->assertEquals('My test comment', $tinyUrlRow['comment']);
+    }
+
+    /**
+     * @test
+     */
     public function apiSetsDeleteOnUseIfConfiguredInTypoScript()
     {
-        $typoScript = array(
-            'tinyurl.' => array(
-                'deleteOnUse' => 1,
-            )
-        );
+        $typoScript = [
+            'tinyurl.' => ['deleteOnUse' => 1],
+        ];
         $contentObject = GeneralUtility::makeInstance(ContentObjectRenderer::class);
         $this->tinyUrlsApi->initializeConfigFromTyposcript($typoScript, $contentObject);
         $this->tinyUrlsApi->getTinyUrl('http://mydomain.tld');
@@ -122,11 +133,9 @@ class TinyurlsApiTest extends FunctionalTestCase
     public function apiSetsValidUntilIfConfiguredInTypoScript()
     {
         $validUntilTimestamp = 20000;
-        $typoScript = array(
-            'tinyurl.' => array(
-                'validUntil' => $validUntilTimestamp,
-            )
-        );
+        $typoScript = [
+            'tinyurl.' => ['validUntil' => $validUntilTimestamp],
+        ];
         $contentObject = GeneralUtility::makeInstance(ContentObjectRenderer::class);
         $this->tinyUrlsApi->initializeConfigFromTyposcript($typoScript, $contentObject);
         $this->tinyUrlsApi->getTinyUrl('http://mydomain.tld');
