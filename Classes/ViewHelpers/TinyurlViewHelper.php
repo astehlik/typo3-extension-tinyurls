@@ -1,11 +1,20 @@
 <?php
 namespace Tx\Tinyurls\ViewHelpers;
 
+/*                                                                        *
+ * This script belongs to the TYPO3 extension "tinyurls".                 *
+ *                                                                        *
+ * It is free software; you can redistribute it and/or modify it under    *
+ * the terms of the GNU General Public License, either version 3 of the   *
+ * License, or (at your option) any later version.                        *
+ *                                                                        *
+ * The TYPO3 project - inspiring people to share!                         *
+ *                                                                        */
+
+use Tx\Tinyurls\TinyUrl\Api as TinyUrlApi;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Fluid\Core\Rendering\RenderingContextInterface;
 use TYPO3\CMS\Fluid\Core\ViewHelper\AbstractViewHelper;
 use TYPO3\CMS\Fluid\Core\ViewHelper\Facets\CompilableInterface;
-use TYPO3\CMS\Fluid\Core\ViewHelper\Exception;
 
 /**
  * A view helper for shortening URLs.
@@ -13,7 +22,8 @@ use TYPO3\CMS\Fluid\Core\ViewHelper\Exception;
  * = Examples =
  *
  * <code title="Shortened URL">
- * <mynamespace:tinyurl url="http://www.google.de" onlyOneTimeValid="0" validUntil="1484740235" urlKey="TvRydDxwK8JOreSQ0zlCVZmtkLMfFn1G7HEhN9Bo546cjbgispUaqA3IW2PYuX" />
+ * <mynamespace:tinyurl url="http://www.google.de" onlyOneTimeValid="0" validUntil="1484740235"
+ *                      urlKey="TvRydDxwK8JOreSQ0zlCVZmtkLMfFn1G7HEhN9Bo546cjbgispUaqA3IW2PYuX" />
  * </code>
  * <output>
  * http://mytypo3page.tld/index.php?eID=tx_tinyurls&tx_tinyurls[key]=Aefc-3E
@@ -31,47 +41,25 @@ class TinyurlViewHelper extends AbstractViewHelper implements CompilableInterfac
      */
     public function render($url = null, $onlyOneTimeValid = false, $validUntil = 0, $urlKey = '')
     {
-        return static::renderStatic(
-            [
-                'url' => $url,
-                'onlyOneTimeValid' => $onlyOneTimeValid,
-                'validUntil' => $validUntil,
-                'urlKey' => $urlKey
-            ],
-            $this->buildRenderChildrenClosure(),
-            $this->renderingContext
-        );
-    }
-
-    /**
-     * @param array $arguments
-     * @param \Closure $renderChildrenClosure
-     * @param RenderingContextInterface $renderingContext
-     *
-     * @return int
-     * @throws Exception
-     */
-    public static function renderStatic(array $arguments, \Closure $renderChildrenClosure, RenderingContextInterface $renderingContext)
-    {
-        if ($arguments['url'] === null) {
-            $arguments['url'] = $renderChildrenClosure();
+        if ($url === null) {
+            $url = $this->renderChildren();
         }
 
-        $tinyUrlApi = GeneralUtility::makeInstance(\Tx\Tinyurls\TinyUrl\Api::class);
+        $tinyUrlApi = GeneralUtility::makeInstance(TinyUrlApi::class);
 
-        if ($arguments['onlyOneTimeValid']) {
-            $tinyUrlApi->setDeleteOnUse($arguments['onlyOneTimeValid']);
+        if ($onlyOneTimeValid) {
+            $tinyUrlApi->setDeleteOnUse($onlyOneTimeValid);
         }
 
-        if ($arguments['validUntil'] > 0) {
-            $tinyUrlApi->setValidUntil($arguments['validUntil']);
+        if ($validUntil > 0) {
+            $tinyUrlApi->setValidUntil($validUntil);
         }
 
-        if ($arguments['urlKey'] !== '') {
-            $tinyUrlApi->setUrlKey($arguments['urlKey']);
+        if ($urlKey !== '') {
+            $tinyUrlApi->setUrlKey($urlKey);
         }
 
-        $tinyUrl = $tinyUrlApi->getTinyUrl($arguments['url']);
+        $tinyUrl = $tinyUrlApi->getTinyUrl($url);
 
         return $tinyUrl;
     }
