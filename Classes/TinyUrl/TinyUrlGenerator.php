@@ -120,7 +120,7 @@ class TinyUrlGenerator
      *
      * @param string $comment
      */
-    public function setComment(string $comment)
+    public function setComment($comment)
     {
         $this->comment = (string)$comment;
     }
