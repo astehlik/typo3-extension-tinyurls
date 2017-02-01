@@ -49,20 +49,20 @@ before_script:
 script:
   - >
     echo;
-    echo "Running phpcs"
-    .Build/bin/phpcs --config-set installed_paths $PWD/.Build/vendor/de-swebhosting/php-codestyle/PhpCodeSniffer,Tests/CodeSniffer
+    echo "Running phpcs";
+    .Build/bin/phpcs --config-set installed_paths $PWD/.Build/vendor/de-swebhosting/php-codestyle/PhpCodeSniffer,Tests/CodeSniffer;
     .Build/bin/phpcs --standard=PSRTinyurls Classes Tests/Unit Tests/Functional ext_localconf.php
   - >
     echo;
-    echo "Determining phpunit config path"
-    if [ $TYPO3_VERSION == "dev-master" ]; then
-      PHPUNIT_CONFIG_PATH=".Build/vendor/typo3/cms/typo3/components/testing_framework/core/Build"
+    echo "Determining phpunit config path";
+    if [ "$TYPO3_VERSION" == "dev-master" ]; then
+      PHPUNIT_CONFIG_PATH=".Build/vendor/typo3/cms/typo3/components/testing_framework/core/Build";
     else
-      PHPUNIT_CONFIG_PATH=".Build/vendor/typo3/cms/typo3/sysext/core/Build"
+      PHPUNIT_CONFIG_PATH=".Build/vendor/typo3/cms/typo3/sysext/core/Build";
     fi
   - >
     echo;
-    echo "Running unit tests"
+    echo "Running unit tests";
     .Build/bin/phpunit -c $PHPUNIT_CONFIG_PATH/UnitTests.xml Tests/Unit/
   - >
     echo;
