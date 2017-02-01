@@ -71,6 +71,16 @@ class Api
     }
 
     /**
+     * Sets the comment for the created tiny URL.
+     *
+     * @param string $comment
+     */
+    public function setComment($comment)
+    {
+        $this->tinyUrlGenerator->setComment($comment);
+    }
+
+    /**
      * Sets the deleteOnUse option, if TRUE the URL will be deleted from
      * the database on the first hit
      *
