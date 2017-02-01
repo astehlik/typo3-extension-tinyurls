@@ -46,6 +46,7 @@ before_script:
   # test classes that are not included in the dist versions.
   - composer require typo3/cms=$TYPO3_VERSION --prefer-source
   - export TYPO3_PATH_WEB=$PWD/.Build/Web
+  - test -d $PWD/.Build/vendor/typo3/cms/components && ln -s "$PWD/.Build/vendor/typo3/cms/components" .Build/Web/components
 
 script:
   - >
