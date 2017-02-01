@@ -56,7 +56,7 @@ script:
     echo;
     echo "Determining phpunit config path";
     if [ "$TYPO3_VERSION" == "dev-master" ]; then
-      export PHPUNIT_CONFIG_PATH=".Build/vendor/typo3/cms/typo3/components/testing_framework/core/Build";
+      export PHPUNIT_CONFIG_PATH=".Build/vendor/typo3/cms/components/testing_framework/core/Build";
     else
       export PHPUNIT_CONFIG_PATH=".Build/vendor/typo3/cms/typo3/sysext/core/Build";
     fi
