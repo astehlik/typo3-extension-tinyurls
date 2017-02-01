@@ -14,7 +14,6 @@ namespace Tx\Tinyurls\ViewHelpers;
 use Tx\Tinyurls\TinyUrl\Api as TinyUrlApi;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Fluid\Core\ViewHelper\AbstractViewHelper;
-use TYPO3\CMS\Fluid\Core\ViewHelper\Facets\CompilableInterface;
 
 /**
  * A view helper for shortening URLs.
@@ -30,7 +29,7 @@ use TYPO3\CMS\Fluid\Core\ViewHelper\Facets\CompilableInterface;
  * (depending on the extension manager settings of tinyurl and viewhelper parameters)
  * </output>
  */
-class TinyurlViewHelper extends AbstractViewHelper implements CompilableInterface
+class TinyurlViewHelper extends AbstractViewHelper
 {
     /**
      * @param string $url The Url to be shorting
