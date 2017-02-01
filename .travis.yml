@@ -55,8 +55,16 @@ script:
     .Build/bin/phpcs --standard=PSRTinyurls Classes Tests/Unit Tests/Functional ext_localconf.php
   - >
     echo;
-    echo "Running unit tests";
-    .Build/bin/phpunit -c .Build/vendor/typo3/cms/typo3/sysext/core/Build/UnitTests.xml Tests/Unit/
+    echo "Determining phpunit config path"
+    if [ $TYPO3_VERSION == "dev-master" ]; then
+      PHPUNIT_CONFIG_PATH=".Build/vendor/typo3/cms/typo3/components/testing_framework/core/Build"
+    else
+      PHPUNIT_CONFIG_PATH=".Build/vendor/typo3/cms/typo3/sysext/core/Build"
+    fi
+  - >
+    echo;
+    echo "Running unit tests"
+    .Build/bin/phpunit -c $PHPUNIT_CONFIG_PATH/UnitTests.xml Tests/Unit/
   - >
     echo;
     echo "Running php lint";
@@ -67,7 +75,7 @@ script:
     export typo3DatabaseHost="localhost";
     export typo3DatabaseUsername="root";
     export typo3DatabasePassword="";
-    find . -wholename '*Tests/Functional/*Test.php' ! -path "./.Build/*" | parallel --gnu 'echo; echo "Running functional test suite {}"; .Build/bin/phpunit --colors -c .Build/vendor/typo3/cms/typo3/sysext/core/Build/FunctionalTests.xml {}'
+    find . -wholename '*Tests/Functional/*Test.php' ! -path "./.Build/*" | parallel --gnu 'echo; echo "Running functional test suite {}"; .Build/bin/phpunit --colors -c $PHPUNIT_CONFIG_PATH/FunctionalTests.xml {}'
 
 after_script:
   - >
