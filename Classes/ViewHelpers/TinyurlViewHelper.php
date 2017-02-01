@@ -60,6 +60,11 @@ class TinyurlViewHelper extends AbstractViewHelper
 
         $tinyUrl = $tinyUrlApi->getTinyUrl($url);
 
+        // Backward compatibility for TYPO3 7: we need to do the escaping manually.
+        if (!property_exists($this, 'escapeOutput')) {
+            $tinyUrl = htmlspecialchars($tinyUrl);
+        }
+
         return $tinyUrl;
     }
 }
