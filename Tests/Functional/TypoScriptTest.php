@@ -29,7 +29,12 @@ class TypoScriptTest extends FunctionalTestCase
     public function setUp()
     {
         parent::setUp();
-        $this->importDataSet(ORIGINAL_ROOT . 'typo3/sysext/core/Tests/Functional/Fixtures/pages.xml');
+        if (file_exists(ORIGINAL_ROOT . 'typo3/sysext/core/Tests/Functional/Fixtures/pages.xml')) {
+            $this->importDataSet(ORIGINAL_ROOT . 'typo3/sysext/core/Tests/Functional/Fixtures/pages.xml');
+        } else {
+            // For TYPO3 master master
+            $this->importDataSet(ORIGINAL_ROOT . 'typo3/sysext/frontend/Tests/Functional/Fixtures/pages.xml');
+        }
     }
 
     /**
