@@ -179,6 +179,7 @@ class TinyUrlGenerator
             'delete_on_use' => (int)$this->optionDeleteOnUse,
             'valid_until' => $this->optionValidUntil,
             'comment' => $this->comment,
+            'tstamp' => $GLOBALS['EXEC_TIME'],
         ];
 
         $customUrlKey = $this->getCustomUrlKey($targetUrlHash);
