@@ -35,7 +35,7 @@ class UrlUtilsTest extends PHPUnitTestCase
      */
     public function setUp()
     {
-        $this->configUtilityMock = $this->getMock(ConfigUtils::class);
+        $this->configUtilityMock = $this->createMock(ConfigUtils::class);
         $this->urlUtils = $this->getMockBuilder(UrlUtils::class)
             ->setMethods(['getIndependentEnvironmentVariable', 'getConfigUtils'])
             ->disableOriginalConstructor()
