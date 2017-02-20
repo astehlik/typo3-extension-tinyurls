@@ -18,9 +18,9 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Recordlist\RecordList\AbstractDatabaseRecordList;
 
 /**
- * Contains a hook for the typolink generation to convert a typolink
- * in a tinyurl. Additionally, it contains a public api for generating
- * a tinyurl in another extension.
+ * Hook for improving the display of tinyurls in the list module.
+ *
+ * We make this a singleton to improve the performance. We can cache the urldisplay query.
  */
 class DatabaseRecordList implements SingletonInterface
 {
@@ -30,6 +30,19 @@ class DatabaseRecordList implements SingletonInterface
      * @var string
      */
     protected $urlDisplayQuery;
+
+    /**
+     * @var UrlUtils
+     */
+    protected $urlUtils;
+
+    /**
+     * @param UrlUtils $urlUtils
+     */
+    public function injectUrlUtils(UrlUtils $urlUtils)
+    {
+        $this->urlUtils = $urlUtils;
+    }
 
     /**
      * Called by the makeQueryArray hook in the DatabaseRecordList.
@@ -44,20 +57,28 @@ class DatabaseRecordList implements SingletonInterface
         array &$queryParts,
         /** @noinspection PhpUnusedParameterInspection */
         AbstractDatabaseRecordList $parentRecordList,
-        $table
+        string $table
     ) {
         if ($table !== 'tx_tinyurls_urls') {
             return;
         }
-        if (!strpos($queryParts['SELECT'], 'urldisplay')) {
+        if (strpos($queryParts['SELECT'], 'urldisplay') === false) {
             return;
         }
 
         if ($this->urlDisplayQuery === null) {
-            $urlUtils = GeneralUtility::makeInstance(UrlUtils::class);
+            $urlUtils = $this->getUrlUtils();
             $this->urlDisplayQuery = "CONCAT('" . $urlUtils->createSpeakingTinyUrl("', urlkey, '") . "') as urldisplay";
         }
 
         $queryParts['SELECT'] = str_replace('urldisplay', $this->urlDisplayQuery, $queryParts['SELECT']);
+    }
+
+    protected function getUrlUtils(): UrlUtils
+    {
+        if ($this->urlUtils === null) {
+            $this->urlUtils = GeneralUtility::makeInstance(UrlUtils::class);
+        }
+        return $this->urlUtils;
     }
 }
