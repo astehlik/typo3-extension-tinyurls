@@ -96,9 +96,9 @@ class CopyableFieldElementTest extends TestCase
     public function testRenderInitializesResultArray()
     {
         // Test for some common array keys. This way we do not need to mock the test subject.
-        static::assertArrayHasKey('additionalJavaScriptPost', $this->copyableFieldElement->render());
-        static::assertArrayHasKey('additionalHiddenFields', $this->copyableFieldElement->render());
-        static::assertArrayHasKey('inlineData', $this->copyableFieldElement->render());
+        $this->assertArrayHasKey('additionalJavaScriptPost', $this->copyableFieldElement->render());
+        $this->assertArrayHasKey('additionalHiddenFields', $this->copyableFieldElement->render());
+        $this->assertArrayHasKey('inlineData', $this->copyableFieldElement->render());
     }
 
     public function testRenderInitializesTemplatePathInFormFieldView()
@@ -117,7 +117,7 @@ class CopyableFieldElementTest extends TestCase
 
     public function testRenderLoadsAdditionalLanguageLabels()
     {
-        static::assertArraySubset(
+        $this->assertArraySubset(
             [
                 'additionalInlineLanguageLabelFiles' => ['EXT:tinyurls/Resources/Private/Language/locallang_db_js.xlf'],
             ],
@@ -127,7 +127,7 @@ class CopyableFieldElementTest extends TestCase
 
     public function testRenderLoadsCopyToClipboardJsModule()
     {
-        static::assertArraySubset(
+        $this->assertArraySubset(
             ['requireJsModules' => ['TYPO3/CMS/Tinyurls/CopyToClipboard']],
             $this->copyableFieldElement->render()
         );
@@ -140,7 +140,7 @@ class CopyableFieldElementTest extends TestCase
             ->willReturn('The final html');
 
         $result = $this->copyableFieldElement->render();
-        static::assertEquals('The final html', $result['html']);
+        $this->assertEquals('The final html', $result['html']);
     }
 
     /**

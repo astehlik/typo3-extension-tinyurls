@@ -34,6 +34,6 @@ class TinyUrlDisplayTest extends TestCase
         $tinyUrlDisplay->setTinyUrlGenerator($tinyUrlGenerator);
 
         $formElementData['databaseRow']['urlkey'] = 'the tiny urlkey';
-        static::assertEquals('the generated url', $tinyUrlDisplay->buildTinyUrlFormFormElementData($formElementData));
+        $this->assertEquals('the generated url', $tinyUrlDisplay->buildTinyUrlFormFormElementData($formElementData));
     }
 }

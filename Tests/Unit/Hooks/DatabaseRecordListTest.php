@@ -48,14 +48,14 @@ class DatabaseRecordList extends TestCase
             $this->parentRecordListMock,
             'tx_tinyurls_urls'
         );
-        static::assertEquals($queryPartsOriginal, $queryParts);
+        $this->assertEquals($queryPartsOriginal, $queryParts);
     }
 
     public function testmakeQueryArrayPostDoesNotChangeQueryPartsForOtherTable()
     {
         $queryPartsOriginal = $queryParts = ['SELECT' => 'urldisplay'];
         $this->databaseRecordListHooks->makeQueryArray_post($queryParts, $this->parentRecordListMock, 'othertable');
-        static::assertEquals($queryPartsOriginal, $queryParts);
+        $this->assertEquals($queryPartsOriginal, $queryParts);
     }
 
     public function testmakeQueryArrayPostReplacesUrldisplayWithConcatQuery()
@@ -74,7 +74,7 @@ class DatabaseRecordList extends TestCase
             $this->parentRecordListMock,
             'tx_tinyurls_urls'
         );
-        static::assertEquals($queryPartsExcpected, $queryParts);
+        $this->assertEquals($queryPartsExcpected, $queryParts);
     }
 
     public function testmakeQueryArrayPostReplacesUrldisplayWithConcatQueryFromCache()
@@ -101,7 +101,7 @@ class DatabaseRecordList extends TestCase
             $this->parentRecordListMock,
             'tx_tinyurls_urls'
         );
-        static::assertEquals($queryPartsExcpected, $queryParts);
+        $this->assertEquals($queryPartsExcpected, $queryParts);
     }
 
     /**
