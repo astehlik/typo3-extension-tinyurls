@@ -12,14 +12,14 @@ namespace Tx\Tinyurls\Tests\Utils;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
-use PHPUnit_Framework_TestCase as PHPUnitTestCase;
+use PHPUnit\Framework\TestCase;
 use Tx\Tinyurls\Utils\ConfigUtils;
 use Tx\Tinyurls\Utils\UrlUtils;
 
 /**
  * Tests for the tinyurls API.
  */
-class UrlUtilsTest extends PHPUnitTestCase
+class UrlUtilsTest extends TestCase
 {
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
@@ -31,10 +31,7 @@ class UrlUtilsTest extends PHPUnitTestCase
      */
     protected $urlUtils;
 
-    /**
-     *
-     */
-    public function setUp()
+    protected function setUp()
     {
         $this->configUtilityMock = $this->createMock(ConfigUtils::class);
         $this->urlUtils = $this->getMockBuilder(UrlUtils::class)
