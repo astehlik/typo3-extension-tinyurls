@@ -40,7 +40,7 @@ class UrlUtilsTest extends TestCase
             ->getMock();
         $this->urlUtils->expects($this->once())
             ->method('getConfigUtils')
-            ->will($this->returnValue($this->configUtilityMock));
+            ->willReturn($this->configUtilityMock);
         $this->urlUtils->__construct();
     }
 
@@ -52,10 +52,10 @@ class UrlUtilsTest extends TestCase
     {
         $this->configUtilityMock->expects($this->once())
             ->method('getExtensionConfigurationValue')
-            ->will($this->returnValue('###MY_ENV_MARKER###'));
+            ->willReturn('###MY_ENV_MARKER###');
         $this->urlUtils->expects($this->once())
             ->method('getIndependentEnvironmentVariable')
-            ->will($this->returnValue('replacedvalue'));
+            ->willReturn('replacedvalue');
         $speakingUrl = $this->urlUtils->createSpeakingTinyUrl('testkey');
         $this->assertEquals('replacedvalue', $speakingUrl);
     }
@@ -68,7 +68,7 @@ class UrlUtilsTest extends TestCase
     {
         $this->configUtilityMock->expects($this->once())
             ->method('getExtensionConfigurationValue')
-            ->will($this->returnValue('###MY_ENV_MARKER1###/###MY_ENV_MARKER2###'));
+            ->willReturn('###MY_ENV_MARKER1###/###MY_ENV_MARKER2###');
         $this->urlUtils->expects($this->exactly(2))
             ->method('getIndependentEnvironmentVariable')
             ->will($this->onConsecutiveCalls('myenvvalue1', 'myenvvalue2'));
@@ -84,7 +84,7 @@ class UrlUtilsTest extends TestCase
     {
         $this->configUtilityMock->expects($this->once())
             ->method('getExtensionConfigurationValue')
-            ->will($this->returnValue('###TINY_URL_KEY###'));
+            ->willReturn('###TINY_URL_KEY###');
         $speakingUrl = $this->urlUtils->createSpeakingTinyUrl('testkey');
         $this->assertEquals('testkey', $speakingUrl);
     }
