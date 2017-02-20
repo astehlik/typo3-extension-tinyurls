@@ -21,14 +21,37 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 class TinyUrlDispay
 {
     /**
+     * @var TinyUrlGenerator
+     */
+    protected $tinyUrlGenerator;
+
+    /**
      * Renders a full tiny URL based on the given form element data.
+     *
+     * This method is called as a valueFunc by the TYPO3 form engine.
      *
      * @param array $formElementData
      * @return string
      */
-    public function buildTinyUrlFormFormElementData(array $formElementData)
+    public function buildTinyUrlFormFormElementData(array $formElementData): string
     {
-        $tinyUrlGenerator = GeneralUtility::makeInstance(TinyUrlGenerator::class);
+        $tinyUrlGenerator = $this->getTinyUrlGenerator();
         return $tinyUrlGenerator->buildTinyUrl($formElementData['databaseRow']['urlkey']);
+    }
+
+    /**
+     * @param TinyUrlGenerator $tinyUrlGenerator
+     */
+    public function setTinyUrlGenerator(TinyUrlGenerator $tinyUrlGenerator)
+    {
+        $this->tinyUrlGenerator = $tinyUrlGenerator;
+    }
+
+    protected function getTinyUrlGenerator(): TinyUrlGenerator
+    {
+        if ($this->tinyUrlGenerator === null) {
+            $this->tinyUrlGenerator = GeneralUtility::makeInstance(TinyUrlGenerator::class);
+        }
+        return $this->tinyUrlGenerator;
     }
 }
