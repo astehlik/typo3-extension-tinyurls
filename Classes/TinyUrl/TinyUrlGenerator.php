@@ -28,6 +28,13 @@ class TinyUrlGenerator
     protected $comment = '';
 
     /**
+     * Contains the configuration that can be set in the extension manager
+     *
+     * @var ConfigUtils
+     */
+    protected $configUtils;
+
+    /**
      * If this option is 1 the URL will be deleted from the database
      * on the first hit
      *
@@ -58,13 +65,6 @@ class TinyUrlGenerator
     protected $urlUtils;
 
     /**
-     * Contains the configuration that can be set in the extension manager
-     *
-     * @var ConfigUtils
-     */
-    protected $configUtils;
-
-    /**
      * Initializes the config utils
      */
     public function __construct()
@@ -79,7 +79,7 @@ class TinyUrlGenerator
      * @param string $tinyUrlKey
      * @return string
      */
-    public function buildTinyUrl($tinyUrlKey)
+    public function buildTinyUrl($tinyUrlKey): string
     {
         if ($this->configUtils->getExtensionConfigurationValue('createSpeakingURLs')) {
             $tinyUrl = $this->urlUtils->createSpeakingTinyUrl($tinyUrlKey);
