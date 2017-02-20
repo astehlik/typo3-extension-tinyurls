@@ -13,17 +13,17 @@ namespace Tx\Tinyurls\Tests\Unit\FormEngine;
  *                                                                        */
 
 use PHPUnit\Framework\TestCase;
-use Tx\Tinyurls\FormEngine\TinyUrlDispay;
+use Tx\Tinyurls\FormEngine\TinyUrlDisplay;
 use Tx\Tinyurls\TinyUrl\TinyUrlGenerator;
 
 /**
  * Builds the tiny URL for displaying it within Backend forms.
  */
-class TinyUrlDispayTest extends TestCase
+class TinyUrlDisplayTest extends TestCase
 {
     public function testBuildTinyUrlFormFormElementDataBuildTinyUrlUsingUrlKey()
     {
-        $tinyUrlDisplay = new TinyUrlDispay();
+        $tinyUrlDisplay = new TinyUrlDisplay();
 
         /** @var TinyUrlGenerator|\PHPUnit_Framework_MockObject_MockObject $tinyUrlGenerator */
         $tinyUrlGenerator = $this->createMock(TinyUrlGenerator::class);

@@ -50,7 +50,7 @@ return array(
 			'label' => 'Tiny URL',
 			'config' => array(
 				'type' => 'tx_tinyurls_copyable_field',
-				'valueFunc' => \Tx\Tinyurls\FormEngine\TinyUrlDispay::class . '->buildTinyUrlFormFormElementData',
+				'valueFunc' => \Tx\Tinyurls\FormEngine\TinyUrlDisplay::class . '->buildTinyUrlFormFormElementData',
 				'size' => 30
 			)
 		),

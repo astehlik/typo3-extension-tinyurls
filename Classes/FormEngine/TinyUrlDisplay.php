@@ -18,7 +18,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 /**
  * Builds the tiny URL for displaying it within Backend forms.
  */
-class TinyUrlDispay
+class TinyUrlDisplay
 {
     /**
      * @var TinyUrlGenerator
