@@ -1,6 +1,7 @@
 <?php
-use Tx\Tinyurls\Hooks\EidProcessor;
+declare(strict_types = 1);
+use Tx\Tinyurls\Controller\EidController;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
-$eidProcessor = GeneralUtility::makeInstance(EidProcessor::class);
+$eidProcessor = GeneralUtility::makeInstance(EidController::class);
 $eidProcessor->main();

@@ -1,5 +1,6 @@
 <?php
-namespace Tx\Tinyurls\Hooks;
+declare(strict_types = 1);
+namespace Tx\Tinyurls\Controller;
 
 /*                                                                        *
  * This script belongs to the TYPO3 extension "tinyurls".                 *
@@ -22,7 +23,7 @@ use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
  * @author Alexander Stehlik <alexander.stehlik.deleteme@gmail.com>
  * @author Sebastian Lemke <s.lemke.deleteme@infoworxx.de>
  */
-class EidProcessor
+class EidController
 {
     /**
      * Contains the extension configration
