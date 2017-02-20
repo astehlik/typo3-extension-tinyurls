@@ -28,15 +28,7 @@ before_install:
 before_script:
   # Rename our working directory, required for Extension upload to TER.
   - cd .. && mv typo3-extension-tinyurls tinyurls && cd tinyurls
-  # First we install all required packages as dist versions.
-  - composer require typo3/cms=$TYPO3_VERSION --prefer-dist
-  # Now remove the TYPO3 core and all related symlinks.
-  - rm -Rf .Build/vendor/typo3/cms
-  - rm -f .Build/Web/typo3
-  - rm -f .Build/Web/index.php
-  # Finally we install the TYPO3 core as source version because we need some functional
-  # test classes that are not included in the dist versions.
-  - composer require typo3/cms=$TYPO3_VERSION --prefer-source
+  - composer require typo3/cms=$TYPO3_VERSION
   - export TYPO3_PATH_WEB=$PWD/.Build/Web
   - if [ -d $PWD/.Build/vendor/typo3/cms/components ]; then ln -s "$PWD/.Build/vendor/typo3/cms/components" .Build/Web/components; fi
 
