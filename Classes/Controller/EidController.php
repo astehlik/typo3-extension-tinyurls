@@ -12,7 +12,8 @@ namespace Tx\Tinyurls\Controller;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
-use Tx\Tinyurls\Utils\ConfigUtils;
+use Tx\Tinyurls\Domain\Repository\TinyUrlDatabaseRepository;
+use Tx\Tinyurls\Utils\HttpUtilityWrapper;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\HttpUtility;
 use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
@@ -26,18 +27,50 @@ use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
 class EidController
 {
     /**
-     * Contains the extension configration
-     *
-     * @var \Tx\Tinyurls\Utils\ConfigUtils
+     * @var HttpUtilityWrapper
      */
-    protected $configUtils;
+    protected $httpUtility;
 
     /**
-     * Initializes the extension configuration
+     * @var TinyUrlDatabaseRepository
      */
-    public function __construct()
+    protected $tinyUrlRepository;
+
+    /**
+     * @var TypoScriptFrontendController
+     */
+    protected $typoScriptFrontendController;
+
+    /**
+     * @param HttpUtilityWrapper $httpUtility
+     */
+    public function injectHttpUility(HttpUtilityWrapper $httpUtility)
     {
-        $this->configUtils = GeneralUtility::makeInstance(ConfigUtils::class);
+        $this->httpUtility = $httpUtility;
+    }
+
+    /**
+     * @param TinyUrlDatabaseRepository $tinyUrlRepository
+     */
+    public function injectTinyUrlRepository(TinyUrlDatabaseRepository $tinyUrlRepository)
+    {
+        $this->tinyUrlRepository = $tinyUrlRepository;
+    }
+
+    /**
+     * @return TypoScriptFrontendController
+     */
+    public function getTypoScriptFrontendController(): TypoScriptFrontendController
+    {
+        if ($this->typoScriptFrontendController === null) {
+            $this->typoScriptFrontendController = GeneralUtility::makeInstance(
+                TypoScriptFrontendController::class,
+                $GLOBALS['TYPO3_CONF_VARS'],
+                0,
+                0
+            );
+        }
+        return $this->typoScriptFrontendController;
     }
 
     /**
@@ -47,19 +80,22 @@ class EidController
     public function main()
     {
         try {
-            $this->purgeInvalidUrls();
+            $this->getTinyUrlRepository()->purgeInvalidUrls();
             $tinyUrlData = $this->getTinyUrlData();
             $this->countUrlHit($tinyUrlData);
-            HttpUtility::redirect($tinyUrlData['target_url'], HttpUtility::HTTP_STATUS_301);
+            $this->getHttpUtility()->redirect($tinyUrlData['target_url'], HttpUtility::HTTP_STATUS_301);
         } catch (\Exception $exception) {
-            $tsfe = GeneralUtility::makeInstance(
-                TypoScriptFrontendController::class,
-                $GLOBALS['TYPO3_CONF_VARS'],
-                0,
-                0
-            );
+            $tsfe = $this->getTypoScriptFrontendController();
             $tsfe->pageNotFoundAndExit($exception->getMessage());
         }
+    }
+
+    /**
+     * @param TypoScriptFrontendController $typoScriptFrontendController
+     */
+    public function setTypoScriptFrontendController(TypoScriptFrontendController $typoScriptFrontendController)
+    {
+        $this->typoScriptFrontendController = $typoScriptFrontendController;
     }
 
     /**
@@ -74,22 +110,15 @@ class EidController
             return;
         }
 
-        // See: http://lists.typo3.org/pipermail/typo3-dev/2007-December/026936.html
-        // Use of "set counter=counter+1" - avoiding race conditions
-        $this->getDatabaseConnection()->exec_UPDATEquery(
-            'tx_tinyurls_urls',
-            'uid=' . (integer)$tinyUrlData['uid'],
-            ['counter' => 'counter + 1'],
-            ['counter']
-        );
+        $this->getTinyUrlRepository()->countTinyUrlHit((int)$tinyUrlData['uid']);
     }
 
-    /**
-     * @return \TYPO3\CMS\Core\Database\DatabaseConnection
-     */
-    protected function getDatabaseConnection()
+    protected function getHttpUtility(): HttpUtilityWrapper
     {
-        return $GLOBALS['TYPO3_DB'];
+        if ($this->httpUtility === null) {
+            $this->httpUtility = GeneralUtility::makeInstance(HttpUtilityWrapper::class);
+        }
+        return $this->httpUtility;
     }
 
     /**
@@ -100,59 +129,29 @@ class EidController
      */
     protected function getTinyUrlData()
     {
-        $getVariables = GeneralUtility::_GET('tx_tinyurls');
-        $tinyUrlKey = null;
-
-        if (is_array($getVariables) && array_key_exists('key', $getVariables)) {
-            $tinyUrlKey = $getVariables['key'];
-        } else {
+        $getVariables = GeneralUtility::_GET();
+        if (empty($getVariables['tx_tinyurls']['key'])) {
             throw new \RuntimeException('No tinyurl key was submitted.');
         }
 
-        $selctWhereStatement = 'urlkey=' .
-            $this->getDatabaseConnection()->fullQuoteStr($tinyUrlKey, 'tx_tinyurls_urls');
-        $selctWhereStatement = $this->configUtils->appendPidQuery($selctWhereStatement);
+        $tinyUrlKey = (string)$getVariables['tx_tinyurls']['key'];
 
-        $result = $this->getDatabaseConnection()->exec_SELECTquery(
-            'uid,urlkey,target_url,delete_on_use',
-            'tx_tinyurls_urls',
-            $selctWhereStatement
-        );
-
-        if (!$this->getDatabaseConnection()->sql_num_rows($result)) {
-            throw new \RuntimeException('The given tinyurl key was not found in the database.');
-        }
-
-        $tinyUrlData = $this->getDatabaseConnection()->sql_fetch_assoc($result);
+        $tinyUrlData = $this->getTinyUrlRepository()->findTinyUrlByKey($tinyUrlKey);
 
         if ($tinyUrlData['delete_on_use']) {
-            $deleteWhereStatement = 'urlkey=' .
-                $this->getDatabaseConnection()->fullQuoteStr($tinyUrlData['urlkey'], 'tx_tinyurls_urls');
-            $deleteWhereStatement = $this->configUtils->appendPidQuery($deleteWhereStatement);
-
-            $this->getDatabaseConnection()->exec_DELETEquery(
-                'tx_tinyurls_urls',
-                $deleteWhereStatement
-            );
-
+            $this->getTinyUrlRepository()->deleteTinyUrlByKey($tinyUrlKey);
             $this->sendNoCacheHeaders();
         }
 
         return $tinyUrlData;
     }
 
-    /**
-     * Purges all invalid urls from the database
-     */
-    protected function purgeInvalidUrls()
+    protected function getTinyUrlRepository(): TinyUrlDatabaseRepository
     {
-        $purgeWhereStatement = 'valid_until>0 AND valid_until<' . time();
-        $purgeWhereStatement = $this->configUtils->appendPidQuery($purgeWhereStatement);
-
-        $this->getDatabaseConnection()->exec_DELETEquery(
-            'tx_tinyurls_urls',
-            $purgeWhereStatement
-        );
+        if ($this->tinyUrlRepository === null) {
+            $this->tinyUrlRepository = GeneralUtility::makeInstance(TinyUrlDatabaseRepository::class);
+        }
+        return $this->tinyUrlRepository;
     }
 
     /**
@@ -160,9 +159,10 @@ class EidController
      */
     protected function sendNoCacheHeaders()
     {
-        header('Expires: 0');
-        header('Last-Modified: ' . gmdate('D, d M Y H:i:s') . ' GMT');
-        header('Cache-Control: no-cache, must-revalidate');
-        header('Pragma: no-cache');
+        $httpUtility = $this->getHttpUtility();
+        $httpUtility->header('Expires', '0');
+        $httpUtility->header('Last-Modified', gmdate('D, d M Y H:i:s') . ' GMT');
+        $httpUtility->header('Cache-Control', 'no-cache, must-revalidate');
+        $httpUtility->header('Pragma', 'no-cache');
     }
 }

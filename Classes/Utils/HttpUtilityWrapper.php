@@ -13,20 +13,20 @@ namespace Tx\Tinyurls\Utils;
  *                                                                        */
 
 use TYPO3\CMS\Core\SingletonInterface;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Core\Utility\HttpUtility;
 
 /**
- * A wrapper class for GeneralUtility calls. This allows us better mocking in the Unit tests.
+ * A wrapper class for HtmlUtility calls. This allows us better mocking in the Unit tests.
  */
-class GeneralUtilityWrapper implements SingletonInterface
+class HttpUtilityWrapper implements SingletonInterface
 {
-    public function callUserFunction(string $funcName, array &$params, object &$callingObject)
+    public function header(string $name, string $value)
     {
-        return GeneralUtility::callUserFunction($funcName, $params, $callingObject);
+        header($name . ': ' . $value);
     }
 
-    public function getFileAbsFileName(string $filename): string
+    public function redirect(string $url, string $httpStatus)
     {
-        return GeneralUtility::getFileAbsFileName($filename);
+        HttpUtility::redirect($url, $httpStatus);
     }
 }
