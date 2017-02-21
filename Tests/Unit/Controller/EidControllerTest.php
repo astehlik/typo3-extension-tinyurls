@@ -18,6 +18,9 @@ use Tx\Tinyurls\Domain\Repository\TinyUrlDatabaseRepository;
 use Tx\Tinyurls\Utils\HttpUtilityWrapper;
 use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
 
+/**
+ * @backupGlobals enabled
+ */
 class EidControllerTest extends TestCase
 {
     /**
