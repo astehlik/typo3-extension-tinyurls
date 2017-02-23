@@ -12,8 +12,10 @@ namespace Tx\Tinyurls\Hooks;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
+use Tx\Tinyurls\Domain\Repository\TinyUrlDatabaseRepository;
+use Tx\Tinyurls\Exception\TinyUrlNotFoundException;
 use Tx\Tinyurls\Utils\UrlUtils;
-use TYPO3\CMS\Backend\Utility\BackendUtility;
+use TYPO3\CMS\Core\DataHandling\DataHandler;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
@@ -25,18 +27,42 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 class TceDataMap
 {
     /**
+     * The DataHandler instance that calls the hook.
+     *
+     * @var DataHandler
+     */
+    protected $dataHandler;
+
+    /**
+     * @var array
+     */
+    protected $existingTinyUrlData;
+
+    /**
+     * @var bool
+     */
+    protected $isNewRecord;
+
+    /**
+     * @var TinyUrlDatabaseRepository
+     */
+    protected $tinyUrlRepository;
+
+    /**
      * Tiny URL utilities
      *
      * @var UrlUtils
      */
     protected $urlUtils;
 
-    /**
-     * Initializes the URL utils
-     */
-    public function __construct()
+    public function injectTinyUrlRepository(TinyUrlDatabaseRepository $tinyUrlRepository)
     {
-        $this->urlUtils = GeneralUtility::makeInstance(UrlUtils::class);
+        $this->tinyUrlRepository = $tinyUrlRepository;
+    }
+
+    public function injectUrlUtils(UrlUtils $urlUtils)
+    {
+        $this->urlUtils = $urlUtils;
     }
 
     /**
@@ -46,52 +72,95 @@ class TceDataMap
      * @param string $table (refrence) The table currently processing data for
      * @param string $id (reference) The record uid currently processing data for, [integer] or [string] (like 'NEW...')
      * @param array $fieldArray (reference) The field array of a record
-     * @param \TYPO3\CMS\Core\DataHandling\DataHandler $tcemain Reference to the TCEmain object that calls this hook
+     * @param DataHandler $tcemain Reference to the TCEmain object that calls this hook
      * @see t3lib_TCEmain::hook_processDatamap_afterDatabaseOperations()
      */
     public function processDatamap_afterDatabaseOperations(
         /** @noinspection PhpUnusedParameterInspection */
-        $status,
-        $table,
+        string $status,
+        string $table,
         $id,
-        &$fieldArray,
-        $tcemain
+        array &$fieldArray,
+        DataHandler $tcemain
     ) {
         if ($table != 'tx_tinyurls_urls') {
             return;
         }
 
-        $regenerateUrlKey = false;
+        $this->dataHandler = $tcemain;
+        $this->isNewRecord = $this->isNewRecord($id);
 
-        if (GeneralUtility::isFirstPartOfStr($id, 'NEW')) {
-            $id = $tcemain->substNEWwithIDs[$id];
-            $regenerateUrlKey = true;
+        $tinyUrlId = $this->getTinyUrlIdFromDataHandlerIfNew($id);
+
+        try {
+            $this->existingTinyUrlData = $this->getTinyUrlRepository()->findTinyUrlByUid($tinyUrlId);
+        } catch (TinyUrlNotFoundException $exception) {
+            return;
         }
 
-        $tinyUrlData = BackendUtility::getRecord('tx_tinyurls_urls', $id);
-        $updateArray['target_url_hash'] = $this->urlUtils->generateTinyurlHash($tinyUrlData['target_url']);
+        $updateArray = $this->getUpdatedUrlData($tinyUrlId);
 
-        // If the hash has changed we regenerate the URL key
-        if ($updateArray['target_url_hash'] !== $tinyUrlData['target_url_hash']) {
-            $regenerateUrlKey = true;
+        if ($updateArray === []) {
+            return;
         }
 
-        if ($regenerateUrlKey) {
-            $updateArray['urlkey'] = $this->urlUtils->generateTinyurlKeyForUid($id);
-        }
-
-        // Update the data in the field array so that it is consistent
-        // with the data in the database.
+        // Update the data in the field array so that it is consistent with the data in the database.
         $fieldArray = array_merge($fieldArray, $updateArray);
 
-        $this->getDatabaseConnection()->exec_UPDATEquery('tx_tinyurls_urls', 'uid=' . $id, $updateArray);
+        $this->getTinyUrlRepository()->updateTinyUrl($tinyUrlId, $updateArray);
     }
 
-    /**
-     * @return \TYPO3\CMS\Core\Database\DatabaseConnection
-     */
-    protected function getDatabaseConnection()
+    protected function getTinyUrlIdFromDataHandlerIfNew($originalId): int
     {
-        return $GLOBALS['TYPO3_DB'];
+        if ($this->isNewRecord) {
+            $id = (int)$this->dataHandler->substNEWwithIDs[$originalId];
+        } else {
+            $id = (int)$originalId;
+        }
+
+        return $id;
+    }
+
+    protected function getTinyUrlRepository(): TinyUrlDatabaseRepository
+    {
+        if ($this->tinyUrlRepository === null) {
+            $this->tinyUrlRepository = GeneralUtility::makeInstance(TinyUrlDatabaseRepository::class);
+        }
+        return $this->tinyUrlRepository;
+    }
+
+    protected function getUpdatedUrlData(int $tinyUrlId): array
+    {
+        $targetUrl = $this->existingTinyUrlData['target_url'];
+        $newTargetUrlHash = $this->getUrlUtils()->generateTinyurlHash($targetUrl);
+        $updateArray = [];
+
+        if ($this->shouldRecordBeUpdated($newTargetUrlHash)) {
+            $updateArray['target_url_hash'] = $newTargetUrlHash;
+            $updateArray['urlkey'] = $this->getUrlUtils()->generateTinyurlKeyForUid($tinyUrlId);
+        }
+
+        return $updateArray;
+    }
+
+    protected function getUrlUtils(): UrlUtils
+    {
+        if ($this->urlUtils === null) {
+            $this->urlUtils = GeneralUtility::makeInstance(UrlUtils::class);
+        }
+        return $this->urlUtils;
+    }
+
+    protected function isNewRecord($id): bool
+    {
+        return GeneralUtility::isFirstPartOfStr($id, 'NEW');
+    }
+
+    protected function shouldRecordBeUpdated(string $newTargetUrlHash): bool
+    {
+        if ($this->isNewRecord) {
+            return true;
+        }
+        return $this->existingTinyUrlData['target_url_hash'] !== $newTargetUrlHash;
     }
 }

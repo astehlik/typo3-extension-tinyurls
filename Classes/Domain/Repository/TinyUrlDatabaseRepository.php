@@ -12,6 +12,7 @@ namespace Tx\Tinyurls\Domain\Repository;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
+use Tx\Tinyurls\Exception\TinyUrlNotFoundException;
 use Tx\Tinyurls\Utils\ConfigUtils;
 use TYPO3\CMS\Core\Database\DatabaseConnection;
 use TYPO3\CMS\Core\SingletonInterface;
@@ -75,10 +76,34 @@ class TinyUrlDatabaseRepository implements SingletonInterface
         );
 
         if (empty($result)) {
-            throw new \RuntimeException('The given tinyurl key was not found in the database.');
+            throw new TinyUrlNotFoundException(
+                sprintf('The tinyurl with the key %s was not found in the database.', $tinyUrlKey)
+            );
         }
 
         return $result;
+    }
+
+    public function findTinyUrlByUid(int $uid): array
+    {
+        $result = $this->getDatabaseConnection()->exec_SELECTgetSingleRow(
+            '*',
+            'tx_tinyurls_urls',
+            'uid=' . $uid
+        );
+
+        if (empty($result)) {
+            throw new TinyUrlNotFoundException(
+                sprintf('The tinyurl with the uid %d was not found in the database.', $uid)
+            );
+        }
+
+        return $result;
+    }
+
+    public function updateTinyUrl(int $tinyUrlUid, array $newTinyUrlData)
+    {
+        $this->getDatabaseConnection()->exec_UPDATEquery('tx_tinyurls_urls', 'uid=' . $tinyUrlUid, $newTinyUrlData);
     }
 
     /**
