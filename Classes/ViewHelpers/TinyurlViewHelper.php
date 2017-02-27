@@ -33,6 +33,11 @@ use TYPO3\CMS\Fluid\Core\ViewHelper\AbstractViewHelper;
 class TinyurlViewHelper extends AbstractViewHelper
 {
     /**
+     * @var TinyUrlApi
+     */
+    protected $tinyUrlApi;
+
+    /**
      * @param string $url The Url to be shorting
      * @param bool $onlyOneTimeValid If this is is true, the tiny URL is deleted from the database on the first hit.
      * @param int $validUntil Timestamp until generated link is valid
@@ -45,7 +50,7 @@ class TinyurlViewHelper extends AbstractViewHelper
             $url = $this->renderChildren();
         }
 
-        $tinyUrlApi = GeneralUtility::makeInstance(TinyUrlApi::class);
+        $tinyUrlApi = $this->getTinyUrlApi();
 
         if ($onlyOneTimeValid) {
             $tinyUrlApi->setDeleteOnUse($onlyOneTimeValid);
@@ -67,5 +72,18 @@ class TinyurlViewHelper extends AbstractViewHelper
         }
 
         return $tinyUrl;
+    }
+
+    public function setTinyUrlApi(TinyUrlApi $tinyUrlApi)
+    {
+        $this->tinyUrlApi = $tinyUrlApi;
+    }
+
+    protected function getTinyUrlApi(): TinyUrlApi
+    {
+        if ($this->tinyUrlApi === null) {
+            $this->tinyUrlApi = GeneralUtility::makeInstance(TinyUrlApi::class);
+        }
+        return $this->tinyUrlApi;
     }
 }
