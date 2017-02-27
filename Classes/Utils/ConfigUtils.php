@@ -20,6 +20,13 @@ use TYPO3\CMS\Core\SingletonInterface;
 class ConfigUtils implements SingletonInterface
 {
     /**
+     * The initialized extension configuration
+     *
+     * @var array
+     */
+    protected $extensionConfiguration = null;
+
+    /**
      * Contains the default values for the extension configuration
      *
      * @var array
@@ -34,13 +41,6 @@ class ConfigUtils implements SingletonInterface
     ];
 
     /**
-     * The initialized extension configuration
-     *
-     * @var array
-     */
-    protected $extensionConfiguration = null;
-
-    /**
      * Contains the default values for the tinyurl configuration
      *
      * @var array
@@ -50,85 +50,6 @@ class ConfigUtils implements SingletonInterface
         'validUntil' => 0,
         'urlKey' => false,
     ];
-
-    /**
-     * Initializes the extension configuration array, merging the default config and the config
-     * defined by the user
-     */
-    protected function initializeExtensionConfiguration()
-    {
-        $extensionConfiguration = [];
-        $finalConfiguration = [];
-
-        if (isset($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['tinyurls'])) {
-            $extensionConfigurationData = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['tinyurls']);
-
-            if (is_array($extensionConfigurationData)) {
-                $extensionConfiguration = $extensionConfigurationData;
-            }
-        }
-
-        foreach ($this->extensionConfigurationDefaults as $configKey => $defaultValue) {
-            if (array_key_exists($configKey, $extensionConfiguration)) {
-                $finalConfiguration[$configKey] = $extensionConfiguration[$configKey];
-            } else {
-                $finalConfiguration[$configKey] = $defaultValue;
-            }
-        }
-
-        $this->extensionConfiguration = $finalConfiguration;
-    }
-
-    /**
-     * Appends a PID query to the given where statement
-     *
-     * @param string $whereStatement The where statement where the PID query should be appended to
-     * @return string The where statement with the appended PID query
-     */
-    public function appendPidQuery($whereStatement)
-    {
-        if (!empty($whereStatement)) {
-            $whereStatement .= ' AND ';
-        }
-
-        $whereStatement .= 'pid=' . intval($this->getExtensionConfigurationValue('urlRecordStoragePID'));
-
-        return $whereStatement;
-    }
-
-    /**
-     * Returns the extension configuration
-     *
-     * @return array
-     */
-    public function getExtensionConfiguration()
-    {
-        if ($this->extensionConfiguration === null) {
-            $this->initializeExtensionConfiguration();
-        }
-
-        return $this->extensionConfiguration;
-    }
-
-    /**
-     * Returns an extension configuration value
-     *
-     * @param string $key the configuration key
-     * @return mixed the configuration value
-     * @throws \InvalidArgumentException if the configuration key does not exist
-     */
-    public function getExtensionConfigurationValue($key)
-    {
-        if ($this->extensionConfiguration === null) {
-            $this->initializeExtensionConfiguration();
-        }
-
-        if (!array_key_exists($key, $this->extensionConfiguration)) {
-            throw new \InvalidArgumentException('The key ' . $key . ' does not exists in the extension configuration');
-        }
-
-        return $this->extensionConfiguration[$key];
-    }
 
     /**
      * Initializes the tinyurl configuration with default values and
@@ -163,5 +84,120 @@ class ConfigUtils implements SingletonInterface
                 $tinyUrlGenerator->$configSetter($configValue);
             }
         }
+    }
+
+    /**
+     * Appends a PID query to the given where statement
+     *
+     * @param string $whereStatement The where statement where the PID query should be appended to
+     * @return string The where statement with the appended PID query
+     */
+    public function appendPidQuery($whereStatement)
+    {
+        if (!empty($whereStatement)) {
+            $whereStatement .= ' AND ';
+        }
+
+        $whereStatement .= 'pid=' . intval($this->getExtensionConfigurationValueInternal('urlRecordStoragePID'));
+
+        return $whereStatement;
+    }
+
+    public function areSpeakingUrlsEnabled(): bool
+    {
+        return (bool)$this->getExtensionConfigurationValueInternal('createSpeakingURLs');
+    }
+
+    public function getBase62Dictionary(): string
+    {
+        return (string)$this->getExtensionConfigurationValueInternal('base62Dictionary');
+    }
+
+    /**
+     * Returns the extension configuration
+     *
+     * @return array
+     */
+    public function getExtensionConfiguration()
+    {
+        if ($this->extensionConfiguration === null) {
+            $this->initializeExtensionConfiguration();
+        }
+
+        return $this->extensionConfiguration;
+    }
+
+    /**
+     * Returns an extension configuration value
+     *
+     * @deprecated Please use the matching getter for retrieving the config value.
+     * @param string $key the configuration key
+     * @return mixed the configuration value
+     * @throws \InvalidArgumentException if the configuration key does not exist
+     */
+    public function getExtensionConfigurationValue(string $key)
+    {
+        return $this->getExtensionConfigurationValueInternal($key);
+    }
+
+    public function getMinimalRandomKeyLength(): int
+    {
+        return (int)$this->getExtensionConfigurationValueInternal('minimalRandomKeyLength');
+    }
+
+    public function getMinimalTinyurlKeyLength(): int
+    {
+        return (int)$this->getExtensionConfigurationValueInternal('minimalTinyurlKeyLength');
+    }
+
+    public function getSpeakingUrlTemplate(): string
+    {
+        return (string)$this->getExtensionConfigurationValueInternal('speakingUrlTemplate');
+    }
+
+    public function getUrlRecordStoragePid(): int
+    {
+        return $this->getExtensionConfigurationValueInternal('urlRecordStoragePID');
+    }
+
+    protected function getExtensionConfigurationValueInternal(string $key)
+    {
+        if ($this->extensionConfiguration === null) {
+            $this->initializeExtensionConfiguration();
+        }
+
+        if (!array_key_exists($key, $this->extensionConfiguration)) {
+            throw new \InvalidArgumentException('The key ' . $key . ' does not exists in the extension configuration');
+        }
+
+        return $this->extensionConfiguration[$key];
+    }
+
+    /**
+     * Initializes the extension configuration array, merging the default config and the config
+     * defined by the user
+     */
+    protected function initializeExtensionConfiguration()
+    {
+        $extensionConfiguration = [];
+        $finalConfiguration = [];
+
+        if (isset($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['tinyurls'])) {
+            $extensionConfigurationData = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['tinyurls']);
+
+            if (is_array($extensionConfigurationData)) {
+                $extensionConfiguration = $extensionConfigurationData;
+            }
+        }
+
+        foreach ($this->extensionConfigurationDefaults as $configKey => $defaultValue) {
+            if (array_key_exists($configKey, $extensionConfiguration)) {
+                $finalConfiguration[$configKey] = $extensionConfiguration[$configKey];
+            } else {
+                $finalConfiguration[$configKey] = $defaultValue;
+            }
+        }
+
+        $this->extensionConfiguration = $finalConfiguration;
     }
 }

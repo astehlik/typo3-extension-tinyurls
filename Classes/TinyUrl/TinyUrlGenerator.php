@@ -81,7 +81,7 @@ class TinyUrlGenerator
      */
     public function buildTinyUrl($tinyUrlKey): string
     {
-        if ($this->configUtils->getExtensionConfigurationValue('createSpeakingURLs')) {
+        if ($this->configUtils->areSpeakingUrlsEnabled()) {
             $tinyUrl = $this->urlUtils->createSpeakingTinyUrl($tinyUrlKey);
             return $tinyUrl;
         } else {
@@ -174,7 +174,7 @@ class TinyUrlGenerator
     protected function generateNewTinyurl($targetUrl, $targetUrlHash)
     {
         $insertArray = [
-            'pid' => $this->configUtils->getExtensionConfigurationValue('urlRecordStoragePID'),
+            'pid' => $this->configUtils->getUrlRecordStoragePid(),
             'target_url' => $targetUrl,
             'target_url_hash' => $targetUrlHash,
             'delete_on_use' => (int)$this->optionDeleteOnUse,

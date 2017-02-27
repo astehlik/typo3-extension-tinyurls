@@ -29,4 +29,21 @@ class GeneralUtilityWrapper implements SingletonInterface
     {
         return GeneralUtility::getFileAbsFileName($filename);
     }
+
+    public function getIndpEnv(string $getEnvName)
+    {
+        return GeneralUtility::getIndpEnv($getEnvName);
+    }
+
+    public function getRandomHexString(int $count)
+    {
+        if (class_exists('TYPO3\\CMS\\Core\\Crypto\\Random')) {
+            /** @noinspection PhpUnnecessaryFullyQualifiedNameInspection We can not import it if it does not exist. */
+            $random = GeneralUtility::makeInstance(\TYPO3\CMS\Core\Crypto\Random::class);
+            return $random->generateRandomHexString($count);
+        } else {
+            /** @noinspection PhpDeprecationInspection We already use the newer method if it exists. */
+            return GeneralUtility::getRandomHexString($count);
+        }
+    }
 }
