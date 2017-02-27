@@ -34,18 +34,6 @@ class Api
     protected $typoScriptConfigurator;
 
     /**
-     * Initializes the tinyUrl generator
-     */
-    public function __construct()
-    {
-        $this->tinyUrlGenerator = GeneralUtility::makeInstance(TinyUrlGenerator::class);
-        $this->typoScriptConfigurator = GeneralUtility::makeInstance(
-            TypoScriptConfigurator::class,
-            $this->tinyUrlGenerator
-        );
-    }
-
-    /**
      * Initializes the configuration of the tiny URL generator based on the given
      * TypoScript configuration. The content object is used to parse values with
      * stdWrap
@@ -55,9 +43,9 @@ class Api
      * @param ContentObjectRenderer $contentObject The parent content object (used for running stdWrap)
      * @api
      */
-    public function initializeConfigFromTyposcript($config, $contentObject)
+    public function initializeConfigFromTyposcript(array $config, ContentObjectRenderer $contentObject)
     {
-        $this->typoScriptConfigurator->initializeConfigFromTyposcript($config, $contentObject);
+        $this->getTypoScriptConfigurator()->initializeConfigFromTyposcript($config, $contentObject);
     }
 
     /**
@@ -69,9 +57,9 @@ class Api
      * @return string the tiny URL
      * @api
      */
-    public function getTinyUrl($targetUrl)
+    public function getTinyUrl(string $targetUrl): string
     {
-        return $this->tinyUrlGenerator->getTinyUrl($targetUrl);
+        return $this->getTinyUrlGenerator()->getTinyUrl($targetUrl);
     }
 
     /**
@@ -79,9 +67,9 @@ class Api
      *
      * @param string $comment
      */
-    public function setComment($comment)
+    public function setComment(string $comment)
     {
-        $this->tinyUrlGenerator->setComment($comment);
+        $this->getTinyUrlGenerator()->setComment($comment);
     }
 
     /**
@@ -90,9 +78,19 @@ class Api
      *
      * @param bool $deleteOnUse
      */
-    public function setDeleteOnUse($deleteOnUse)
+    public function setDeleteOnUse(bool $deleteOnUse)
     {
-        $this->tinyUrlGenerator->setOptionDeleteOnUse($deleteOnUse);
+        $this->getTinyUrlGenerator()->setOptionDeleteOnUse($deleteOnUse);
+    }
+
+    public function setTinyUrlGenerator(TinyUrlGenerator $tinyUrlGenerator)
+    {
+        $this->tinyUrlGenerator = $tinyUrlGenerator;
+    }
+
+    public function setTypoScriptConfigurator(TypoScriptConfigurator $typoScriptConfigurator)
+    {
+        $this->typoScriptConfigurator = $typoScriptConfigurator;
     }
 
     /**
@@ -100,9 +98,9 @@ class Api
      *
      * @param string $urlKey
      */
-    public function setUrlKey($urlKey)
+    public function setUrlKey(string $urlKey)
     {
-        $this->tinyUrlGenerator->setOptionUrlKey($urlKey);
+        $this->getTinyUrlGenerator()->setOptionUrlKey($urlKey);
     }
 
     /**
@@ -110,8 +108,27 @@ class Api
      *
      * @param int $validUntil
      */
-    public function setValidUntil($validUntil)
+    public function setValidUntil(int $validUntil)
     {
-        $this->tinyUrlGenerator->setOptionValidUntil($validUntil);
+        $this->getTinyUrlGenerator()->setOptionValidUntil($validUntil);
+    }
+
+    protected function getTinyUrlGenerator(): TinyUrlGenerator
+    {
+        if ($this->tinyUrlGenerator === null) {
+            $this->tinyUrlGenerator = GeneralUtility::makeInstance(TinyUrlGenerator::class);
+        }
+        return $this->tinyUrlGenerator;
+    }
+
+    protected function getTypoScriptConfigurator(): TypoScriptConfigurator
+    {
+        if ($this->typoScriptConfigurator === null) {
+            $this->typoScriptConfigurator = GeneralUtility::makeInstance(
+                TypoScriptConfigurator::class,
+                $this->getTinyUrlGenerator()
+            );
+        }
+        return $this->typoScriptConfigurator;
     }
 }
