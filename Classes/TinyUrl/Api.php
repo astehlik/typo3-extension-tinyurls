@@ -12,7 +12,7 @@ namespace Tx\Tinyurls\TinyUrl;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
-use Tx\Tinyurls\Utils\ConfigUtils;
+use Tx\Tinyurls\Configuration\TypoScriptConfigurator;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
 
@@ -29,9 +29,9 @@ class Api
     protected $tinyUrlGenerator;
 
     /**
-     * @var ConfigUtils
+     * @var TypoScriptConfigurator
      */
-    protected $tinyUrlConfigUtils;
+    protected $typoScriptConfigurator;
 
     /**
      * Initializes the tinyUrl generator
@@ -39,21 +39,10 @@ class Api
     public function __construct()
     {
         $this->tinyUrlGenerator = GeneralUtility::makeInstance(TinyUrlGenerator::class);
-        $this->tinyUrlConfigUtils = GeneralUtility::makeInstance(ConfigUtils::class);
-    }
-
-    /**
-     * Returns the final tiny URL for the given target URL using the
-     * configuration options that have been provided by the setters or
-     * by TypoScript
-     *
-     * @param string $targetUrl
-     * @return string the tiny URL
-     * @api
-     */
-    public function getTinyUrl($targetUrl)
-    {
-        return $this->tinyUrlGenerator->getTinyUrl($targetUrl);
+        $this->typoScriptConfigurator = GeneralUtility::makeInstance(
+            TypoScriptConfigurator::class,
+            $this->tinyUrlGenerator
+        );
     }
 
     /**
@@ -68,7 +57,21 @@ class Api
      */
     public function initializeConfigFromTyposcript($config, $contentObject)
     {
-        $this->tinyUrlConfigUtils->initializeConfigFromTyposcript($config, $contentObject, $this->tinyUrlGenerator);
+        $this->typoScriptConfigurator->initializeConfigFromTyposcript($config, $contentObject);
+    }
+
+    /**
+     * Returns the final tiny URL for the given target URL using the
+     * configuration options that have been provided by the setters or
+     * by TypoScript
+     *
+     * @param string $targetUrl
+     * @return string the tiny URL
+     * @api
+     */
+    public function getTinyUrl($targetUrl)
+    {
+        return $this->tinyUrlGenerator->getTinyUrl($targetUrl);
     }
 
     /**

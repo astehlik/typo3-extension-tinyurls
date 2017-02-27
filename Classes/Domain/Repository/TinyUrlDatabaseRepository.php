@@ -12,8 +12,8 @@ namespace Tx\Tinyurls\Domain\Repository;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
+use Tx\Tinyurls\Configuration\ExtensionConfiguration;
 use Tx\Tinyurls\Exception\TinyUrlNotFoundException;
-use Tx\Tinyurls\Utils\ConfigUtils;
 use TYPO3\CMS\Core\Database\DatabaseConnection;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -23,16 +23,16 @@ class TinyUrlDatabaseRepository implements SingletonInterface
     /**
      * Contains the extension configration
      *
-     * @var \Tx\Tinyurls\Utils\ConfigUtils
+     * @var \Tx\Tinyurls\Configuration\ExtensionConfiguration
      */
-    protected $configUtils;
+    protected $extensionConfiguration;
 
     /**
-     * @param ConfigUtils $configUtils
+     * @param ExtensionConfiguration $extensionConfiguration
      */
-    public function injectConfigUtils(ConfigUtils $configUtils)
+    public function injectExtensionConfiguration(ExtensionConfiguration $extensionConfiguration)
     {
-        $this->configUtils = $configUtils;
+        $this->extensionConfiguration = $extensionConfiguration;
     }
 
     /**
@@ -55,7 +55,7 @@ class TinyUrlDatabaseRepository implements SingletonInterface
     {
         $deleteWhereStatement = 'urlkey=' .
             $this->getDatabaseConnection()->fullQuoteStr($tinyUrlKey, 'tx_tinyurls_urls');
-        $deleteWhereStatement = $this->getConfigUtils()->appendPidQuery($deleteWhereStatement);
+        $deleteWhereStatement = $this->getExtensionConfiguration()->appendPidQuery($deleteWhereStatement);
 
         $this->getDatabaseConnection()->exec_DELETEquery(
             'tx_tinyurls_urls',
@@ -67,7 +67,7 @@ class TinyUrlDatabaseRepository implements SingletonInterface
     {
         $selctWhereStatement = 'urlkey=' .
             $this->getDatabaseConnection()->fullQuoteStr($tinyUrlKey, 'tx_tinyurls_urls');
-        $selctWhereStatement = $this->getConfigUtils()->appendPidQuery($selctWhereStatement);
+        $selctWhereStatement = $this->getExtensionConfiguration()->appendPidQuery($selctWhereStatement);
 
         $result = $this->getDatabaseConnection()->exec_SELECTgetSingleRow(
             'uid,urlkey,target_url,delete_on_use',
@@ -101,18 +101,13 @@ class TinyUrlDatabaseRepository implements SingletonInterface
         return $result;
     }
 
-    public function updateTinyUrl(int $tinyUrlUid, array $newTinyUrlData)
-    {
-        $this->getDatabaseConnection()->exec_UPDATEquery('tx_tinyurls_urls', 'uid=' . $tinyUrlUid, $newTinyUrlData);
-    }
-
     /**
      * Purges all invalid urls from the database
      */
     public function purgeInvalidUrls()
     {
         $purgeWhereStatement = 'valid_until>0 AND valid_until<' . time();
-        $purgeWhereStatement = $this->getConfigUtils()->appendPidQuery($purgeWhereStatement);
+        $purgeWhereStatement = $this->getExtensionConfiguration()->appendPidQuery($purgeWhereStatement);
 
         $this->getDatabaseConnection()->exec_DELETEquery(
             'tx_tinyurls_urls',
@@ -120,12 +115,9 @@ class TinyUrlDatabaseRepository implements SingletonInterface
         );
     }
 
-    protected function getConfigUtils(): ConfigUtils
+    public function updateTinyUrl(int $tinyUrlUid, array $newTinyUrlData)
     {
-        if ($this->configUtils === null) {
-            $this->configUtils = GeneralUtility::makeInstance(ConfigUtils::class);
-        }
-        return $this->configUtils;
+        $this->getDatabaseConnection()->exec_UPDATEquery('tx_tinyurls_urls', 'uid=' . $tinyUrlUid, $newTinyUrlData);
     }
 
     /**
@@ -134,5 +126,13 @@ class TinyUrlDatabaseRepository implements SingletonInterface
     protected function getDatabaseConnection(): DatabaseConnection
     {
         return $GLOBALS['TYPO3_DB'];
+    }
+
+    protected function getExtensionConfiguration(): ExtensionConfiguration
+    {
+        if ($this->extensionConfiguration === null) {
+            $this->extensionConfiguration = GeneralUtility::makeInstance(ExtensionConfiguration::class);
+        }
+        return $this->extensionConfiguration;
     }
 }

@@ -12,6 +12,7 @@ namespace Tx\Tinyurls\Utils;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
+use Tx\Tinyurls\Configuration\ExtensionConfiguration;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -23,18 +24,18 @@ class UrlUtils implements SingletonInterface
     /**
      * Contains the extension configration
      *
-     * @var ConfigUtils
+     * @var ExtensionConfiguration
      */
-    protected $configUtils;
+    protected $extensionConfiguration;
 
     /**
      * @var GeneralUtilityWrapper
      */
     protected $generalUtility;
 
-    public function injectConfigUtils(ConfigUtils $configUtils)
+    public function injectExtensionConfiguration(ExtensionConfiguration $extensionConfiguration)
     {
-        $this->configUtils = $configUtils;
+        $this->extensionConfiguration = $extensionConfiguration;
     }
 
     public function injectGeneralUtility(GeneralUtilityWrapper $generalUtility)
@@ -50,7 +51,7 @@ class UrlUtils implements SingletonInterface
      */
     public function createSpeakingTinyUrl(string $tinyUrlKey): string
     {
-        $speakingUrl = $this->configUtils->getSpeakingUrlTemplate();
+        $speakingUrl = $this->extensionConfiguration->getSpeakingUrlTemplate();
 
         $speakingUrl = str_replace('###TINY_URL_KEY###', $tinyUrlKey, $speakingUrl);
 
@@ -93,13 +94,13 @@ class UrlUtils implements SingletonInterface
     {
         $tinyUrlKey = $this->convertIntToBase62(
             $insertedUid,
-            $this->getConfigUtils()->getBase62Dictionary()
+            $this->getExtensionConfiguration()->getBase62Dictionary()
         );
 
         $numberOfFillupChars =
-            $this->getConfigUtils()->getMinimalTinyurlKeyLength() - strlen($tinyUrlKey);
+            $this->getExtensionConfiguration()->getMinimalTinyurlKeyLength() - strlen($tinyUrlKey);
 
-        $minimalRandomKeyLength = $this->getConfigUtils()->getMinimalRandomKeyLength();
+        $minimalRandomKeyLength = $this->getExtensionConfiguration()->getMinimalRandomKeyLength();
         if ($numberOfFillupChars < $minimalRandomKeyLength) {
             $numberOfFillupChars = $minimalRandomKeyLength;
         }
@@ -135,12 +136,12 @@ class UrlUtils implements SingletonInterface
         return $base62Integer;
     }
 
-    protected function getConfigUtils(): ConfigUtils
+    protected function getExtensionConfiguration(): ExtensionConfiguration
     {
-        if ($this->configUtils === null) {
-            $this->configUtils = GeneralUtility::makeInstance(ConfigUtils::class);
+        if ($this->extensionConfiguration === null) {
+            $this->extensionConfiguration = GeneralUtility::makeInstance(ExtensionConfiguration::class);
         }
-        return $this->configUtils;
+        return $this->extensionConfiguration;
     }
 
     protected function getGeneralUtility(): GeneralUtilityWrapper

@@ -1,6 +1,6 @@
 <?php
 declare(strict_types = 1);
-namespace Tx\Tinyurls\Utils;
+namespace Tx\Tinyurls\Configuration;
 
 /*                                                                        *
  * This script belongs to the TYPO3 extension "tinyurls".                 *
@@ -12,12 +12,15 @@ namespace Tx\Tinyurls\Utils;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
+use Tx\Tinyurls\TinyUrl\TinyUrlGenerator;
 use TYPO3\CMS\Core\SingletonInterface;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
 
 /**
  * Contains utilities for getting configuration
  */
-class ConfigUtils implements SingletonInterface
+class ExtensionConfiguration implements SingletonInterface
 {
     /**
      * The initialized extension configuration
@@ -41,49 +44,21 @@ class ConfigUtils implements SingletonInterface
     ];
 
     /**
-     * Contains the default values for the tinyurl configuration
-     *
-     * @var array
-     */
-    protected $tinyurlConfigDefaults = [
-        'deleteOnUse' => 0,
-        'validUntil' => 0,
-        'urlKey' => false,
-    ];
-
-    /**
      * Initializes the tinyurl configuration with default values and
      * if the user set his own values they are parsed through stdWrap
      *
      * @param array $config
      * @param \TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer $contentObject
      * @param \Tx\Tinyurls\TinyUrl\TinyUrlGenerator $tinyUrlGenerator
+     * @deprecated Please use the TypoScriptConfigurator class instead.
      */
-    public function initializeConfigFromTyposcript($config, $contentObject, $tinyUrlGenerator)
-    {
-        if (!array_key_exists('tinyurl.', $config)) {
-            return;
-        }
-
-        $tinyUrlConfig = $config['tinyurl.'];
-
-        foreach ($this->tinyurlConfigDefaults as $configKey => $defaultValue) {
-            $configValue = $defaultValue;
-
-            if (array_key_exists($configKey, $tinyUrlConfig)) {
-                $configValue = $tinyUrlConfig[$configKey];
-
-                if (array_key_exists($configValue . '.', $tinyUrlConfig)) {
-                    $configValue = $contentObject->stdWrap($configValue, $tinyUrlConfig[$configKey . '.']);
-                }
-            }
-
-            $configSetter = 'setOption' . ucfirst($configKey);
-
-            if (method_exists($tinyUrlGenerator, $configSetter)) {
-                $tinyUrlGenerator->$configSetter($configValue);
-            }
-        }
+    public function initializeConfigFromTyposcript(
+        array $config,
+        ContentObjectRenderer $contentObject,
+        TinyUrlGenerator $tinyUrlGenerator
+    ) {
+        $typoScriptConfigurator = GeneralUtility::makeInstance(TypoScriptConfigurator::class, $tinyUrlGenerator);
+        $typoScriptConfigurator->initializeConfigFromTyposcript($config, $contentObject);
     }
 
     /**
@@ -98,7 +73,7 @@ class ConfigUtils implements SingletonInterface
             $whereStatement .= ' AND ';
         }
 
-        $whereStatement .= 'pid=' . intval($this->getExtensionConfigurationValueInternal('urlRecordStoragePID'));
+        $whereStatement .= 'pid=' . (int)$this->getUrlRecordStoragePid();
 
         return $whereStatement;
     }
@@ -116,14 +91,12 @@ class ConfigUtils implements SingletonInterface
     /**
      * Returns the extension configuration
      *
+     * @deprecated Please use the matching getter for retrieving a config value.
      * @return array
      */
-    public function getExtensionConfiguration()
+    public function getExtensionConfiguration(): array
     {
-        if ($this->extensionConfiguration === null) {
-            $this->initializeExtensionConfiguration();
-        }
-
+        $this->initializeExtensionConfiguration();
         return $this->extensionConfiguration;
     }
 
@@ -157,14 +130,12 @@ class ConfigUtils implements SingletonInterface
 
     public function getUrlRecordStoragePid(): int
     {
-        return $this->getExtensionConfigurationValueInternal('urlRecordStoragePID');
+        return (int)$this->getExtensionConfigurationValueInternal('urlRecordStoragePID');
     }
 
     protected function getExtensionConfigurationValueInternal(string $key)
     {
-        if ($this->extensionConfiguration === null) {
-            $this->initializeExtensionConfiguration();
-        }
+        $this->initializeExtensionConfiguration();
 
         if (!array_key_exists($key, $this->extensionConfiguration)) {
             throw new \InvalidArgumentException('The key ' . $key . ' does not exists in the extension configuration');
@@ -179,6 +150,10 @@ class ConfigUtils implements SingletonInterface
      */
     protected function initializeExtensionConfiguration()
     {
+        if ($this->extensionConfiguration !== null) {
+            return;
+        }
+
         $extensionConfiguration = [];
         $finalConfiguration = [];
 

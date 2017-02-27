@@ -13,7 +13,7 @@ namespace Tx\Tinyurls\Tests\Utils;
  *                                                                        */
 
 use PHPUnit\Framework\TestCase;
-use Tx\Tinyurls\Utils\ConfigUtils;
+use Tx\Tinyurls\Configuration\ExtensionConfiguration;
 use Tx\Tinyurls\Utils\GeneralUtilityWrapper;
 use Tx\Tinyurls\Utils\UrlUtils;
 
@@ -23,9 +23,9 @@ use Tx\Tinyurls\Utils\UrlUtils;
 class UrlUtilsTest extends TestCase
 {
     /**
-     * @var ConfigUtils|\PHPUnit_Framework_MockObject_MockObject
+     * @var ExtensionConfiguration|\PHPUnit_Framework_MockObject_MockObject
      */
-    protected $configUtilityMock;
+    protected $extensionConfigurationMock;
 
     /**
      * @var GeneralUtilityWrapper|\PHPUnit_Framework_MockObject_MockObject
@@ -39,17 +39,17 @@ class UrlUtilsTest extends TestCase
 
     protected function setUp()
     {
-        $this->configUtilityMock = $this->createMock(ConfigUtils::class);
+        $this->extensionConfigurationMock = $this->createMock(ExtensionConfiguration::class);
         $this->generalUtilityMock = $this->createMock(GeneralUtilityWrapper::class);
 
         $this->urlUtils = new UrlUtils();
-        $this->urlUtils->injectConfigUtils($this->configUtilityMock);
+        $this->urlUtils->injectExtensionConfiguration($this->extensionConfigurationMock);
         $this->urlUtils->injectGeneralUtility($this->generalUtilityMock);
     }
 
     public function testCreateSpeakingTinyUrlReplacesIndependentEnvironmentMarker()
     {
-        $this->configUtilityMock->expects($this->once())
+        $this->extensionConfigurationMock->expects($this->once())
             ->method('getSpeakingUrlTemplate')
             ->willReturn('###MY_ENV_MARKER###');
         $this->generalUtilityMock->expects($this->once())
@@ -61,7 +61,7 @@ class UrlUtilsTest extends TestCase
 
     public function testCreateSpeakingTinyUrlReplacesMultipleIndependentEnvironmentMarkers()
     {
-        $this->configUtilityMock->expects($this->once())
+        $this->extensionConfigurationMock->expects($this->once())
             ->method('getSpeakingUrlTemplate')
             ->willReturn('###MY_ENV_MARKER1###/###MY_ENV_MARKER2###');
         $this->generalUtilityMock->expects($this->exactly(2))
@@ -73,7 +73,7 @@ class UrlUtilsTest extends TestCase
 
     public function testCreateSpeakingTinyUrlReplacesTinyUrlMarker()
     {
-        $this->configUtilityMock->expects($this->once())
+        $this->extensionConfigurationMock->expects($this->once())
             ->method('getSpeakingUrlTemplate')
             ->willReturn('###TINY_URL_KEY###');
         $speakingUrl = $this->urlUtils->createSpeakingTinyUrl('testkey');
@@ -82,7 +82,7 @@ class UrlUtilsTest extends TestCase
 
     public function testGenerateTinyurlKeyForUidEncodesIntegerIfNoMinimalLengthIsConfigured()
     {
-        $this->configUtilityMock->method('getBase62Dictionary')
+        $this->extensionConfigurationMock->method('getBase62Dictionary')
             ->willReturn('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
 
         $key = $this->urlUtils->generateTinyurlKeyForUid(1243);
@@ -91,10 +91,10 @@ class UrlUtilsTest extends TestCase
 
     public function testGenerateTinyurlKeyForUidFillsUpKeyUpToConfiguredMinimalLength()
     {
-        $this->configUtilityMock->method('getBase62Dictionary')
+        $this->extensionConfigurationMock->method('getBase62Dictionary')
             ->willReturn('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
 
-        $this->configUtilityMock->method('getMinimalTinyurlKeyLength')
+        $this->extensionConfigurationMock->method('getMinimalTinyurlKeyLength')
             ->willReturn(4);
 
         $this->generalUtilityMock->method('getRandomHexString')
@@ -107,13 +107,13 @@ class UrlUtilsTest extends TestCase
 
     public function testGenerateTinyurlKeyForUidFillsUpKeyWithConfiguredMinimalRandomPart()
     {
-        $this->configUtilityMock->method('getBase62Dictionary')
+        $this->extensionConfigurationMock->method('getBase62Dictionary')
             ->willReturn('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
 
-        $this->configUtilityMock->method('getMinimalTinyurlKeyLength')
+        $this->extensionConfigurationMock->method('getMinimalTinyurlKeyLength')
             ->willReturn(3);
 
-        $this->configUtilityMock->method('getMinimalRandomKeyLength')
+        $this->extensionConfigurationMock->method('getMinimalRandomKeyLength')
             ->willReturn(2);
 
         $this->generalUtilityMock->method('getRandomHexString')

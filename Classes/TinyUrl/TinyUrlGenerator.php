@@ -12,7 +12,7 @@ namespace Tx\Tinyurls\TinyUrl;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
-use Tx\Tinyurls\Utils\ConfigUtils;
+use Tx\Tinyurls\Configuration\ExtensionConfiguration;
 use Tx\Tinyurls\Utils\UrlUtils;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -30,9 +30,9 @@ class TinyUrlGenerator
     /**
      * Contains the configuration that can be set in the extension manager
      *
-     * @var ConfigUtils
+     * @var ExtensionConfiguration
      */
-    protected $configUtils;
+    protected $extensionConfiguration;
 
     /**
      * If this option is 1 the URL will be deleted from the database
@@ -69,7 +69,7 @@ class TinyUrlGenerator
      */
     public function __construct()
     {
-        $this->configUtils = GeneralUtility::makeInstance(ConfigUtils::class);
+        $this->extensionConfiguration = GeneralUtility::makeInstance(ExtensionConfiguration::class);
         $this->urlUtils = GeneralUtility::makeInstance(UrlUtils::class);
     }
 
@@ -81,7 +81,7 @@ class TinyUrlGenerator
      */
     public function buildTinyUrl($tinyUrlKey): string
     {
-        if ($this->configUtils->areSpeakingUrlsEnabled()) {
+        if ($this->extensionConfiguration->areSpeakingUrlsEnabled()) {
             $tinyUrl = $this->urlUtils->createSpeakingTinyUrl($tinyUrlKey);
             return $tinyUrl;
         } else {
@@ -174,7 +174,7 @@ class TinyUrlGenerator
     protected function generateNewTinyurl($targetUrl, $targetUrlHash)
     {
         $insertArray = [
-            'pid' => $this->configUtils->getUrlRecordStoragePid(),
+            'pid' => $this->extensionConfiguration->getUrlRecordStoragePid(),
             'target_url' => $targetUrl,
             'target_url_hash' => $targetUrlHash,
             'delete_on_use' => (int)$this->optionDeleteOnUse,
@@ -231,7 +231,7 @@ class TinyUrlGenerator
 
         $customUrlKeyWhere = 'urlkey=' .
             $this->getDatabaseConnection()->fullQuoteStr($customUrlKey, 'tx_tinyurls_urls');
-        $customUrlKeyWhere = $this->configUtils->appendPidQuery($customUrlKeyWhere);
+        $customUrlKeyWhere = $this->extensionConfiguration->appendPidQuery($customUrlKeyWhere);
 
         $customUrlKeyResult = $this->getDatabaseConnection()->exec_SELECTquery(
             'target_url',
@@ -270,7 +270,7 @@ class TinyUrlGenerator
     {
         $whereStatement = 'target_url_hash=' .
             $this->getDatabaseConnection()->fullQuoteStr($targetUrlHash, 'tx_tinyurls_urls');
-        $whereStatement = $this->configUtils->appendPidQuery($whereStatement);
+        $whereStatement = $this->extensionConfiguration->appendPidQuery($whereStatement);
 
         $result = $this->getDatabaseConnection()->exec_SELECTquery(
             '*',
