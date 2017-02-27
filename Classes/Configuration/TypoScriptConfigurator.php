@@ -1,4 +1,5 @@
 <?php
+declare(strict_types = 1);
 namespace Tx\Tinyurls\Configuration;
 
 /*                                                                        *
@@ -61,7 +62,7 @@ class TypoScriptConfigurator
             if (array_key_exists($configKey, $tinyUrlConfig)) {
                 $configValue = $tinyUrlConfig[$configKey];
 
-                if (array_key_exists($configValue . '.', $tinyUrlConfig)) {
+                if (array_key_exists($configKey . '.', $tinyUrlConfig)) {
                     $configValue = $contentObjectRenderer->stdWrap(
                         $configValue,
                         $tinyUrlConfig[$configKey . '.']
