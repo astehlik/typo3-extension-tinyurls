@@ -51,7 +51,7 @@ class UrlUtils implements SingletonInterface
      */
     public function createSpeakingTinyUrl(string $tinyUrlKey): string
     {
-        $speakingUrl = $this->extensionConfiguration->getSpeakingUrlTemplate();
+        $speakingUrl = $this->getExtensionConfiguration()->getSpeakingUrlTemplate();
 
         $speakingUrl = str_replace('###TINY_URL_KEY###', $tinyUrlKey, $speakingUrl);
 
