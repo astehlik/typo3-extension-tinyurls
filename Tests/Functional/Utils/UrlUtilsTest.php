@@ -1,6 +1,6 @@
 <?php
 declare(strict_types = 1);
-namespace Tx\Tinyurls\Tests\Functional;
+namespace Tx\Tinyurls\Tests\Functional\Utils;
 
 /*                                                                        *
  * This script belongs to the TYPO3 extension "tinyurls".                 *
