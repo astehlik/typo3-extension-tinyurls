@@ -1,0 +1,204 @@
+<?php
+declare(strict_types = 1);
+namespace Tx\Tinyurls\Domain\Repository;
+
+/*                                                                        *
+ * This script belongs to the TYPO3 extension "tinyurls".                 *
+ *                                                                        *
+ * It is free software; you can redistribute it and/or modify it under    *
+ * the terms of the GNU General Public License, either version 3 of the   *
+ * License, or (at your option) any later version.                        *
+ *                                                                        *
+ * The TYPO3 project - inspiring people to share!                         *
+ *                                                                        */
+
+use Tx\Tinyurls\Database\StoragePageQueryRestriction;
+use Tx\Tinyurls\Domain\Model\TinyUrl;
+use Tx\Tinyurls\Exception\TinyUrlNotFoundException;
+use TYPO3\CMS\Core\Database\Connection;
+use TYPO3\CMS\Core\Database\ConnectionPool;
+use TYPO3\CMS\Core\Database\Query\QueryBuilder;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+
+class TinyUrlDoctrineRepository extends AbstractTinyUrlDatabaseRepository implements TinyUrlRepository
+{
+    /**
+     * See: http://lists.typo3.org/pipermail/typo3-dev/2007-December/026936.html
+     * Use of "set counter=counter+1" - avoiding race conditions
+     *
+     * @param TinyUrl $tinyUrl
+     */
+    public function countTinyUrlHit(TinyUrl $tinyUrl)
+    {
+        $queryBuilder = $this->getQueryBuilder();
+        $queryBuilder
+            ->update(static::TABLE_URLS)
+            ->set('counter', 'counter + 1')
+            ->where(
+                $queryBuilder->expr()->eq(
+                    'uid',
+                    $queryBuilder->createNamedParameter($tinyUrl->getUid(), \PDO::PARAM_INT)
+                )
+            )
+            ->execute();
+    }
+
+    public function deleteTinyUrlByKey(string $tinyUrlKey)
+    {
+        $queryBuilder = $this->getQueryBuilder();
+        $queryBuilder
+            ->delete(static::TABLE_URLS)
+            ->where($queryBuilder->expr()->eq('urlkey', $queryBuilder->createNamedParameter($tinyUrlKey)))
+            ->execute();
+    }
+
+    public function findTinyUrlByKey(string $tinyUrlKey): TinyUrl
+    {
+        $queryBuilder = $this->getQueryBuilder();
+        $result = $queryBuilder
+            ->select('*')
+            ->from(static::TABLE_URLS)
+            ->where($queryBuilder->expr()->eq('urlkey', $queryBuilder->createNamedParameter($tinyUrlKey)))
+            ->execute()
+            ->fetch();
+
+        if (empty($result)) {
+            throw new TinyUrlNotFoundException(
+                sprintf('The tinyurl with the key %s was not found in the database.', $tinyUrlKey)
+            );
+        }
+
+        return $this->createTinyUrlFromDatabaseRow($result);
+    }
+
+    public function findTinyUrlByTargetUrl(string $targetUrl): TinyUrl
+    {
+        $queryBuilder = $this->getQueryBuilder();
+        $result = $queryBuilder
+            ->select('*')
+            ->from(static::TABLE_URLS)
+            ->where(
+                $queryBuilder->expr()->eq(
+                    'target_url_hash',
+                    $queryBuilder->createNamedParameter($this->getTargetUrlHash($targetUrl))
+                )
+            )
+            ->execute()
+            ->fetch();
+
+        if (empty($result)) {
+            throw new TinyUrlNotFoundException(
+                sprintf('No existing tinyurl was found in the database for the target URL %s.', $targetUrl)
+            );
+        }
+
+        return $this->createTinyUrlFromDatabaseRow($result);
+    }
+
+    public function findTinyUrlByUid(int $uid): TinyUrl
+    {
+        $queryBuilder = $this->getQueryBuilder();
+        $result = $queryBuilder
+            ->select('*')
+            ->from(static::TABLE_URLS)
+            ->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter($uid, \PDO::PARAM_INT)))
+            ->execute()
+            ->fetch();
+
+        if (empty($result)) {
+            throw new TinyUrlNotFoundException(
+                sprintf('The tinyurl with the uid %d was not found in the database.', $uid)
+            );
+        }
+
+        return $this->createTinyUrlFromDatabaseRow($result);
+    }
+
+    public function insertNewTinyUrl(TinyUrl $tinyUrl)
+    {
+        $this->prepareTinyUrlForInsert($tinyUrl);
+
+        try {
+            $this->getDatabaseConnection()->beginTransaction();
+
+            $this->getDatabaseConnection()->insert(
+                static::TABLE_URLS,
+                $this->getTinyUrlDatabaseData($tinyUrl)
+            );
+
+            $tinyUrlUid = (int)$this->getDatabaseConnection()->lastInsertId(static::TABLE_URLS, 'uid');
+            $tinyUrl->persistPostProcessInsert($tinyUrlUid);
+
+            if ($tinyUrl->getUrlkey() === '') {
+                $tinyUrl->regenerateUrlKey();
+                $this->updateTinyUrl($tinyUrl);
+            }
+
+            $this->getDatabaseConnection()->commit();
+        } catch (\Exception $e) {
+            $this->getDatabaseConnection()->rollBack();
+            throw $e;
+        }
+    }
+
+    /**
+     * Purges all invalid urls from the database
+     */
+    public function purgeInvalidUrls()
+    {
+        $queryBuilder = $this->getQueryBuilder();
+        $queryBuilder
+            ->delete(static::TABLE_URLS)
+            ->where(
+                $queryBuilder->expr()->andX(
+                    $queryBuilder->expr()->gt('valid_until', 0),
+                    $queryBuilder->expr()->lt(
+                        'valid_until',
+                        $queryBuilder->createNamedParameter(time(), \PDO::PARAM_INT)
+                    )
+                )
+            )
+            ->execute();
+    }
+
+    public function updateTinyUrl(TinyUrl $tinyUrl)
+    {
+        if ($tinyUrl->getUid() < 1) {
+            throw new \InvalidArgumentException('Only existing TinyUrl records can be updated.');
+        }
+
+        $this->validateTinyUrl($tinyUrl);
+
+        $tinyUrl->persistPreProcess();
+
+        $newTinyUrlData = $this->getTinyUrlDatabaseData($tinyUrl);
+
+        $this->getDatabaseConnection()->update(
+            static::TABLE_URLS,
+            $newTinyUrlData,
+            ['uid' => (int)$tinyUrl->getUid()]
+        );
+
+        $tinyUrl->persistPostProcess();
+    }
+
+    protected function getDatabaseConnection(): Connection
+    {
+        return GeneralUtility::makeInstance(ConnectionPool::class)
+            ->getConnectionForTable(static::TABLE_URLS);
+    }
+
+    protected function getQueryBuilder(): QueryBuilder
+    {
+        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
+            ->getQueryBuilderForTable(static::TABLE_URLS);
+
+        $queryBuilder->getRestrictions()->removeAll();
+
+        $storagePid = $this->getExtensionConfiguration()->getUrlRecordStoragePid();
+        $storagePageRestriction = GeneralUtility::makeInstance(StoragePageQueryRestriction::class, $storagePid);
+        $queryBuilder->getRestrictions()->add($storagePageRestriction);
+
+        return $queryBuilder;
+    }
+}

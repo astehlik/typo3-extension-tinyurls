@@ -13,13 +13,8 @@ namespace Tx\Tinyurls\Tests\Unit\Hooks;
  *                                                                        */
 
 use PHPUnit\Framework\TestCase;
-use Tx\Tinyurls\Domain\Repository\TinyUrlDatabaseRepository;
-use Tx\Tinyurls\Exception\TinyUrlNotFoundException;
-use Tx\Tinyurls\Hooks\TceDataMap;
 use Tx\Tinyurls\Hooks\TypoLink;
 use Tx\Tinyurls\TinyUrl\Api;
-use Tx\Tinyurls\Utils\UrlUtils;
-use TYPO3\CMS\Core\DataHandling\DataHandler;
 use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
 
 class TypoLinkTest extends TestCase

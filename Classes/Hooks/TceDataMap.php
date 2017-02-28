@@ -13,6 +13,7 @@ namespace Tx\Tinyurls\Hooks;
  *                                                                        */
 
 use Tx\Tinyurls\Domain\Repository\TinyUrlDatabaseRepository;
+use Tx\Tinyurls\Domain\Repository\TinyUrlRepository;
 use Tx\Tinyurls\Exception\TinyUrlNotFoundException;
 use Tx\Tinyurls\Utils\UrlUtils;
 use TYPO3\CMS\Core\DataHandling\DataHandler;
@@ -83,7 +84,7 @@ class TceDataMap
         array &$fieldArray,
         DataHandler $tcemain
     ) {
-        if ($table != 'tx_tinyurls_urls') {
+        if ($table != TinyUrlRepository::TABLE_URLS) {
             return;
         }
 

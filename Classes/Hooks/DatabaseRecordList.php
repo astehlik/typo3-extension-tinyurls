@@ -12,6 +12,7 @@ namespace Tx\Tinyurls\Hooks;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
+use Tx\Tinyurls\Domain\Repository\TinyUrlRepository;
 use Tx\Tinyurls\Utils\UrlUtils;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -59,7 +60,7 @@ class DatabaseRecordList implements SingletonInterface
         AbstractDatabaseRecordList $parentRecordList,
         string $table
     ) {
-        if ($table !== 'tx_tinyurls_urls') {
+        if ($table !== TinyUrlRepository::TABLE_URLS) {
             return;
         }
         if (strpos($queryParts['SELECT'], 'urldisplay') === false) {
