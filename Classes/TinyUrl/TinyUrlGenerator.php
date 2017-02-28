@@ -78,17 +78,11 @@ class TinyUrlGenerator
      *
      * @param string $tinyUrlKey
      * @return string
+     * @deprecated Use UrlTils::buildTinyUrl() instead.
      */
     public function buildTinyUrl($tinyUrlKey): string
     {
-        if ($this->extensionConfiguration->areSpeakingUrlsEnabled()) {
-            $tinyUrl = $this->urlUtils->createSpeakingTinyUrl($tinyUrlKey);
-            return $tinyUrl;
-        } else {
-            $tinyUrl = GeneralUtility::getIndpEnv('TYPO3_SITE_URL');
-            $tinyUrl .= '?eID=tx_tinyurls&tx_tinyurls[key]=' . $tinyUrlKey;
-            return $tinyUrl;
-        }
+        return $this->getUrlUtils()->buildTinyUrl($tinyUrlKey);
     }
 
     /**

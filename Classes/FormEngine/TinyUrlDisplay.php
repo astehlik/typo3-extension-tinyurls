@@ -12,7 +12,7 @@ namespace Tx\Tinyurls\FormEngine;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
-use Tx\Tinyurls\TinyUrl\TinyUrlGenerator;
+use Tx\Tinyurls\Utils\UrlUtils;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
@@ -21,9 +21,14 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 class TinyUrlDisplay
 {
     /**
-     * @var TinyUrlGenerator
+     * @var UrlUtils
      */
-    protected $tinyUrlGenerator;
+    protected $urlUtils;
+
+    public function injectUrlUtils(UrlUtils $urlUtils)
+    {
+        $this->urlUtils = $urlUtils;
+    }
 
     /**
      * Renders a full tiny URL based on the given form element data.
@@ -35,23 +40,15 @@ class TinyUrlDisplay
      */
     public function buildTinyUrlFormFormElementData(array $formElementData): string
     {
-        $tinyUrlGenerator = $this->getTinyUrlGenerator();
-        return $tinyUrlGenerator->buildTinyUrl($formElementData['databaseRow']['urlkey']);
+        $urlUtils = $this->getUrlUtils();
+        return $urlUtils->buildTinyUrl($formElementData['databaseRow']['urlkey']);
     }
 
-    /**
-     * @param TinyUrlGenerator $tinyUrlGenerator
-     */
-    public function setTinyUrlGenerator(TinyUrlGenerator $tinyUrlGenerator)
+    protected function getUrlUtils(): UrlUtils
     {
-        $this->tinyUrlGenerator = $tinyUrlGenerator;
-    }
-
-    protected function getTinyUrlGenerator(): TinyUrlGenerator
-    {
-        if ($this->tinyUrlGenerator === null) {
-            $this->tinyUrlGenerator = GeneralUtility::makeInstance(TinyUrlGenerator::class);
+        if ($this->urlUtils === null) {
+            $this->urlUtils = GeneralUtility::makeInstance(UrlUtils::class);
         }
-        return $this->tinyUrlGenerator;
+        return $this->urlUtils;
     }
 }

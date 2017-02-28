@@ -43,6 +43,18 @@ class UrlUtils implements SingletonInterface
         $this->generalUtility = $generalUtility;
     }
 
+    public function buildTinyUrl(string $tinyUrlKey)
+    {
+        if ($this->extensionConfiguration->areSpeakingUrlsEnabled()) {
+            $tinyUrl = $this->createSpeakingTinyUrl($tinyUrlKey);
+            return $tinyUrl;
+        } else {
+            $tinyUrl = GeneralUtility::getIndpEnv('TYPO3_SITE_URL');
+            $tinyUrl .= '?eID=tx_tinyurls&tx_tinyurls[key]=' . $tinyUrlKey;
+            return $tinyUrl;
+        }
+    }
+
     /**
      * Generates a speaking tinyurl based on the speaking url template
      *
