@@ -13,6 +13,8 @@ namespace Tx\Tinyurls\Utils;
  *                                                                        */
 
 use Tx\Tinyurls\Configuration\ExtensionConfiguration;
+use Tx\Tinyurls\Domain\Model\TinyUrl;
+use Tx\Tinyurls\Object\ImplementationManager;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -88,64 +90,29 @@ class UrlUtils implements SingletonInterface
     /**
      * Generates a sha1 hash of the given URL
      *
+     * @deprecated Use TinyUrl model for hash generation instead.
      * @param string $url
      * @return string
      */
     public function generateTinyurlHash(string $url): string
     {
-        return sha1($url);
+        $tinyUrl = TinyUrl::createNew();
+        $tinyUrl->setTargetUrl($url);
+        return $tinyUrl->getTargetUrlHash();
     }
 
     /**
      * Generates a unique tinyurl key for the record with the given UID
      *
+     * @deprecated Use the UrlKeyGenerator for generating the URL key.
      * @param int $insertedUid
      * @return string
      */
     public function generateTinyurlKeyForUid(int $insertedUid): string
     {
-        $tinyUrlKey = $this->convertIntToBase62(
-            $insertedUid,
-            $this->getExtensionConfiguration()->getBase62Dictionary()
-        );
-
-        $numberOfFillupChars =
-            $this->getExtensionConfiguration()->getMinimalTinyurlKeyLength() - strlen($tinyUrlKey);
-
-        $minimalRandomKeyLength = $this->getExtensionConfiguration()->getMinimalRandomKeyLength();
-        if ($numberOfFillupChars < $minimalRandomKeyLength) {
-            $numberOfFillupChars = $minimalRandomKeyLength;
-        }
-
-        if ($numberOfFillupChars < 1) {
-            return $tinyUrlKey;
-        }
-
-        $tinyUrlKey .= '-' . $this->getGeneralUtility()->getRandomHexString($numberOfFillupChars);
-
-        return $tinyUrlKey;
-    }
-
-    /**
-     * This mehtod converts the given base 10 integer to a base62
-     *
-     * Thanks to http://jeremygibbs.com/2012/01/16/how-to-make-a-url-shortener
-     *
-     * @param int $base10Integer The integer that will converted
-     * @param string $base62Dictionary the dictionary for generating the base62 integer
-     * @return string A base62 encoded integer using a custom dictionary
-     */
-    protected function convertIntToBase62(int $base10Integer, string $base62Dictionary): string
-    {
-        $base62Integer = '';
-        $base = 62;
-
-        do {
-            $base62Integer = $base62Dictionary[($base10Integer % $base)] . $base62Integer;
-            $base10Integer = floor($base10Integer / $base);
-        } while ($base10Integer > 0);
-
-        return $base62Integer;
+        $tinyUrl = TinyUrl::createNew();
+        $tinyUrl->persistPostProcessInsert($insertedUid);
+        return ImplementationManager::getInstance()->getUrlGeyGenerator()->generateTinyurlKeyForTinyUrl($tinyUrl);
     }
 
     protected function getExtensionConfiguration(): ExtensionConfiguration

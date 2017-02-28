@@ -79,48 +79,4 @@ class UrlUtilsTest extends TestCase
         $speakingUrl = $this->urlUtils->createSpeakingTinyUrl('testkey');
         $this->assertEquals('testkey', $speakingUrl);
     }
-
-    public function testGenerateTinyurlKeyForUidEncodesIntegerIfNoMinimalLengthIsConfigured()
-    {
-        $this->extensionConfigurationMock->method('getBase62Dictionary')
-            ->willReturn('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
-
-        $key = $this->urlUtils->generateTinyurlKeyForUid(1243);
-        $this->assertEquals('ud', $key);
-    }
-
-    public function testGenerateTinyurlKeyForUidFillsUpKeyUpToConfiguredMinimalLength()
-    {
-        $this->extensionConfigurationMock->method('getBase62Dictionary')
-            ->willReturn('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
-
-        $this->extensionConfigurationMock->method('getMinimalTinyurlKeyLength')
-            ->willReturn(4);
-
-        $this->generalUtilityMock->method('getRandomHexString')
-            ->with(2)
-            ->willReturn('ag');
-
-        $key = $this->urlUtils->generateTinyurlKeyForUid(1243);
-        $this->assertEquals('ud-ag', $key);
-    }
-
-    public function testGenerateTinyurlKeyForUidFillsUpKeyWithConfiguredMinimalRandomPart()
-    {
-        $this->extensionConfigurationMock->method('getBase62Dictionary')
-            ->willReturn('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
-
-        $this->extensionConfigurationMock->method('getMinimalTinyurlKeyLength')
-            ->willReturn(3);
-
-        $this->extensionConfigurationMock->method('getMinimalRandomKeyLength')
-            ->willReturn(2);
-
-        $this->generalUtilityMock->method('getRandomHexString')
-            ->with(2)
-            ->willReturn('ag');
-
-        $key = $this->urlUtils->generateTinyurlKeyForUid(1243);
-        $this->assertEquals('ud-ag', $key);
-    }
 }
