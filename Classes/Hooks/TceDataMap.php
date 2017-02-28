@@ -12,10 +12,10 @@ namespace Tx\Tinyurls\Hooks;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
-use Tx\Tinyurls\Domain\Repository\TinyUrlDatabaseRepository;
+use Tx\Tinyurls\Domain\Model\TinyUrl;
 use Tx\Tinyurls\Domain\Repository\TinyUrlRepository;
 use Tx\Tinyurls\Exception\TinyUrlNotFoundException;
-use Tx\Tinyurls\Utils\UrlUtils;
+use Tx\Tinyurls\Object\ImplementationManager;
 use TYPO3\CMS\Core\DataHandling\DataHandler;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -35,35 +35,23 @@ class TceDataMap
     protected $dataHandler;
 
     /**
-     * @var array
-     */
-    protected $existingTinyUrlData;
-
-    /**
      * @var bool
      */
     protected $isNewRecord;
 
     /**
-     * @var TinyUrlDatabaseRepository
+     * @var TinyUrl
+     */
+    protected $tinyUrl;
+
+    /**
+     * @var TinyUrlRepository
      */
     protected $tinyUrlRepository;
 
-    /**
-     * Tiny URL utilities
-     *
-     * @var UrlUtils
-     */
-    protected $urlUtils;
-
-    public function injectTinyUrlRepository(TinyUrlDatabaseRepository $tinyUrlRepository)
+    public function injectTinyUrlRepository(TinyUrlRepository $tinyUrlRepository)
     {
         $this->tinyUrlRepository = $tinyUrlRepository;
-    }
-
-    public function injectUrlUtils(UrlUtils $urlUtils)
-    {
-        $this->urlUtils = $urlUtils;
     }
 
     /**
@@ -94,12 +82,12 @@ class TceDataMap
         $tinyUrlId = $this->getTinyUrlIdFromDataHandlerIfNew($id);
 
         try {
-            $this->existingTinyUrlData = $this->getTinyUrlRepository()->findTinyUrlByUid($tinyUrlId);
+            $this->tinyUrl = $this->getTinyUrlRepository()->findTinyUrlByUid($tinyUrlId);
         } catch (TinyUrlNotFoundException $exception) {
             return;
         }
 
-        $updateArray = $this->getUpdatedUrlData($tinyUrlId);
+        $updateArray = $this->updateTinyUrlAndGetChangedFields();
 
         if ($updateArray === []) {
             return;
@@ -108,7 +96,7 @@ class TceDataMap
         // Update the data in the field array so that it is consistent with the data in the database.
         $fieldArray = array_merge($fieldArray, $updateArray);
 
-        $this->getTinyUrlRepository()->updateTinyUrl($tinyUrlId, $updateArray);
+        $this->getTinyUrlRepository()->updateTinyUrl($this->tinyUrl);
     }
 
     protected function getTinyUrlIdFromDataHandlerIfNew($originalId): int
@@ -122,34 +110,12 @@ class TceDataMap
         return $id;
     }
 
-    protected function getTinyUrlRepository(): TinyUrlDatabaseRepository
+    protected function getTinyUrlRepository(): TinyUrlRepository
     {
         if ($this->tinyUrlRepository === null) {
-            $this->tinyUrlRepository = GeneralUtility::makeInstance(TinyUrlDatabaseRepository::class);
+            $this->tinyUrlRepository = ImplementationManager::getInstance()->getTinyUrlRepository();
         }
         return $this->tinyUrlRepository;
-    }
-
-    protected function getUpdatedUrlData(int $tinyUrlId): array
-    {
-        $targetUrl = $this->existingTinyUrlData['target_url'];
-        $newTargetUrlHash = $this->getUrlUtils()->generateTinyurlHash($targetUrl);
-        $updateArray = [];
-
-        if ($this->shouldRecordBeUpdated($newTargetUrlHash)) {
-            $updateArray['target_url_hash'] = $newTargetUrlHash;
-            $updateArray['urlkey'] = $this->getUrlUtils()->generateTinyurlKeyForUid($tinyUrlId);
-        }
-
-        return $updateArray;
-    }
-
-    protected function getUrlUtils(): UrlUtils
-    {
-        if ($this->urlUtils === null) {
-            $this->urlUtils = GeneralUtility::makeInstance(UrlUtils::class);
-        }
-        return $this->urlUtils;
     }
 
     protected function isNewRecord($id): bool
@@ -157,11 +123,27 @@ class TceDataMap
         return GeneralUtility::isFirstPartOfStr($id, 'NEW');
     }
 
-    protected function shouldRecordBeUpdated(string $newTargetUrlHash): bool
+    protected function shouldUrlKeyBeRegenerated(): bool
     {
         if ($this->isNewRecord) {
             return true;
         }
-        return $this->existingTinyUrlData['target_url_hash'] !== $newTargetUrlHash;
+        return $this->tinyUrl->getTargetUrlHasChanged();
+    }
+
+    protected function updateTinyUrlAndGetChangedFields(): array
+    {
+        $updateArray = [];
+
+        if ($this->tinyUrl->getTargetUrlHasChanged()) {
+            $updateArray['target_url_hash'] = $this->tinyUrl->getTargetUrlHash();
+        }
+
+        if ($this->shouldUrlKeyBeRegenerated()) {
+            $this->tinyUrl->regenerateUrlKey();
+            $updateArray['urlkey'] = $this->tinyUrl->getUrlkey();
+        }
+
+        return $updateArray;
     }
 }

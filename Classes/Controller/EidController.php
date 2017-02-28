@@ -12,7 +12,9 @@ namespace Tx\Tinyurls\Controller;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
-use Tx\Tinyurls\Domain\Repository\TinyUrlDatabaseRepository;
+use Tx\Tinyurls\Domain\Model\TinyUrl;
+use Tx\Tinyurls\Domain\Repository\TinyUrlRepository;
+use Tx\Tinyurls\Object\ImplementationManager;
 use Tx\Tinyurls\Utils\HttpUtilityWrapper;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\HttpUtility;
@@ -32,7 +34,7 @@ class EidController
     protected $httpUtility;
 
     /**
-     * @var TinyUrlDatabaseRepository
+     * @var TinyUrlRepository
      */
     protected $tinyUrlRepository;
 
@@ -50,9 +52,9 @@ class EidController
     }
 
     /**
-     * @param TinyUrlDatabaseRepository $tinyUrlRepository
+     * @param TinyUrlRepository $tinyUrlRepository
      */
-    public function injectTinyUrlRepository(TinyUrlDatabaseRepository $tinyUrlRepository)
+    public function injectTinyUrlRepository(TinyUrlRepository $tinyUrlRepository)
     {
         $this->tinyUrlRepository = $tinyUrlRepository;
     }
@@ -81,9 +83,9 @@ class EidController
     {
         try {
             $this->getTinyUrlRepository()->purgeInvalidUrls();
-            $tinyUrlData = $this->getTinyUrlData();
-            $this->countUrlHit($tinyUrlData);
-            $this->getHttpUtility()->redirect($tinyUrlData['target_url'], HttpUtility::HTTP_STATUS_301);
+            $tinyUrl = $this->getTinyUrl();
+            $this->countUrlHit($tinyUrl);
+            $this->getHttpUtility()->redirect($tinyUrl->getTargetUrl(), HttpUtility::HTTP_STATUS_301);
         } catch (\Exception $exception) {
             $tsfe = $this->getTypoScriptFrontendController();
             $tsfe->pageNotFoundAndExit($exception->getMessage());
@@ -101,16 +103,16 @@ class EidController
     /**
      * Increases the hit counter for the given tiny URL record.
      *
-     * @param array $tinyUrlData
+     * @param TinyUrl $tinyUrl
      */
-    protected function countUrlHit($tinyUrlData)
+    protected function countUrlHit(TinyUrl $tinyUrl)
     {
         // There is no point in counting the hit of a URL that is already deleted
-        if ($tinyUrlData['delete_on_use']) {
+        if ($tinyUrl->getDeleteOnUse()) {
             return;
         }
 
-        $this->getTinyUrlRepository()->countTinyUrlHit((int)$tinyUrlData['uid']);
+        $this->getTinyUrlRepository()->countTinyUrlHit($tinyUrl);
     }
 
     protected function getHttpUtility(): HttpUtilityWrapper
@@ -124,10 +126,10 @@ class EidController
     /**
      * Returns the data of the tiny URL record that was found by the submitted tinyurl key.
      *
-     * @return array
+     * @return TinyUrl
      * @throws \RuntimeException If the target url can not be resolved
      */
-    protected function getTinyUrlData()
+    protected function getTinyUrl(): TinyUrl
     {
         $getVariables = GeneralUtility::_GET();
         if (empty($getVariables['tx_tinyurls']['key'])) {
@@ -136,20 +138,20 @@ class EidController
 
         $tinyUrlKey = (string)$getVariables['tx_tinyurls']['key'];
 
-        $tinyUrlData = $this->getTinyUrlRepository()->findTinyUrlByKey($tinyUrlKey);
+        $tinyUrl = $this->getTinyUrlRepository()->findTinyUrlByKey($tinyUrlKey);
 
-        if ($tinyUrlData['delete_on_use']) {
+        if ($tinyUrl->getDeleteOnUse()) {
             $this->getTinyUrlRepository()->deleteTinyUrlByKey($tinyUrlKey);
             $this->sendNoCacheHeaders();
         }
 
-        return $tinyUrlData;
+        return $tinyUrl;
     }
 
-    protected function getTinyUrlRepository(): TinyUrlDatabaseRepository
+    protected function getTinyUrlRepository(): TinyUrlRepository
     {
         if ($this->tinyUrlRepository === null) {
-            $this->tinyUrlRepository = GeneralUtility::makeInstance(TinyUrlDatabaseRepository::class);
+            $this->tinyUrlRepository = ImplementationManager::getInstance()->getTinyUrlRepository();
         }
         return $this->tinyUrlRepository;
     }

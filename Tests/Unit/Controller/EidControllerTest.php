@@ -13,9 +13,10 @@ namespace Tx\Tinyurls\Tests\Unit\Controller;
  *                                                                        */
 
 use PHPUnit\Framework\TestCase;
+use Tx\Tinyurls\Domain\Model\TinyUrl;
 use Tx\Tinyurls\Utils\HttpUtilityWrapper;
 use Tx\Tinyurls\Controller\EidController;
-use Tx\Tinyurls\Domain\Repository\TinyUrlDatabaseRepository;
+use Tx\Tinyurls\Domain\Repository\TinyUrlRepository;
 use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
 
 /**
@@ -34,7 +35,7 @@ class EidControllerTest extends TestCase
     protected $httpUtilityMock;
 
     /**
-     * @var TinyUrlDatabaseRepository|\PHPUnit_Framework_MockObject_MockObject
+     * @var TinyUrlRepository|\PHPUnit_Framework_MockObject_MockObject
      */
     protected $tinyUrlRepositoryMock;
 
@@ -47,7 +48,7 @@ class EidControllerTest extends TestCase
     {
         $this->tsfeMock = $this->createMock(TypoScriptFrontendController::class);
         $this->httpUtilityMock = $this->createMock(HttpUtilityWrapper::class);
-        $this->tinyUrlRepositoryMock = $this->createMock(TinyUrlDatabaseRepository::class);
+        $this->tinyUrlRepositoryMock = $this->createMock(TinyUrlRepository::class);
 
         $this->eidController = new EidController();
         $this->eidController->setTypoScriptFrontendController($this->tsfeMock);
@@ -58,10 +59,12 @@ class EidControllerTest extends TestCase
     public function testDeleteOnUseUrlIsDeleted()
     {
         $_GET['tx_tinyurls']['key'] = 'thekey';
+        $tinyUrlMock = $this->createMock(TinyUrl::class);
+        $tinyUrlMock->method('getDeleteOnUse')->willReturn(true);
 
         $this->tinyUrlRepositoryMock->expects($this->once())
             ->method('findTinyUrlByKey')
-            ->willReturn(['delete_on_use' => 1]);
+            ->willReturn($tinyUrlMock);
 
         $this->tinyUrlRepositoryMock->expects($this->once())
             ->method('deleteTinyUrlByKey')
@@ -73,10 +76,12 @@ class EidControllerTest extends TestCase
     public function testDeleteOnUseUrlSendsNoCacheHeaders()
     {
         $_GET['tx_tinyurls']['key'] = 'thekey';
+        $tinyUrlMock = $this->createMock(TinyUrl::class);
+        $tinyUrlMock->method('getDeleteOnUse')->willReturn(true);
 
         $this->tinyUrlRepositoryMock->expects($this->once())
             ->method('findTinyUrlByKey')
-            ->willReturn(['delete_on_use' => 1]);
+            ->willReturn($tinyUrlMock);
 
         $this->httpUtilityMock->expects($this->exactly(4))
             ->method('header')
@@ -105,14 +110,17 @@ class EidControllerTest extends TestCase
     public function testHitIsCountedIfUrlIsNotDeletedOnUse()
     {
         $_GET['tx_tinyurls']['key'] = 'thekey';
+        $tinyUrlMock = $this->createMock(TinyUrl::class);
+        $tinyUrlMock->method('getUid')->willReturn(999);
+        $tinyUrlMock->method('getDeleteOnUse')->willReturn(false);
 
         $this->tinyUrlRepositoryMock->expects($this->once())
             ->method('findTinyUrlByKey')
-            ->willReturn(['uid' => 999, 'delete_on_use' => 0]);
+            ->willReturn($tinyUrlMock);
 
         $this->tinyUrlRepositoryMock->expects($this->once())
             ->method('countTinyUrlHit')
-            ->with(999);
+            ->with($tinyUrlMock);
 
         $this->eidController->main();
     }
@@ -120,10 +128,12 @@ class EidControllerTest extends TestCase
     public function testHitIsNotCountedIfUrlIsDeletedOnUse()
     {
         $_GET['tx_tinyurls']['key'] = 'thekey';
+        $tinyUrlMock = $this->createMock(TinyUrl::class);
+        $tinyUrlMock->method('getDeleteOnUse')->willReturn(true);
 
         $this->tinyUrlRepositoryMock->expects($this->once())
             ->method('findTinyUrlByKey')
-            ->willReturn(['delete_on_use' => 1]);
+            ->willReturn($tinyUrlMock);
 
         $this->tinyUrlRepositoryMock->expects($this->never())
             ->method('countTinyUrlHit');
@@ -167,16 +177,14 @@ class EidControllerTest extends TestCase
     public function testRedirectsToTargetUrl()
     {
         $_GET['tx_tinyurls']['key'] = 'thekey';
+        $tinyUrlMock = $this->createMock(TinyUrl::class);
+        $tinyUrlMock->method('getUid')->willReturn(666);
+        $tinyUrlMock->method('getTargetUrl')->willReturn('http://the-target.url');
+        $tinyUrlMock->method('getDeleteOnUse')->willReturn(false);
 
         $this->tinyUrlRepositoryMock->expects($this->once())
             ->method('findTinyUrlByKey')
-            ->willReturn(
-                [
-                    'uid' => 666,
-                    'target_url' => 'http://the-target.url',
-                    'delete_on_use' => 0,
-                ]
-            );
+            ->willReturn($tinyUrlMock);
 
         $this->httpUtilityMock->expects($this->once())
             ->method('redirect')

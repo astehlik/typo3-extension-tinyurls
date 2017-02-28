@@ -13,7 +13,8 @@ namespace Tx\Tinyurls\Tests\Unit\Hooks;
  *                                                                        */
 
 use PHPUnit\Framework\TestCase;
-use Tx\Tinyurls\Domain\Repository\TinyUrlDatabaseRepository;
+use Tx\Tinyurls\Domain\Model\TinyUrl;
+use Tx\Tinyurls\Domain\Repository\TinyUrlRepository;
 use Tx\Tinyurls\Exception\TinyUrlNotFoundException;
 use Tx\Tinyurls\Hooks\TceDataMap;
 use Tx\Tinyurls\Utils\UrlUtils;
@@ -27,36 +28,27 @@ class TceDataMapTest extends TestCase
     protected $tceDataMapHook;
 
     /**
-     * @var TinyUrlDatabaseRepository|\PHPUnit_Framework_MockObject_MockObject
+     * @var TinyUrlRepository|\PHPUnit_Framework_MockObject_MockObject
      */
     protected $tinyUrlRepositoryMock;
 
-    /**
-     * @var UrlUtils|\PHPUnit_Framework_MockObject_MockObject
-     */
-    protected $urlUtilsMock;
-
     protected function setUp()
     {
-        $this->urlUtilsMock = $this->createMock(UrlUtils::class);
-        $this->tinyUrlRepositoryMock = $this->createMock(TinyUrlDatabaseRepository::class);
+        $this->tinyUrlRepositoryMock = $this->createMock(TinyUrlRepository::class);
 
         $this->tceDataMapHook = new TceDataMap();
-        $this->tceDataMapHook->injectUrlUtils($this->urlUtilsMock);
         $this->tceDataMapHook->injectTinyUrlRepository($this->tinyUrlRepositoryMock);
     }
 
     public function testDoesNotRegenerateKeyForExistingUnchangedRecord()
     {
         $fieldArray = $fieldArrayOriginal = ['the field' => 'the value'];
+        $tinyUrlMock = $this->createMock(TinyUrl::class);
+        $tinyUrlMock->method('getTargetUrlHasChanged')->willReturn(false);
 
         $this->tinyUrlRepositoryMock->expects($this->once())
             ->method('findTinyUrlByUid')
-            ->willReturn(['target_url' => 'the target url', 'target_url_hash' => 'the hash']);
-
-        $this->urlUtilsMock->expects($this->once())
-            ->method('generateTinyurlHash')
-            ->willReturn('the hash');
+            ->willReturn($tinyUrlMock);
 
         $this->tinyUrlRepositoryMock->expects($this->never())
             ->method('updateTinyUrl');
@@ -75,19 +67,17 @@ class TceDataMapTest extends TestCase
     public function testGeneratesHashForChangedUrl()
     {
         $fieldArray = $fieldArrayOriginal = ['the field' => 'the value'];
+        $tinyUrlMock = $this->createMock(TinyUrl::class);
+        $tinyUrlMock->method('getTargetUrlHasChanged')->willReturn(true);
+        $tinyUrlMock->method('getTargetUrlHash')->willReturn('the new hash');
 
         $this->tinyUrlRepositoryMock->expects($this->once())
             ->method('findTinyUrlByUid')
-            ->willReturn(['target_url' => 'the new target url', 'target_url_hash' => 'the old hash']);
-
-        $this->urlUtilsMock->expects($this->once())
-            ->method('generateTinyurlHash')
-            ->with('the new target url')
-            ->willReturn('the new hash');
+            ->willReturn($tinyUrlMock);
 
         $this->tinyUrlRepositoryMock->expects($this->once())
             ->method('updateTinyUrl')
-            ->with(99, ['target_url_hash' => 'the new hash', 'urlkey' => null]);
+            ->with($tinyUrlMock);
 
         $this->tceDataMapHook->processDatamap_afterDatabaseOperations(
             'dummyStatus',
@@ -103,23 +93,21 @@ class TceDataMapTest extends TestCase
     public function testGeneratesKeyForChangedUrl()
     {
         $fieldArray = ['the field' => 'the value'];
+        $tinyUrlMock = $this->createMock(TinyUrl::class);
+        $tinyUrlMock->method('getUid')->willReturn(99);
+        $tinyUrlMock->method('getTargetUrlHasChanged')->willReturn(true);
+        $tinyUrlMock->method('getUrlKey')->willReturn('the new key');
+
+        $tinyUrlMock->expects($this->once())
+            ->method('regenerateUrlKey');
 
         $this->tinyUrlRepositoryMock->expects($this->once())
             ->method('findTinyUrlByUid')
-            ->willReturn(['target_url' => 'the new target url', 'target_url_hash' => 'the old hash']);
-
-        $this->urlUtilsMock->expects($this->once())
-            ->method('generateTinyurlHash')
-            ->willReturn('the new hash');
-
-        $this->urlUtilsMock->expects($this->once())
-            ->method('generateTinyurlKeyForUid')
-            ->with(99)
-            ->willReturn('the new key');
+            ->willReturn($tinyUrlMock);
 
         $this->tinyUrlRepositoryMock->expects($this->once())
             ->method('updateTinyUrl')
-            ->with(99, ['target_url_hash' => 'the new hash', 'urlkey' => 'the new key']);
+            ->with($tinyUrlMock);
 
         $this->tceDataMapHook->processDatamap_afterDatabaseOperations(
             'dummyStatus',
@@ -135,24 +123,22 @@ class TceDataMapTest extends TestCase
     public function testGeneratesKeyForNewRecord()
     {
         $fieldArray = ['the field' => 'the value'];
+        $tinyUrlMock = $this->createMock(TinyUrl::class);
+        $tinyUrlMock->method('getUid')->willReturn(123);
+        $tinyUrlMock->method('getTargetUrlHash')->willReturn('the hash');
+        $tinyUrlMock->method('getTargetUrlHasChanged')->willReturn(true);
+        $tinyUrlMock->method('getUrlKey')->willReturn('the key');
+
+        $tinyUrlMock->expects($this->once())
+            ->method('regenerateUrlKey');
 
         $this->tinyUrlRepositoryMock->expects($this->once())
             ->method('findTinyUrlByUid')
-            ->willReturn(['target_url' => 'the target url', 'target_url_hash' => '']);
-
-        $this->urlUtilsMock->expects($this->once())
-            ->method('generateTinyurlHash')
-            ->willReturn('the hash');
-
-        $this->urlUtilsMock->expects($this->once())
-            ->method('generateTinyurlKeyForUid')
-            ->with(123)
-            ->willReturn('the key');
-
+            ->willReturn($tinyUrlMock);
 
         $this->tinyUrlRepositoryMock->expects($this->once())
             ->method('updateTinyUrl')
-            ->with(123, ['target_url_hash' => 'the hash', 'urlkey' => 'the key']);
+            ->with($tinyUrlMock);
 
         $dataHandlerMock = $this->getDataHandlerMock();
         $dataHandlerMock->substNEWwithIDs['NEW1234'] = '123';

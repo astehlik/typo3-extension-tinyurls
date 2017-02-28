@@ -12,7 +12,10 @@ namespace Tx\Tinyurls\TinyUrl;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
-use Tx\Tinyurls\Configuration\ExtensionConfiguration;
+use Tx\Tinyurls\Domain\Model\TinyUrl;
+use Tx\Tinyurls\Domain\Repository\TinyUrlRepository;
+use Tx\Tinyurls\Exception\TinyUrlNotFoundException;
+use Tx\Tinyurls\Object\ImplementationManager;
 use Tx\Tinyurls\Utils\UrlUtils;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -28,13 +31,6 @@ class TinyUrlGenerator
     protected $comment = '';
 
     /**
-     * Contains the configuration that can be set in the extension manager
-     *
-     * @var ExtensionConfiguration
-     */
-    protected $extensionConfiguration;
-
-    /**
      * If this option is 1 the URL will be deleted from the database
      * on the first hit
      *
@@ -45,7 +41,7 @@ class TinyUrlGenerator
     /**
      * With this option the user can specify a custom URL key
      *
-     * @var bool
+     * @var string|bool
      */
     protected $optionUrlKey = false;
 
@@ -58,19 +54,23 @@ class TinyUrlGenerator
     protected $optionValidUntil = 0;
 
     /**
-     * Tiny URL utilities
-     *
+     * @var TinyUrlRepository
+     */
+    protected $tinyUrlRepository;
+
+    /**
      * @var UrlUtils
      */
     protected $urlUtils;
 
-    /**
-     * Initializes the config utils
-     */
-    public function __construct()
+    public function injectTinyUrlRepository(TinyUrlRepository $tinyUrlRepository)
     {
-        $this->extensionConfiguration = GeneralUtility::makeInstance(ExtensionConfiguration::class);
-        $this->urlUtils = GeneralUtility::makeInstance(UrlUtils::class);
+        $this->tinyUrlRepository = $tinyUrlRepository;
+    }
+
+    public function injectUrlUtils(UrlUtils $urlUtils)
+    {
+        $this->urlUtils = $urlUtils;
     }
 
     /**
@@ -98,14 +98,13 @@ class TinyUrlGenerator
             return $targetUrl;
         }
 
-        $targetUrlHash = $this->urlUtils->generateTinyurlHash($targetUrl);
-
-        $tinyUrlData = $this->getExistingTinyurl($targetUrlHash);
-        if ($tinyUrlData === false) {
-            $tinyUrlData = $this->generateNewTinyurl($targetUrl, $targetUrlHash);
+        try {
+            $tinyUrl = $this->getTinyUrlRepository()->findTinyUrlByTargetUrl($targetUrl);
+        } catch (TinyUrlNotFoundException $e) {
+            $tinyUrl = $this->generateNewTinyurl($targetUrl);
         }
 
-        $tinyUrl = $this->buildTinyUrl($tinyUrlData['urlkey']);
+        $tinyUrl = $this->getUrlUtils()->buildTinyUrl($tinyUrl->getUrlkey());
 
         return $tinyUrl;
     }
@@ -162,120 +161,44 @@ class TinyUrlGenerator
      * getTinyUrl().
      *
      * @param string $targetUrl
-     * @param string $targetUrlHash
-     * @return array
+     * @return TinyUrl
      */
-    protected function generateNewTinyurl($targetUrl, $targetUrlHash)
+    protected function generateNewTinyurl(string $targetUrl): TinyUrl
     {
-        $insertArray = [
-            'pid' => $this->extensionConfiguration->getUrlRecordStoragePid(),
-            'target_url' => $targetUrl,
-            'target_url_hash' => $targetUrlHash,
-            'delete_on_use' => (int)$this->optionDeleteOnUse,
-            'valid_until' => $this->optionValidUntil,
-            'comment' => $this->comment,
-            'tstamp' => $GLOBALS['EXEC_TIME'],
-        ];
+        $tinyUrl = TinyUrl::createNew();
+        $tinyUrl->setTargetUrl($targetUrl);
+        $tinyUrl->setComment($this->comment);
 
-        $customUrlKey = $this->getCustomUrlKey($targetUrlHash);
-        if ($customUrlKey !== false) {
-            $insertArray['urlkey'] = $customUrlKey;
-            $insertArray['urldisplay'] = $this->urlUtils->createSpeakingTinyUrl($customUrlKey);
+        if ($this->optionDeleteOnUse) {
+            $tinyUrl->enableDeleteOnUse();
         }
 
-        $this->getDatabaseConnection()->exec_INSERTquery(
-            'tx_tinyurls_urls',
-            $insertArray
-        );
-
-        // If no custom URL key was set, the key is generated using the uid from the database.
-        if ($customUrlKey === false) {
-            $insertedUid = $this->getDatabaseConnection()->sql_insert_id();
-            $tinyUrlKey = $this->urlUtils->generateTinyurlKeyForUid($insertedUid);
-            $this->getDatabaseConnection()->exec_UPDATEquery(
-                'tx_tinyurls_urls',
-                'uid=' . $insertedUid,
-                ['urlkey' => $tinyUrlKey]
-            );
-            $insertArray['urlkey'] = $tinyUrlKey;
+        if ($this->optionValidUntil > 0) {
+            $tinyUrl->setValidUntil(new \DateTime('@' . $this->optionValidUntil));
         }
 
-        return $insertArray;
+        if ($this->optionUrlKey !== false) {
+            $tinyUrl->setCustomUrlKey($this->optionUrlKey);
+        }
+
+        $this->getTinyUrlRepository()->insertNewTinyUrl($tinyUrl);
+
+        return $tinyUrl;
     }
 
-    /**
-     * Checks the tinyurl config and returns a custom tinyurl key if
-     * one was set
-     *
-     * @param string $targetUrlHash The target url hash is needed to check if the custom key matches the target url
-     * @return bool|string FALSE if no custom key was set, otherwise the custom key
-     * @throws \Exception If custom url key was set but empty or if the key already existed with a different URL
-     */
-    protected function getCustomUrlKey($targetUrlHash)
+    protected function getTinyUrlRepository(): TinyUrlRepository
     {
-        $customUrlKey = $this->optionUrlKey;
-
-        if ($customUrlKey === false) {
-            return false;
+        if ($this->tinyUrlRepository === null) {
+            $this->tinyUrlRepository = ImplementationManager::getInstance()->getTinyUrlRepository();
         }
-
-        if (empty($customUrlKey)) {
-            throw new \Exception('An empty url key was set.');
-        }
-
-        $customUrlKeyWhere = 'urlkey=' .
-            $this->getDatabaseConnection()->fullQuoteStr($customUrlKey, 'tx_tinyurls_urls');
-        $customUrlKeyWhere = $this->extensionConfiguration->appendPidQuery($customUrlKeyWhere);
-
-        $customUrlKeyResult = $this->getDatabaseConnection()->exec_SELECTquery(
-            'target_url',
-            'tx_tinyurls_urls',
-            $customUrlKeyWhere
-        );
-
-        if ($this->getDatabaseConnection()->sql_num_rows($customUrlKeyResult)) {
-            $existingUrlData = $this->getDatabaseConnection()->sql_fetch_assoc($customUrlKeyResult);
-
-            if ($existingUrlData['target_url_hash'] !== $targetUrlHash) {
-                throw new \Exception(
-                    'A url key was set that already exists in the database and points to a different URL.'
-                );
-            }
-        }
-
-        return $customUrlKey;
+        return $this->tinyUrlRepository;
     }
 
-    /**
-     * @return \TYPO3\CMS\Core\Database\DatabaseConnection
-     */
-    protected function getDatabaseConnection()
+    protected function getUrlUtils(): UrlUtils
     {
-        return $GLOBALS['TYPO3_DB'];
-    }
-
-    /**
-     * Checks if there is already an existing tinyurl and returns its data
-     *
-     * @param $targetUrlHash
-     * @return bool|array FALSE if no existing URL was found, otherwise associative array with tinyurl data
-     */
-    protected function getExistingTinyurl($targetUrlHash)
-    {
-        $whereStatement = 'target_url_hash=' .
-            $this->getDatabaseConnection()->fullQuoteStr($targetUrlHash, 'tx_tinyurls_urls');
-        $whereStatement = $this->extensionConfiguration->appendPidQuery($whereStatement);
-
-        $result = $this->getDatabaseConnection()->exec_SELECTquery(
-            '*',
-            'tx_tinyurls_urls',
-            $whereStatement
-        );
-
-        if (!$this->getDatabaseConnection()->sql_num_rows($result)) {
-            return false;
-        } else {
-            return $this->getDatabaseConnection()->sql_fetch_assoc($result);
+        if ($this->urlUtils === null) {
+            $this->urlUtils = GeneralUtility::makeInstance(UrlUtils::class);
         }
+        return $this->urlUtils;
     }
 }
