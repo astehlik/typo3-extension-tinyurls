@@ -164,13 +164,7 @@ class TinyUrlDatabaseRepository extends AbstractTinyUrlDatabaseRepository implem
 
     public function updateTinyUrl(TinyUrl $tinyUrl)
     {
-        if ($tinyUrl->isNew()) {
-            throw new \InvalidArgumentException('Only existing TinyUrl records can be updated.');
-        }
-
-        $this->validateTinyUrl($tinyUrl);
-
-        $tinyUrl->persistPreProcess();
+        $this->prepareTinyUrlForUpdate($tinyUrl);
 
         $newTinyUrlData = $this->getTinyUrlDatabaseData($tinyUrl);
 

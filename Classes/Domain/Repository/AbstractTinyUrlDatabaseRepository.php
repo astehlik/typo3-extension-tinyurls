@@ -77,6 +77,17 @@ abstract class AbstractTinyUrlDatabaseRepository
         $tinyUrl->persistPreProcess();
     }
 
+    protected function prepareTinyUrlForUpdate(TinyUrl $tinyUrl)
+    {
+        if ($tinyUrl->isNew()) {
+            throw new \InvalidArgumentException('Only existing TinyUrl records can be updated.');
+        }
+
+        $this->validateTinyUrl($tinyUrl);
+
+        $tinyUrl->persistPreProcess();
+    }
+
     protected function validateTinyUrl(TinyUrl $tinyUrl)
     {
         $validator = GeneralUtility::makeInstance(TinyUrlValidator::class);

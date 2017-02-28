@@ -163,13 +163,7 @@ class TinyUrlDoctrineRepository extends AbstractTinyUrlDatabaseRepository implem
 
     public function updateTinyUrl(TinyUrl $tinyUrl)
     {
-        if ($tinyUrl->getUid() < 1) {
-            throw new \InvalidArgumentException('Only existing TinyUrl records can be updated.');
-        }
-
-        $this->validateTinyUrl($tinyUrl);
-
-        $tinyUrl->persistPreProcess();
+        $this->prepareTinyUrlForUpdate($tinyUrl);
 
         $newTinyUrlData = $this->getTinyUrlDatabaseData($tinyUrl);
 
