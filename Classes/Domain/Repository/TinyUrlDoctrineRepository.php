@@ -114,33 +114,6 @@ class TinyUrlDoctrineRepository extends AbstractTinyUrlDatabaseRepository implem
         return $this->createTinyUrlFromDatabaseRow($result);
     }
 
-    public function insertNewTinyUrl(TinyUrl $tinyUrl)
-    {
-        $this->prepareTinyUrlForInsert($tinyUrl);
-
-        try {
-            $this->getDatabaseConnection()->beginTransaction();
-
-            $this->getDatabaseConnection()->insert(
-                static::TABLE_URLS,
-                $this->getTinyUrlDatabaseData($tinyUrl)
-            );
-
-            $tinyUrlUid = (int)$this->getDatabaseConnection()->lastInsertId(static::TABLE_URLS, 'uid');
-            $tinyUrl->persistPostProcessInsert($tinyUrlUid);
-
-            if ($tinyUrl->getUrlkey() === '') {
-                $tinyUrl->regenerateUrlKey();
-                $this->updateTinyUrl($tinyUrl);
-            }
-
-            $this->getDatabaseConnection()->commit();
-        } catch (\Exception $e) {
-            $this->getDatabaseConnection()->rollBack();
-            throw $e;
-        }
-    }
-
     /**
      * Purges all invalid urls from the database
      */
@@ -194,5 +167,20 @@ class TinyUrlDoctrineRepository extends AbstractTinyUrlDatabaseRepository implem
         $queryBuilder->getRestrictions()->add($storagePageRestriction);
 
         return $queryBuilder;
+    }
+
+    protected function insertNewTinyUrlInDatabase(TinyUrl $tinyUrl): int
+    {
+        $this->getDatabaseConnection()->insert(
+            static::TABLE_URLS,
+            $this->getTinyUrlDatabaseData($tinyUrl)
+        );
+
+        return (int)$this->getDatabaseConnection()->lastInsertId(static::TABLE_URLS, 'uid');
+    }
+
+    protected function transactional(\Closure $transaction)
+    {
+        $this->getDatabaseConnection()->transactional($transaction);
     }
 }

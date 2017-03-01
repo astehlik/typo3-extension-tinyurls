@@ -17,33 +17,6 @@ use Tx\Tinyurls\Domain\Model\TinyUrl;
 
 class TinyUrlTest extends TestCase
 {
-    public function persistPostProcessInsertResetsOriginalHash()
-    {
-        $tinyUrl = TinyUrl::createNew();
-        $tinyUrl->setTargetUrl('the url');
-        $this->assertTrue($tinyUrl->getTargetUrlHasChanged());
-
-        $tinyUrl->persistPostProcessInsert(2);
-        $this->assertFalse($tinyUrl->getTargetUrlHasChanged());
-    }
-
-    public function persistPostProcessInsertSetsUid()
-    {
-        $tinyUrl = TinyUrl::createNew();
-        $tinyUrl->persistPostProcessInsert(2);
-        $this->assertEquals(2, $tinyUrl->getUid());
-    }
-
-    public function persistPostProcessResetsOriginalHash()
-    {
-        $tinyUrl = TinyUrl::createNew();
-        $tinyUrl->setTargetUrl('the url');
-        $this->assertTrue($tinyUrl->getTargetUrlHasChanged());
-
-        $tinyUrl->persistPostProcess();
-        $this->assertFalse($tinyUrl->getTargetUrlHasChanged());
-    }
-
     public function testCreateFromDatabaseFillsComment()
     {
         $tinyUrl = TinyUrl::createFromDatabaseRow($this->getDummyDatabaseRow());
@@ -195,11 +168,47 @@ class TinyUrlTest extends TestCase
         $this->assertFalse($tinyUrl->isNew());
     }
 
-    public function testIsNewReturnsTrueIfUidIsZero()
+    public function testPersistPostProcessInsertResetsOriginalHash()
     {
         $tinyUrl = TinyUrl::createNew();
+        $tinyUrl->setTargetUrl('the url');
+        $this->assertTrue($tinyUrl->getTargetUrlHasChanged());
+
+        $tinyUrl->persistPostProcessInsert(2);
+        $this->assertFalse($tinyUrl->getTargetUrlHasChanged());
+    }
+
+    public function testPersistPostProcessInsertSetsUid()
+    {
+        $tinyUrl = TinyUrl::createNew();
+        $tinyUrl->persistPostProcessInsert(2);
+        $this->assertEquals(2, $tinyUrl->getUid());
+    }
+
+    public function testPersistPostProcessRefusesZeroUid()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $tinyUrl = TinyUrl::createNew();
         $tinyUrl->persistPostProcessInsert(0);
-        $this->assertTrue($tinyUrl->isNew());
+    }
+
+    public function testPersistPostProcessResetsCustomUrlKey()
+    {
+        $tinyUrl = TinyUrl::createNew();
+        $tinyUrl->setCustomUrlKey('custom key');
+        $this->assertTrue($tinyUrl->hasCustomUrlKey());
+        $tinyUrl->persistPostProcess();
+        $this->assertFalse($tinyUrl->hasCustomUrlKey());
+    }
+
+    public function testPersistPostProcessResetsOriginalHash()
+    {
+        $tinyUrl = TinyUrl::createNew();
+        $tinyUrl->setTargetUrl('the url');
+        $this->assertTrue($tinyUrl->getTargetUrlHasChanged());
+
+        $tinyUrl->persistPostProcess();
+        $this->assertFalse($tinyUrl->getTargetUrlHasChanged());
     }
 
     public function testPersistPreProcessSetsCustomUrlKey()

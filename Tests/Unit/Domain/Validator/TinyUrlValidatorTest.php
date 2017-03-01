@@ -83,8 +83,8 @@ class TinyUrlValidatorTest extends TestCase
     public function testValidateReturnsNoErrorIfCustomUrlKeyExistsAndBelongsToSameUrl()
     {
         $tinyUrl = TinyUrl::createNew();
-        $tinyUrl->setCustomUrlKey('the custom key');
         $tinyUrl->persistPostProcessInsert(2);
+        $tinyUrl->setCustomUrlKey('the custom key');
         $existingTinyUrl = TinyUrl::createNew();
         $existingTinyUrl->persistPostProcessInsert(2);
         $this->tinyUrlRepositoryMock->expects($this->once())

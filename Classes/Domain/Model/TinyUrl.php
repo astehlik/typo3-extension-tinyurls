@@ -184,12 +184,27 @@ class TinyUrl
 
     public function persistPostProcess()
     {
+        $this->customUrlKey = null;
         $this->targetUrlHashOriginal = $this->targetUrlHash;
     }
 
+    /**
+     * Initialises the UID generated during persistence.
+     *
+     * IMPORTANT! The Repository needs to update the record in the persistence once more
+     * if no custom URL key is used because we can not generate the URL key without a UID.
+     *
+     * @param int $newUid
+     */
     public function persistPostProcessInsert(int $newUid)
     {
+        if ($newUid === 0) {
+            throw new \InvalidArgumentException('The inserted UID must not be zero.');
+        }
         $this->uid = $newUid;
+        if (!$this->hasCustomUrlKey()) {
+            $this->regenerateUrlKey();
+        }
         $this->persistPostProcess();
     }
 

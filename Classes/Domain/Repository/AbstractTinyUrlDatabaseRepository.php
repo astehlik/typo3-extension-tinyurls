@@ -28,11 +28,46 @@ abstract class AbstractTinyUrlDatabaseRepository
     protected $extensionConfiguration;
 
     /**
+     * Stores the given URL in the database, returns the inserted UID.
+     *
+     * @param TinyUrl $tinyUrl
+     * @return int
+     */
+    abstract protected function insertNewTinyUrlInDatabase(TinyUrl $tinyUrl): int;
+
+    /**
+     * Executes the callback within a transation.
+     *
+     * @param \Closure $callback
+     * @return mixed
+     */
+    abstract protected function transactional(\Closure $callback);
+
+    /**
+     * Updates the given URL in the database.
+     *
+     * @param TinyUrl $tinyUrl
+     * @return mixed
+     */
+    abstract protected function updateTinyUrl(TinyUrl $tinyUrl);
+
+    /**
      * @param ExtensionConfiguration $extensionConfiguration
      */
     public function injectExtensionConfiguration(ExtensionConfiguration $extensionConfiguration)
     {
         $this->extensionConfiguration = $extensionConfiguration;
+    }
+
+    public function insertNewTinyUrl(TinyUrl $tinyUrl)
+    {
+        $this->prepareTinyUrlForInsert($tinyUrl);
+
+        $this->transactional(
+            function () use ($tinyUrl) {
+                $this->insertNewTinyUrlTransaction($tinyUrl);
+            }
+        );
     }
 
     protected function createTinyUrlFromDatabaseRow(array $databaseRow): TinyUrl
@@ -68,6 +103,21 @@ abstract class AbstractTinyUrlDatabaseRepository
             'delete_on_use' => (int)$tinyUrl->getDeleteOnUse(),
             'valid_until' => (int)$tinyUrl->getValidUntil()->getTimestamp(),
         ];
+    }
+
+    protected function insertNewTinyUrlTransaction(TinyUrl $tinyUrl)
+    {
+        $hadCustomUrlKey = $tinyUrl->hasCustomUrlKey();
+
+        $tinyUrlUid = $this->insertNewTinyUrlInDatabase($tinyUrl);
+
+        $tinyUrl->persistPostProcessInsert($tinyUrlUid);
+
+        // We need to save the tinyurl once more because persistPostProcessInsert genereates
+        // the URL key depending on the new UID if no custom URL key is used.
+        if (!$hadCustomUrlKey) {
+            $this->updateTinyUrl($tinyUrl);
+        }
     }
 
     protected function prepareTinyUrlForInsert(TinyUrl $tinyUrl)

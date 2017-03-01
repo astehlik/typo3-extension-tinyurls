@@ -117,32 +117,6 @@ class TinyUrlDatabaseRepository extends AbstractTinyUrlDatabaseRepository implem
         return $this->createTinyUrlFromDatabaseRow($result);
     }
 
-    public function insertNewTinyUrl(TinyUrl $tinyUrl)
-    {
-        $this->prepareTinyUrlForInsert($tinyUrl);
-
-        try {
-            $this->getDatabaseConnection()->sql_query('START TRANSACTION');
-
-            $this->getDatabaseConnection()->exec_INSERTquery(
-                static::TABLE_URLS,
-                $this->getTinyUrlDatabaseData($tinyUrl)
-            );
-
-            $tinyUrl->persistPostProcessInsert((int)$this->getDatabaseConnection()->sql_insert_id());
-
-            if ($tinyUrl->getUrlkey() === '') {
-                $tinyUrl->regenerateUrlKey();
-                $this->updateTinyUrl($tinyUrl);
-            }
-
-            $this->getDatabaseConnection()->sql_query('COMMIT');
-        } catch (\Exception $e) {
-            $this->getDatabaseConnection()->sql_query('ROLLBACK');
-            throw $e;
-        }
-    }
-
     /**
      * Purges all invalid urls from the database
      */
@@ -186,5 +160,27 @@ class TinyUrlDatabaseRepository extends AbstractTinyUrlDatabaseRepository implem
             $this->databaseConnection = $GLOBALS['TYPO3_DB'];
         }
         return $this->databaseConnection;
+    }
+
+    protected function insertNewTinyUrlInDatabase(TinyUrl $tinyUrl): int
+    {
+        $this->getDatabaseConnection()->exec_INSERTquery(
+            static::TABLE_URLS,
+            $this->getTinyUrlDatabaseData($tinyUrl)
+        );
+
+        return (int)$this->getDatabaseConnection()->sql_insert_id();
+    }
+
+    protected function transactional(\Closure $callback)
+    {
+        try {
+            $this->getDatabaseConnection()->sql_query('START TRANSACTION');
+            $callback();
+            $this->getDatabaseConnection()->sql_query('COMMIT');
+        } catch (\Exception $e) {
+            $this->getDatabaseConnection()->sql_query('ROLLBACK');
+            throw $e;
+        }
     }
 }
