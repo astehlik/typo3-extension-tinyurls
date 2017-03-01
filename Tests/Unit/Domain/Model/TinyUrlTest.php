@@ -168,6 +168,14 @@ class TinyUrlTest extends TestCase
         $this->assertFalse($tinyUrl->isNew());
     }
 
+    public function testPersistPostProcessInsertRegeneratesUrlKeyIfNoCustomUrlIsUsed()
+    {
+        $tinyUrl = TinyUrl::createNew();
+        $this->assertEmpty($tinyUrl->getUrlkey());
+        $tinyUrl->persistPostProcessInsert(55);
+        $this->assertRegExp('/3\-[0-9a-z]+/', $tinyUrl->getUrlkey());
+    }
+
     public function testPersistPostProcessInsertResetsOriginalHash()
     {
         $tinyUrl = TinyUrl::createNew();
