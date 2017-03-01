@@ -1,11 +1,11 @@
 <?php
+declare(strict_types = 1);
 namespace Tx\Tinyurls\Domain\Validator;
 
 use Tx\Tinyurls\Domain\Model\TinyUrl;
 use Tx\Tinyurls\Domain\Repository\TinyUrlRepository;
 use Tx\Tinyurls\Exception\TinyUrlNotFoundException;
 use Tx\Tinyurls\Object\ImplementationManager;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Error\Result;
 use TYPO3\CMS\Extbase\Validation\Error;
 use TYPO3\CMS\Extbase\Validation\Validator\ValidatorInterface;
@@ -16,6 +16,16 @@ class TinyUrlValidator implements ValidatorInterface
      * @var Result
      */
     protected $result;
+
+    /**
+     * @var TinyUrlRepository
+     */
+    protected $tinyUrlRepository;
+
+    public function injectTinyUrlRepository(TinyUrlRepository $tinyUrlRepository)
+    {
+        $this->tinyUrlRepository = $tinyUrlRepository;
+    }
 
     /**
      * Returns the options of this validator which can be specified in the constructor
@@ -44,13 +54,21 @@ class TinyUrlValidator implements ValidatorInterface
         return $this->result;
     }
 
+    protected function getTinyUrlRepository(): TinyUrlRepository
+    {
+        if ($this->tinyUrlRepository === null) {
+            $this->tinyUrlRepository = ImplementationManager::getInstance()->getTinyUrlRepository();
+        }
+        return $this->tinyUrlRepository;
+    }
+
     protected function validateCustomUrlKey(TinyUrl $tinyUrl)
     {
         if (!$tinyUrl->hasCustomUrlKey()) {
             return;
         }
 
-        $tinyUrlRepository = ImplementationManager::getInstance()->getTinyUrlRepository();
+        $tinyUrlRepository = $this->getTinyUrlRepository();
 
         try {
             $existingTinyUrl = $tinyUrlRepository->findTinyUrlByKey($tinyUrl->getCustomUrlKey());
@@ -59,18 +77,19 @@ class TinyUrlValidator implements ValidatorInterface
             return;
         }
 
-        if (!$tinyUrl->equals($existingTinyUrl)) {
+        if ($tinyUrl->equals($existingTinyUrl)) {
             // The existing key belongs to the TinyUrl record that is validated.
             return;
         }
 
         $error = new Error('The custom URL key is already used for a different URL.', 1488317930);
-        $this->result->addError($error);
+        $this->result->forProperty('customUrlKey')->addError($error);
     }
 
     protected function validateValidUntil(TinyUrl $tinyUrl)
     {
-        if ($tinyUrl->hasValidUntil() && $tinyUrl->getValidUntil()->diff(new \DateTime())->invert) {
+        $now = new \DateTime();
+        if ($tinyUrl->hasValidUntil() && $now->diff($tinyUrl->getValidUntil())->invert) {
             $error = new Error('The validUntil DateTime must not be in the past.', 1488307858);
             $this->result->forProperty('validUntil')->addError($error);
         }
