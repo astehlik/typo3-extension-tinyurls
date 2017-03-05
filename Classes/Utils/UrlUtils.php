@@ -112,7 +112,7 @@ class UrlUtils implements SingletonInterface
     {
         $tinyUrl = TinyUrl::createNew();
         $tinyUrl->persistPostProcessInsert($insertedUid);
-        return ImplementationManager::getInstance()->getUrlGeyGenerator()->generateTinyurlKeyForTinyUrl($tinyUrl);
+        return ImplementationManager::getInstance()->getUrlKeyGenerator()->generateTinyurlKeyForTinyUrl($tinyUrl);
     }
 
     /**

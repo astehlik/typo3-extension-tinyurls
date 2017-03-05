@@ -218,7 +218,7 @@ class TinyUrl
 
     public function regenerateUrlKey()
     {
-        $tinyUrlKeyGenerator = ImplementationManager::getInstance()->getUrlGeyGenerator();
+        $tinyUrlKeyGenerator = ImplementationManager::getInstance()->getUrlKeyGenerator();
         $this->urlkey = $tinyUrlKeyGenerator->generateTinyurlKeyForTinyUrl($this);
     }
 
