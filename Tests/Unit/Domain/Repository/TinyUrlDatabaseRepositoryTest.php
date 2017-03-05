@@ -21,6 +21,8 @@ use Tx\Tinyurls\Domain\Repository\TinyUrlRepository;
 use Tx\Tinyurls\Domain\Validator\TinyUrlValidator;
 use Tx\Tinyurls\Exception\TinyUrlNotFoundException;
 use Tx\Tinyurls\Exception\TinyUrlValidationException;
+use Tx\Tinyurls\Object\ImplementationManager;
+use Tx\Tinyurls\UrlKeyGenerator\UrlKeyGenerator;
 use TYPO3\CMS\Core\Database\DatabaseConnection;
 use TYPO3\CMS\Extbase\Error\Result;
 
@@ -41,11 +43,19 @@ class TinyUrlDatabaseRepositoryTest extends TestCase
      */
     protected $extensionConfiugrationMock;
 
+    /**
+     * @var UrlKeyGenerator|\PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $urlKeyGeneratorMock;
+
     protected function setUp()
     {
         if (!class_exists('TYPO3\\CMS\\Core\\Database\\DatabaseConnection')) {
             $this->markTestSkipped('The DatabaseConnection class does not exist.');
         }
+
+        $this->urlKeyGeneratorMock = $this->createMock(UrlKeyGenerator::class);
+        ImplementationManager::getInstance()->setUrlKeyGenerator($this->urlKeyGeneratorMock);
 
         $this->databaseConnectionMock = $this->createMock(DatabaseConnection::class);
         $this->extensionConfiugrationMock = $this->createMock(ExtensionConfiguration::class);
@@ -53,6 +63,11 @@ class TinyUrlDatabaseRepositoryTest extends TestCase
         $this->databaseRepository = new TinyUrlDatabaseRepository();
         $this->databaseRepository->setDatabaseConnection($this->databaseConnectionMock);
         $this->databaseRepository->injectExtensionConfiguration($this->extensionConfiugrationMock);
+    }
+
+    protected function tearDown()
+    {
+        ImplementationManager::getInstance()->restoreDefaults();
     }
 
     public function testCountTinyUrlHitIncreasesCountByOne()
@@ -196,14 +211,19 @@ class TinyUrlDatabaseRepositoryTest extends TestCase
 
     public function testInsertNewTinyUrlRegeneratesUrlKey()
     {
-        $this->initializeTinyUrlValidatorMock();
-
         $tinyUrl = TinyUrl::createNew();
+
+        $this->urlKeyGeneratorMock->expects($this->once())
+            ->method('generateTinyurlKeyForTinyUrl')
+            ->with($tinyUrl)
+            ->willReturn('LD-dkked92d');
+
+        $this->initializeTinyUrlValidatorMock();
 
         $this->prepareInsertQuery(2323);
 
         $this->databaseRepository->insertNewTinyUrl($tinyUrl);
-        $this->assertRegExp('/LD\-[a-z0-9]+/', $tinyUrl->getUrlkey());
+        $this->assertEquals('LD-dkked92d', $tinyUrl->getUrlkey());
     }
 
     public function testInsertNewTinyUrlSetsStoragePid()
@@ -236,6 +256,11 @@ class TinyUrlDatabaseRepositoryTest extends TestCase
     {
         $tinyUrl = TinyUrl::createNew();
 
+        $this->urlKeyGeneratorMock->expects($this->once())
+            ->method('generateTinyurlKeyForTinyUrl')
+            ->with($tinyUrl)
+            ->willReturn('LD-k2kf929');
+
         $this->prepareInsertQuery(2323);
 
         $this->databaseConnectionMock->expects($this->once())
@@ -245,7 +270,7 @@ class TinyUrlDatabaseRepositoryTest extends TestCase
                 'uid=2323',
                 $this->callback(
                     function (array $databaseRow) {
-                        return preg_match('/LD\-[0-9a-z]+/', $databaseRow['urlkey']) === 1;
+                        return 'LD-k2kf929' ===  $databaseRow['urlkey'];
                     }
                 )
             );

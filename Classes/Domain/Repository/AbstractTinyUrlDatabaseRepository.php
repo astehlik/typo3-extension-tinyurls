@@ -130,7 +130,7 @@ abstract class AbstractTinyUrlDatabaseRepository
 
     protected function insertNewTinyUrlTransaction(TinyUrl $tinyUrl)
     {
-        $hadCustomUrlKey = $tinyUrl->hasCustomUrlKey();
+        $customUrlKey = $tinyUrl->hasCustomUrlKey() ? $tinyUrl->getCustomUrlKey() : null;
 
         $tinyUrlUid = $this->insertNewTinyUrlInDatabase($tinyUrl);
 
@@ -138,7 +138,8 @@ abstract class AbstractTinyUrlDatabaseRepository
 
         // We need to save the tinyurl once more because persistPostProcessInsert genereates
         // the URL key depending on the new UID if no custom URL key is used.
-        if (!$hadCustomUrlKey) {
+        if ($customUrlKey === null) {
+            $tinyUrl->regenerateUrlKey();
             $this->updateTinyUrl($tinyUrl);
         }
     }

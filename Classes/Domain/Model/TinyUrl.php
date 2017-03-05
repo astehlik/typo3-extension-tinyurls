@@ -202,9 +202,6 @@ class TinyUrl
             throw new \InvalidArgumentException('The inserted UID must not be zero.');
         }
         $this->uid = $newUid;
-        if (!$this->hasCustomUrlKey()) {
-            $this->regenerateUrlKey();
-        }
         $this->persistPostProcess();
     }
 

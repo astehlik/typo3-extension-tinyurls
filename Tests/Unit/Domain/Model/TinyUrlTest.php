@@ -14,6 +14,8 @@ namespace Tx\Tinyurls\Tests\Unit\Domain\Model;
 
 use PHPUnit\Framework\TestCase;
 use Tx\Tinyurls\Domain\Model\TinyUrl;
+use Tx\Tinyurls\Object\ImplementationManager;
+use Tx\Tinyurls\UrlKeyGenerator\UrlKeyGenerator;
 
 class TinyUrlTest extends TestCase
 {
@@ -184,14 +186,6 @@ class TinyUrlTest extends TestCase
         $this->assertFalse($tinyUrl->isNew());
     }
 
-    public function testPersistPostProcessInsertRegeneratesUrlKeyIfNoCustomUrlIsUsed()
-    {
-        $tinyUrl = TinyUrl::createNew();
-        $this->assertEmpty($tinyUrl->getUrlkey());
-        $tinyUrl->persistPostProcessInsert(55);
-        $this->assertRegExp('/3\-[0-9a-z]+/', $tinyUrl->getUrlkey());
-    }
-
     public function testPersistPostProcessInsertResetsOriginalHash()
     {
         $tinyUrl = TinyUrl::createNew();
@@ -254,8 +248,19 @@ class TinyUrlTest extends TestCase
     {
         $tinyUrl = TinyUrl::createNew();
         $tinyUrl->persistPostProcessInsert(2);
+
+        /** @var UrlKeyGenerator|\PHPUnit_Framework_MockObject_MockObject $urlGeneratorMock */
+        $urlGeneratorMock = $this->createMock(UrlKeyGenerator::class);
+        $urlGeneratorMock->expects($this->once())
+            ->method('generateTinyurlKeyForTinyUrl')
+            ->with($tinyUrl)
+            ->willReturn('thekey');
+        ImplementationManager::getInstance()->setUrlKeyGenerator($urlGeneratorMock);
+
         $tinyUrl->regenerateUrlKey();
-        $this->assertRegExp('/c\-[0-9a-f]+/', $tinyUrl->getUrlkey());
+        $this->assertEquals('thekey', $tinyUrl->getUrlkey());
+
+        ImplementationManager::getInstance()->restoreDefaults();
     }
 
     public function testSetCommentSetsComment()
