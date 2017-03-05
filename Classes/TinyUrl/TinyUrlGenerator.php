@@ -80,7 +80,7 @@ class TinyUrlGenerator
      * @return string
      * @deprecated Use UrlTils::buildTinyUrl() instead.
      */
-    public function buildTinyUrl($tinyUrlKey): string
+    public function buildTinyUrl(string $tinyUrlKey): string
     {
         return $this->getUrlUtils()->buildTinyUrl($tinyUrlKey);
     }
@@ -92,7 +92,7 @@ class TinyUrlGenerator
      * @param string $targetUrl The URL that should be minified
      * @return string The generated tinyurl
      */
-    public function getTinyUrl($targetUrl)
+    public function getTinyUrl(string $targetUrl): string
     {
         if (empty($targetUrl)) {
             return $targetUrl;
