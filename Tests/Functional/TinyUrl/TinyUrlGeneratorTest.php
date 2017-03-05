@@ -51,6 +51,6 @@ class TinyUrlGeneratorTest extends FunctionalTestCase
             'tx_tinyurls_urls',
             'uid=1'
         );
-        $this->assertEquals($GLOBALS['EXEC_TIME'], $tinyUrlRow['tstamp']);
+        $this->assertGreaterThanOrEqual($GLOBALS['EXEC_TIME'], $tinyUrlRow['tstamp']);
     }
 }
