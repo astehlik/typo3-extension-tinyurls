@@ -13,7 +13,9 @@ namespace Tx\Tinyurls\Tests\Unit\Object;
  *                                                                        */
 
 use PHPUnit\Framework\TestCase;
+use Tx\Tinyurls\Domain\Repository\TinyUrlRepository;
 use Tx\Tinyurls\Object\ImplementationManager;
+use Tx\Tinyurls\UrlKeyGenerator\UrlKeyGenerator;
 
 class ImplementationManagerTest extends TestCase
 {
@@ -33,10 +35,26 @@ class ImplementationManagerTest extends TestCase
         $this->assertEquals('new class', $this->implementationManager->getTinyUrlRepositoryClass());
     }
 
+    public function testSetTinyUrlRepositorySetsTinyUrlRepositoryInstance()
+    {
+        /** @var TinyUrlRepository $tinyUrlRepository */
+        $tinyUrlRepository = $this->createMock(TinyUrlRepository::class);
+        $this->implementationManager->setTinyUrlRepository($tinyUrlRepository);
+        $this->assertEquals($tinyUrlRepository, $this->implementationManager->getTinyUrlRepository());
+    }
+
     public function testSetUrlKeyGeneratorClassSetsClassName()
     {
         $this->implementationManager->setUrlKeyGeneratorClass('new gen class');
         $this->assertEquals('new gen class', $this->implementationManager->getUrlKeyGeneratorClass());
+    }
+
+    public function testSetUrlKeyGeneratorSetsUrlKeyGeneratorInstance()
+    {
+        /** @var UrlKeyGenerator $urlKeyGenerator */
+        $urlKeyGenerator = $this->createMock(UrlKeyGenerator::class);
+        $this->implementationManager->setUrlKeyGenerator($urlKeyGenerator);
+        $this->assertEquals($urlKeyGenerator, $this->implementationManager->getUrlKeyGenerator());
     }
 
     public function testTinyUrlRepositoryClassDefaultsToDoctrineRepositoryIfExists()

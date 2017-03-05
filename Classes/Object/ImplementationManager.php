@@ -23,9 +23,19 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 class ImplementationManager implements SingletonInterface
 {
     /**
+     * @var TinyUrlRepository
+     */
+    protected $tinyUrlRepository;
+
+    /**
      * @var string
      */
     protected $tinyUrlRepositoryClass;
+
+    /**
+     * @var UrlKeyGenerator
+     */
+    protected $urlKeyGenerator;
 
     /**
      * @var string
@@ -56,7 +66,10 @@ class ImplementationManager implements SingletonInterface
      */
     public function getTinyUrlRepository(): TinyUrlRepository
     {
-        return GeneralUtility::makeInstance($this->tinyUrlRepositoryClass);
+        if ($this->tinyUrlRepository === null) {
+            $this->tinyUrlRepository = GeneralUtility::makeInstance($this->tinyUrlRepositoryClass);
+        }
+        return $this->tinyUrlRepository;
     }
 
     public function getTinyUrlRepositoryClass(): string
@@ -66,7 +79,10 @@ class ImplementationManager implements SingletonInterface
 
     public function getUrlKeyGenerator(): UrlKeyGenerator
     {
-        return GeneralUtility::makeInstance($this->urlKeyGeneratorClass);
+        if ($this->urlKeyGenerator === null) {
+            $this->urlKeyGenerator = GeneralUtility::makeInstance($this->urlKeyGeneratorClass);
+        }
+        return $this->urlKeyGenerator;
     }
 
     public function getUrlKeyGeneratorClass(): string
@@ -74,13 +90,26 @@ class ImplementationManager implements SingletonInterface
         return $this->urlKeyGeneratorClass;
     }
 
+
+    public function setTinyUrlRepository(TinyUrlRepository $tinyUrlRepository)
+    {
+        $this->tinyUrlRepository = $tinyUrlRepository;
+    }
+
     public function setTinyUrlRepositoryClass(string $tinyUrlRepositoryClass)
     {
+        $this->tinyUrlRepository = null;
         $this->tinyUrlRepositoryClass = $tinyUrlRepositoryClass;
+    }
+
+    public function setUrlKeyGenerator(UrlKeyGenerator $urlKeyGenerator)
+    {
+        $this->urlKeyGenerator = $urlKeyGenerator;
     }
 
     public function setUrlKeyGeneratorClass(string $urlKeyGeneratorClass)
     {
+        $this->urlKeyGenerator = null;
         $this->urlKeyGeneratorClass = $urlKeyGeneratorClass;
     }
 }
