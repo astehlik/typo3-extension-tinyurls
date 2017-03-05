@@ -51,7 +51,7 @@ class UrlUtils implements SingletonInterface
             $tinyUrl = $this->createSpeakingTinyUrl($tinyUrlKey);
             return $tinyUrl;
         } else {
-            $tinyUrl = $this->generalUtility->getIndpEnv('TYPO3_SITE_URL');
+            $tinyUrl = $this->getGeneralUtility()->getIndpEnv('TYPO3_SITE_URL');
             $tinyUrl .= '?eID=tx_tinyurls&tx_tinyurls[key]=' . $tinyUrlKey;
             return $tinyUrl;
         }
