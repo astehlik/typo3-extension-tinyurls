@@ -13,7 +13,6 @@ namespace Tx\Tinyurls\Tests\Unit\Object;
  *                                                                        */
 
 use PHPUnit\Framework\TestCase;
-use Tx\Tinyurls\Domain\Repository\TinyUrlDoctrineRepository;
 use Tx\Tinyurls\Object\ImplementationManager;
 
 class ImplementationManagerTest extends TestCase
@@ -43,8 +42,15 @@ class ImplementationManagerTest extends TestCase
     public function testTinyUrlRepositoryClassDefaultsToDoctrineRepositoryIfExists()
     {
         if (class_exists('TYPO3\\CMS\\Core\\Database\\Query\\QueryBuilder')) {
+            /** @noinspection PhpUnnecessaryFullyQualifiedNameInspection */
             $this->assertEquals(
-                TinyUrlDoctrineRepository::class,
+                \Tx\Tinyurls\Domain\Repository\TinyUrlDoctrineRepository::class,
+                $this->implementationManager->getTinyUrlRepositoryClass()
+            );
+        } else {
+            /** @noinspection PhpUnnecessaryFullyQualifiedNameInspection */
+            $this->assertEquals(
+                \Tx\Tinyurls\Domain\Repository\TinyUrlDatabaseRepository::class,
                 $this->implementationManager->getTinyUrlRepositoryClass()
             );
         }
