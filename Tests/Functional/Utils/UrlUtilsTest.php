@@ -13,8 +13,8 @@ namespace Tx\Tinyurls\Tests\Functional\Utils;
  *                                                                        */
 
 use Tx\Tinyurls\Utils\UrlUtils;
-use TYPO3\CMS\Core\Tests\FunctionalTestCase;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\Components\TestingFramework\Core\Functional\FunctionalTestCase;
 
 /**
  * Functional tests for the tinyurls API.

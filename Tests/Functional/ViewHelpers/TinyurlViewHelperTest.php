@@ -12,7 +12,7 @@ namespace Tx\Tinyurls\Tests\Functional\ViewHelpers;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
-use TYPO3\CMS\Core\Tests\FunctionalTestCase;
+use TYPO3\Components\TestingFramework\Core\Functional\FunctionalTestCase;
 
 /**
  * Functional tests for the Tinyurl view helper.
@@ -37,6 +37,7 @@ class TinyurlViewHelperTest extends FunctionalTestCase
             $this->importDataSet(ORIGINAL_ROOT . 'typo3/sysext/frontend/Tests/Functional/Fixtures/pages.xml');
         }
     }
+
     /**
      * @test
      */
