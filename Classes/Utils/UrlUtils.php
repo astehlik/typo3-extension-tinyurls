@@ -47,7 +47,7 @@ class UrlUtils implements SingletonInterface
 
     public function buildTinyUrl(string $tinyUrlKey): string
     {
-        if ($this->extensionConfiguration->areSpeakingUrlsEnabled()) {
+        if ($this->getExtensionConfiguration()->areSpeakingUrlsEnabled()) {
             $tinyUrl = $this->createSpeakingTinyUrl($tinyUrlKey);
             return $tinyUrl;
         } else {
