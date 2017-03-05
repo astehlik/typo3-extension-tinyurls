@@ -105,14 +105,13 @@ class UrlUtils implements SingletonInterface
      * Generates a unique tinyurl key for the record with the given UID
      *
      * @deprecated Use the UrlKeyGenerator for generating the URL key.
-     * @param int $insertedUid
+     * @param int $uid
      * @return string
      */
-    public function generateTinyurlKeyForUid(int $insertedUid): string
+    public function generateTinyurlKeyForUid(int $uid): string
     {
-        $tinyUrl = TinyUrl::createNew();
-        $tinyUrl->persistPostProcessInsert($insertedUid);
-        return ImplementationManager::getInstance()->getUrlKeyGenerator()->generateTinyurlKeyForTinyUrl($tinyUrl);
+        $urlKeyGenerator = ImplementationManager::getInstance()->getUrlKeyGenerator();
+        return $urlKeyGenerator->generateTinyurlKeyForUid($uid);
     }
 
     /**

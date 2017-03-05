@@ -14,16 +14,21 @@ namespace Tx\Tinyurls\UrlKeyGenerator;
 
 use Tx\Tinyurls\Domain\Model\TinyUrl;
 
-/**
- * Contains utilities for creating tiny url keys and url hashes
- */
 interface UrlKeyGenerator
 {
     /**
-     * Generates a unique tinyurl key for the record with the given UID
+     * Generates a unique tinyurl key for the record with the given UID.
      *
      * @param TinyUrl $tinyUrl
      * @return string
      */
     public function generateTinyurlKeyForTinyUrl(TinyUrl $tinyUrl): string;
+
+    /**
+     * Generates a unique tinyurl key for the given UID.
+     *
+     * @param int $uid
+     * @return string
+     */
+    public function generateTinyurlKeyForUid(int $uid): string;
 }

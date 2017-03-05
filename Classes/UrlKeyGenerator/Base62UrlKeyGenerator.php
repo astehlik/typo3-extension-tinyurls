@@ -50,8 +50,19 @@ class Base62UrlKeyGenerator implements UrlKeyGenerator
      */
     public function generateTinyurlKeyForTinyUrl(TinyUrl $tinyUrl): string
     {
+        return $this->generateTinyurlKeyForUid($tinyUrl->getUid());
+    }
+
+    /**
+     * Generates a unique tinyurl key for the given UID.
+     *
+     * @param int $uid
+     * @return string
+     */
+    public function generateTinyurlKeyForUid(int $uid): string
+    {
         $tinyUrlKey = $this->convertIntToBase62(
-            $tinyUrl->getUid(),
+            $uid,
             $this->getExtensionConfiguration()->getBase62Dictionary()
         );
 
