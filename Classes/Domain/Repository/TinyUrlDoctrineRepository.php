@@ -23,6 +23,11 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 class TinyUrlDoctrineRepository extends AbstractTinyUrlDatabaseRepository implements TinyUrlRepository
 {
     /**
+     * @var ConnectionPool
+     */
+    protected $databaseConnectionPool;
+
+    /**
      * See: http://lists.typo3.org/pipermail/typo3-dev/2007-December/026936.html
      * Use of "set counter=counter+1" - avoiding race conditions
      *
@@ -134,6 +139,11 @@ class TinyUrlDoctrineRepository extends AbstractTinyUrlDatabaseRepository implem
             ->execute();
     }
 
+    public function setDatabaseConnectionPool(ConnectionPool $databaseConnectionPool)
+    {
+        $this->databaseConnectionPool = $databaseConnectionPool;
+    }
+
     public function updateTinyUrl(TinyUrl $tinyUrl)
     {
         $this->prepareTinyUrlForUpdate($tinyUrl);
@@ -151,13 +161,25 @@ class TinyUrlDoctrineRepository extends AbstractTinyUrlDatabaseRepository implem
 
     protected function getDatabaseConnection(): Connection
     {
-        return GeneralUtility::makeInstance(ConnectionPool::class)
+        return $this->getDatabaseConnectionPool()
             ->getConnectionForTable(static::TABLE_URLS);
+    }
+
+    /**
+     * @return ConnectionPool
+     * @codeCoverageIgnore
+     */
+    protected function getDatabaseConnectionPool(): ConnectionPool
+    {
+        if ($this->databaseConnectionPool === null) {
+            $this->databaseConnectionPool = GeneralUtility::makeInstance(ConnectionPool::class);
+        }
+        return $this->databaseConnectionPool;
     }
 
     protected function getQueryBuilder(): QueryBuilder
     {
-        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
+        $queryBuilder = $this->getDatabaseConnectionPool()
             ->getQueryBuilderForTable(static::TABLE_URLS);
 
         $queryBuilder->getRestrictions()->removeAll();

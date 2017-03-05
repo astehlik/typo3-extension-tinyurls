@@ -17,6 +17,8 @@ use TYPO3\CMS\Core\Utility\HttpUtility;
 
 /**
  * A wrapper class for HtmlUtility calls. This allows us better mocking in the Unit tests.
+ *
+ * @codeCoverageIgnore
  */
 class HttpUtilityWrapper implements SingletonInterface
 {

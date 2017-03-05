@@ -113,6 +113,10 @@ class Api
         $this->getTinyUrlGenerator()->setOptionValidUntil($validUntil);
     }
 
+    /**
+     * @return TinyUrlGenerator
+     * @codeCoverageIgnore
+     */
     protected function getTinyUrlGenerator(): TinyUrlGenerator
     {
         if ($this->tinyUrlGenerator === null) {
@@ -121,6 +125,10 @@ class Api
         return $this->tinyUrlGenerator;
     }
 
+    /**
+     * @return TypoScriptConfigurator
+     * @codeCoverageIgnore
+     */
     protected function getTypoScriptConfigurator(): TypoScriptConfigurator
     {
         if ($this->typoScriptConfigurator === null) {

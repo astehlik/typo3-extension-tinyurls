@@ -110,6 +110,10 @@ class TceDataMap
         return $id;
     }
 
+    /**
+     * @return TinyUrlRepository
+     * @codeCoverageIgnore
+     */
     protected function getTinyUrlRepository(): TinyUrlRepository
     {
         if ($this->tinyUrlRepository === null) {

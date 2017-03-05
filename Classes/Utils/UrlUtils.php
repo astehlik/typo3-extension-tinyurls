@@ -51,7 +51,7 @@ class UrlUtils implements SingletonInterface
             $tinyUrl = $this->createSpeakingTinyUrl($tinyUrlKey);
             return $tinyUrl;
         } else {
-            $tinyUrl = GeneralUtility::getIndpEnv('TYPO3_SITE_URL');
+            $tinyUrl = $this->generalUtility->getIndpEnv('TYPO3_SITE_URL');
             $tinyUrl .= '?eID=tx_tinyurls&tx_tinyurls[key]=' . $tinyUrlKey;
             return $tinyUrl;
         }
@@ -115,6 +115,10 @@ class UrlUtils implements SingletonInterface
         return ImplementationManager::getInstance()->getUrlGeyGenerator()->generateTinyurlKeyForTinyUrl($tinyUrl);
     }
 
+    /**
+     * @return ExtensionConfiguration
+     * @codeCoverageIgnore
+     */
     protected function getExtensionConfiguration(): ExtensionConfiguration
     {
         if ($this->extensionConfiguration === null) {
@@ -123,6 +127,10 @@ class UrlUtils implements SingletonInterface
         return $this->extensionConfiguration;
     }
 
+    /**
+     * @return GeneralUtilityWrapper
+     * @codeCoverageIgnore
+     */
     protected function getGeneralUtility(): GeneralUtilityWrapper
     {
         if ($this->generalUtility === null) {

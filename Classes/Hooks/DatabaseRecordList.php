@@ -75,6 +75,10 @@ class DatabaseRecordList implements SingletonInterface
         $queryParts['SELECT'] = str_replace('urldisplay', $this->urlDisplayQuery, $queryParts['SELECT']);
     }
 
+    /**
+     * @return UrlUtils
+     * @codeCoverageIgnore
+     */
     protected function getUrlUtils(): UrlUtils
     {
         if ($this->urlUtils === null) {

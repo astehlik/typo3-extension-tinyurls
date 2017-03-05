@@ -44,6 +44,11 @@ class ExtensionConfiguration implements SingletonInterface
     ];
 
     /**
+     * @var TypoScriptConfigurator
+     */
+    protected $typoScriptConfigurator;
+
+    /**
      * Initializes the tinyurl configuration with default values and
      * if the user set his own values they are parsed through stdWrap
      *
@@ -57,7 +62,7 @@ class ExtensionConfiguration implements SingletonInterface
         ContentObjectRenderer $contentObject,
         TinyUrlGenerator $tinyUrlGenerator
     ) {
-        $typoScriptConfigurator = GeneralUtility::makeInstance(TypoScriptConfigurator::class, $tinyUrlGenerator);
+        $typoScriptConfigurator = $this->getTypoScriptConfigurator($tinyUrlGenerator);
         $typoScriptConfigurator->initializeConfigFromTyposcript($config, $contentObject);
     }
 
@@ -133,6 +138,11 @@ class ExtensionConfiguration implements SingletonInterface
         return (int)$this->getExtensionConfigurationValueInternal('urlRecordStoragePID');
     }
 
+    public function setTypoScriptConfigurator(TypoScriptConfigurator $typoScriptConfigurator)
+    {
+        $this->typoScriptConfigurator = $typoScriptConfigurator;
+    }
+
     protected function getExtensionConfigurationValueInternal(string $key)
     {
         $this->initializeExtensionConfiguration();
@@ -142,6 +152,22 @@ class ExtensionConfiguration implements SingletonInterface
         }
 
         return $this->extensionConfiguration[$key];
+    }
+
+    /**
+     * @param TinyUrlGenerator $tinyUrlGenerator
+     * @return TypoScriptConfigurator
+     * @codeCoverageIgnore
+     */
+    protected function getTypoScriptConfigurator(TinyUrlGenerator $tinyUrlGenerator): TypoScriptConfigurator
+    {
+        if ($this->typoScriptConfigurator === null) {
+            $this->typoScriptConfigurator = GeneralUtility::makeInstance(
+                TypoScriptConfigurator::class,
+                $tinyUrlGenerator
+            );
+        }
+        return $this->typoScriptConfigurator;
     }
 
     /**

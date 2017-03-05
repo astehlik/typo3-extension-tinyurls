@@ -61,6 +61,7 @@ class EidController
 
     /**
      * @return TypoScriptFrontendController
+     * @codeCoverageIgnore
      */
     public function getTypoScriptFrontendController(): TypoScriptFrontendController
     {
@@ -115,6 +116,10 @@ class EidController
         $this->getTinyUrlRepository()->countTinyUrlHit($tinyUrl);
     }
 
+    /**
+     * @return HttpUtilityWrapper
+     * @codeCoverageIgnore
+     */
     protected function getHttpUtility(): HttpUtilityWrapper
     {
         if ($this->httpUtility === null) {
@@ -148,6 +153,10 @@ class EidController
         return $tinyUrl;
     }
 
+    /**
+     * @return TinyUrlRepository
+     * @codeCoverageIgnore
+     */
     protected function getTinyUrlRepository(): TinyUrlRepository
     {
         if ($this->tinyUrlRepository === null) {

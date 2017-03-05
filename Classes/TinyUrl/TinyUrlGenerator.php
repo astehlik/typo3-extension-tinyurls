@@ -186,6 +186,10 @@ class TinyUrlGenerator
         return $tinyUrl;
     }
 
+    /**
+     * @return TinyUrlRepository
+     * @codeCoverageIgnore
+     */
     protected function getTinyUrlRepository(): TinyUrlRepository
     {
         if ($this->tinyUrlRepository === null) {
@@ -194,6 +198,10 @@ class TinyUrlGenerator
         return $this->tinyUrlRepository;
     }
 
+    /**
+     * @return UrlUtils
+     * @codeCoverageIgnore
+     */
     protected function getUrlUtils(): UrlUtils
     {
         if ($this->urlUtils === null) {

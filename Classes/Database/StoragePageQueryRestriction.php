@@ -19,6 +19,9 @@ use TYPO3\CMS\Core\Database\Query\Restriction\QueryRestrictionInterface;
 
 class StoragePageQueryRestriction implements QueryRestrictionInterface
 {
+    /**
+     * @var int
+     */
     protected $storagePageUid;
 
     public function __construct(int $storagePageUid)
@@ -46,5 +49,10 @@ class StoragePageQueryRestriction implements QueryRestrictionInterface
         }
 
         return $expressionBuilder->andX(...$constraints);
+    }
+
+    public function getStoragePageUid(): int
+    {
+        return $this->storagePageUid;
     }
 }

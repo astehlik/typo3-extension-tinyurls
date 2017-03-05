@@ -66,10 +66,7 @@ class TinyurlViewHelper extends AbstractViewHelper
 
         $tinyUrl = $tinyUrlApi->getTinyUrl($url);
 
-        // Backward compatibility for TYPO3 7: we need to do the escaping manually.
-        if (!property_exists($this, 'escapeOutput')) {
-            $tinyUrl = htmlspecialchars($tinyUrl);
-        }
+        $tinyUrl = $this->escapeOutputForLegacyFluid($tinyUrl);
 
         return $tinyUrl;
     }
@@ -79,6 +76,27 @@ class TinyurlViewHelper extends AbstractViewHelper
         $this->tinyUrlApi = $tinyUrlApi;
     }
 
+    /**
+     * Backward compatibility for TYPO3 7: we need to do the escaping manually.
+     *
+     * @param string $output
+     * @return string
+     * @codeCoverageIgnore
+     */
+    protected function escapeOutputForLegacyFluid(string $output): string
+    {
+        // Escaping property exists, no need for additional escaping.
+        if (property_exists($this, 'escapeOutput')) {
+            return $output;
+        } else {
+            return htmlspecialchars($output);
+        }
+    }
+
+    /**
+     * @return TinyUrlApi
+     * @codeCoverageIgnore
+     */
     protected function getTinyUrlApi(): TinyUrlApi
     {
         if ($this->tinyUrlApi === null) {

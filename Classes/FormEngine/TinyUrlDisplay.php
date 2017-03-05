@@ -44,6 +44,10 @@ class TinyUrlDisplay
         return $urlUtils->buildTinyUrl($formElementData['databaseRow']['urlkey']);
     }
 
+    /**
+     * @return UrlUtils
+     * @codeCoverageIgnore
+     */
     protected function getUrlUtils(): UrlUtils
     {
         if ($this->urlUtils === null) {

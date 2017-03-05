@@ -153,6 +153,7 @@ class TinyUrlDatabaseRepository extends AbstractTinyUrlDatabaseRepository implem
 
     /**
      * @return DatabaseConnection
+     * @codeCoverageIgnore
      */
     protected function getDatabaseConnection(): DatabaseConnection
     {

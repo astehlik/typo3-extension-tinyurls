@@ -22,8 +22,14 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class ImplementationManager implements SingletonInterface
 {
+    /**
+     * @var string
+     */
     protected $tinyUrlRepositoryClass;
 
+    /**
+     * @var string
+     */
     protected $urlKeyGeneratorClass;
 
     public function __construct()
@@ -31,7 +37,9 @@ class ImplementationManager implements SingletonInterface
         if (class_exists('TYPO3\\CMS\\Core\\Database\\Query\\QueryBuilder')) {
             $this->tinyUrlRepositoryClass = TinyUrlDoctrineRepository::class;
         } else {
+            // @codeCoverageIgnoreStart
             $this->tinyUrlRepositoryClass = TinyUrlDatabaseRepository::class;
+            // @codeCoverageIgnoreEnd
         }
 
         $this->urlKeyGeneratorClass = Base62UrlKeyGenerator::class;
@@ -42,14 +50,28 @@ class ImplementationManager implements SingletonInterface
         return GeneralUtility::makeInstance(ImplementationManager::class);
     }
 
+    /**
+     * @return TinyUrlRepository
+     * @codeCoverageIgnore
+     */
     public function getTinyUrlRepository(): TinyUrlRepository
     {
         return GeneralUtility::makeInstance($this->tinyUrlRepositoryClass);
     }
 
-    public function getUrlGeyGenerator(): UrlKeyGenerator
+    public function getTinyUrlRepositoryClass(): string
+    {
+        return $this->tinyUrlRepositoryClass;
+    }
+
+    public function getUrlKeyGenerator(): UrlKeyGenerator
     {
         return GeneralUtility::makeInstance($this->urlKeyGeneratorClass);
+    }
+
+    public function getUrlKeyGeneratorClass(): string
+    {
+        return $this->urlKeyGeneratorClass;
     }
 
     public function setTinyUrlRepositoryClass(string $tinyUrlRepositoryClass)

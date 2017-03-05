@@ -17,6 +17,8 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * A wrapper class for GeneralUtility calls. This allows us better mocking in the Unit tests.
+ *
+ * @codeCoverageIgnore
  */
 class GeneralUtilityWrapper implements SingletonInterface
 {

@@ -77,6 +77,10 @@ class TypoLink
         $this->tinyUrlApi = $tinyUrlApi;
     }
 
+    /**
+     * @return Api
+     * @codeCoverageIgnore
+     */
     protected function getTinyUrlApi(): Api
     {
         if ($this->tinyUrlApi === null) {

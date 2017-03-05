@@ -54,6 +54,10 @@ class TinyUrlValidator implements ValidatorInterface
         return $this->result;
     }
 
+    /**
+     * @return TinyUrlRepository
+     * @codeCoverageIgnore
+     */
     protected function getTinyUrlRepository(): TinyUrlRepository
     {
         if ($this->tinyUrlRepository === null) {

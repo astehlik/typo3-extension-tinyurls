@@ -121,6 +121,10 @@ class CopyableFieldElement extends AbstractNode implements NodeInterface
         );
     }
 
+    /**
+     * @return StandaloneView
+     * @codeCoverageIgnore
+     */
     protected function getFormFieldView(): StandaloneView
     {
         if ($this->formFieldView === null) {
@@ -129,6 +133,10 @@ class CopyableFieldElement extends AbstractNode implements NodeInterface
         return $this->formFieldView;
     }
 
+    /**
+     * @return IconFactory
+     * @codeCoverageIgnore
+     */
     protected function getIconFactory(): IconFactory
     {
         if ($this->iconFactory === null) {

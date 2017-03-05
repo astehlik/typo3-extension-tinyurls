@@ -28,6 +28,11 @@ abstract class AbstractTinyUrlDatabaseRepository
     protected $extensionConfiguration;
 
     /**
+     * @var TinyUrlValidator
+     */
+    protected $tinyUrlValidator;
+
+    /**
      * Stores the given URL in the database, returns the inserted UID.
      *
      * @param TinyUrl $tinyUrl
@@ -51,9 +56,6 @@ abstract class AbstractTinyUrlDatabaseRepository
      */
     abstract protected function updateTinyUrl(TinyUrl $tinyUrl);
 
-    /**
-     * @param ExtensionConfiguration $extensionConfiguration
-     */
     public function injectExtensionConfiguration(ExtensionConfiguration $extensionConfiguration)
     {
         $this->extensionConfiguration = $extensionConfiguration;
@@ -70,11 +72,20 @@ abstract class AbstractTinyUrlDatabaseRepository
         );
     }
 
+    public function setTinyUrlValidator(TinyUrlValidator $tinyUrlValidator)
+    {
+        $this->tinyUrlValidator = $tinyUrlValidator;
+    }
+
     protected function createTinyUrlFromDatabaseRow(array $databaseRow): TinyUrl
     {
         return TinyUrl::createFromDatabaseRow($databaseRow);
     }
 
+    /**
+     * @return ExtensionConfiguration
+     * @codeCoverageIgnore
+     */
     protected function getExtensionConfiguration(): ExtensionConfiguration
     {
         if ($this->extensionConfiguration === null) {
@@ -103,6 +114,18 @@ abstract class AbstractTinyUrlDatabaseRepository
             'delete_on_use' => (int)$tinyUrl->getDeleteOnUse(),
             'valid_until' => (int)$tinyUrl->getValidUntil()->getTimestamp(),
         ];
+    }
+
+    /**
+     * @return TinyUrlValidator
+     * @codeCoverageIgnore
+     */
+    protected function getTinyUrlValidator(): TinyUrlValidator
+    {
+        if ($this->tinyUrlValidator === null) {
+            $this->tinyUrlValidator = GeneralUtility::makeInstance(TinyUrlValidator::class);
+        }
+        return $this->tinyUrlValidator;
     }
 
     protected function insertNewTinyUrlTransaction(TinyUrl $tinyUrl)
@@ -140,7 +163,7 @@ abstract class AbstractTinyUrlDatabaseRepository
 
     protected function validateTinyUrl(TinyUrl $tinyUrl)
     {
-        $validator = GeneralUtility::makeInstance(TinyUrlValidator::class);
+        $validator = $this->getTinyUrlValidator();
         $result = $validator->validate($tinyUrl);
         if ($result->hasErrors()) {
             $validationError = GeneralUtility::makeInstance(TinyUrlValidationException::class);
