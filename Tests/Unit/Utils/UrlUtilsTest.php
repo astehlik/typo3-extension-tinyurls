@@ -14,6 +14,9 @@ namespace Tx\Tinyurls\Tests\Utils;
 
 use PHPUnit\Framework\TestCase;
 use Tx\Tinyurls\Configuration\ExtensionConfiguration;
+use Tx\Tinyurls\Object\ImplementationManager;
+use Tx\Tinyurls\UrlKeyGenerator\Base62UrlKeyGenerator;
+use Tx\Tinyurls\UrlKeyGenerator\UrlKeyGenerator;
 use Tx\Tinyurls\Utils\GeneralUtilityWrapper;
 use Tx\Tinyurls\Utils\UrlUtils;
 
@@ -123,6 +126,13 @@ class UrlUtilsTest extends TestCase
 
     public function testGenerateTinyurlKeyForUidGeneratesKey()
     {
-        $this->assertRegExp('/ci\-[0-9a-f]+/', $this->urlUtils->generateTinyurlKeyForUid(132));
+        $urlGeneratorMock = $this->createMock(UrlKeyGenerator::class);
+        $urlGeneratorMock->expects($this->once())
+            ->method('generateTinyurlKeyForUid')
+            ->with(132)
+            ->willReturn('thekey');
+        ImplementationManager::getInstance()->setUrlKeyGenerator($urlGeneratorMock);
+        $this->assertEquals('thekey', $this->urlUtils->generateTinyurlKeyForUid(132));
+        ImplementationManager::getInstance()->restoreDefaults();
     }
 }
