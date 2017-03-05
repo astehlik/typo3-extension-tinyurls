@@ -14,7 +14,7 @@ namespace Tx\Tinyurls\Tests\Functional\TinyUrl;
 
 use Tx\Tinyurls\TinyUrl\TinyUrlGenerator;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\Components\TestingFramework\Core\Functional\FunctionalTestCase;
+use Nimut\TestingFramework\TestCase\FunctionalTestCase;
 
 /**
  * Functional tests for the TinyUrlGenerator.

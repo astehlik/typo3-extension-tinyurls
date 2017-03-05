@@ -40,14 +40,6 @@ script:
     .Build/bin/phpcs --standard=PSRTinyurls Classes Tests/Unit Tests/Functional ext_localconf.php
   - >
     echo;
-    echo "Determining phpunit config path";
-    if [ -d ".Build/vendor/typo3/cms/components/testing_framework/Resources/Core/Build" ]; then
-      export PHPUNIT_CONFIG_PATH=".Build/vendor/typo3/cms/components/testing_framework/Resources/Core/Build";
-    else
-      export PHPUNIT_CONFIG_PATH=".Build/vendor/typo3/cms/typo3/sysext/core/Build";
-    fi
-  - >
-    echo;
     echo "Running unit tests";
     .Build/bin/phpunit Tests/Unit/
   - >
@@ -58,12 +50,13 @@ script:
     echo;
     composer remove phpunit/phpunit --dev;
     composer require phpunit/phpunit:^5.6 --dev;
+    composer require --dev nimut/testing-framework;
     mkdir -p ".Build/Web/typo3temp/var/tests";
     export typo3DatabaseName="typo3";
     export typo3DatabaseHost="localhost";
     export typo3DatabaseUsername="root";
     export typo3DatabasePassword="";
-    find . -wholename '*Tests/Functional/*Test.php' ! -path "./.Build/*" | parallel --gnu 'echo; echo "Running functional test suite {}"; .Build/bin/phpunit --colors -c $PHPUNIT_CONFIG_PATH/FunctionalTests.xml {}'
+    find . -wholename '*Tests/Functional/*Test.php' ! -path "./.Build/*" | parallel --gnu 'echo; echo "Running functional test suite {}"; .Build/bin/phpunit --colors -c .Build/vendor/nimut/testing-framework/res/Configuration/FunctionalTests.xml {}'
 
 after_script:
   - >

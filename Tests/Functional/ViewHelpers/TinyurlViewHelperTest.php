@@ -12,7 +12,7 @@ namespace Tx\Tinyurls\Tests\Functional\ViewHelpers;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
-use TYPO3\Components\TestingFramework\Core\Functional\FunctionalTestCase;
+use Nimut\TestingFramework\TestCase\FunctionalTestCase;
 
 /**
  * Functional tests for the Tinyurl view helper.

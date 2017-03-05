@@ -15,7 +15,7 @@ namespace Tx\Tinyurls\Tests\Functional\TinyUrl;
 use Tx\Tinyurls\TinyUrl\Api;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
-use TYPO3\Components\TestingFramework\Core\Functional\FunctionalTestCase;
+use Nimut\TestingFramework\TestCase\FunctionalTestCase;
 
 /**
  * Functional tests for the tinyurls API.
