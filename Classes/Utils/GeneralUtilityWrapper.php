@@ -22,7 +22,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  */
 class GeneralUtilityWrapper implements SingletonInterface
 {
-    public function callUserFunction(string $funcName, array &$params, object &$callingObject)
+    public function callUserFunction(string $funcName, array &$params, &$callingObject)
     {
         return GeneralUtility::callUserFunction($funcName, $params, $callingObject);
     }
