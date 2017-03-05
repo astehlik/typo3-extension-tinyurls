@@ -81,14 +81,14 @@ class TinyUrlDatabaseRepository extends AbstractTinyUrlDatabaseRepository implem
      */
     public function findTinyUrlByTargetUrl(string $targetUrl): TinyUrl
     {
-        $selctWhereStatement = 'target_url_hash=' .
+        $selectWhereStatement = 'target_url_hash=' .
             $this->getDatabaseConnection()->fullQuoteStr($this->getTargetUrlHash($targetUrl), static::TABLE_URLS);
-        $selctWhereStatement = $this->getExtensionConfiguration()->appendPidQuery($selctWhereStatement);
+        $selectWhereStatement = $this->getExtensionConfiguration()->appendPidQuery($selectWhereStatement);
 
         $result = $this->getDatabaseConnection()->exec_SELECTgetSingleRow(
             '*',
             static::TABLE_URLS,
-            $selctWhereStatement
+            $selectWhereStatement
         );
 
         if (empty($result)) {
