@@ -265,7 +265,9 @@ class TinyUrl
         $this->targetUrlHash = (string)$databaseRow['target_url_hash'];
         $this->targetUrlHashOriginal = (string)$databaseRow['target_url_hash'];
         $this->deleteOnUse = (bool)$databaseRow['delete_on_use'];
-        $this->validUntil = new \DateTime('@' . (int)$databaseRow['valid_until']);
+        $this->validUntil = (int)$databaseRow['valid_until'] !== 0
+            ? new \DateTime('@' . (int)$databaseRow['valid_until'])
+            : null;
     }
 
     protected function regenerateTargetUrlHash()

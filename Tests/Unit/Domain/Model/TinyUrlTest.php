@@ -77,6 +77,14 @@ class TinyUrlTest extends TestCase
         $this->assertEquals(new \DateTime('2017-10-10 12:30:00.000000+0000'), $tinyUrl->getValidUntil());
     }
 
+    public function testCreateFromDatabaseFillsValidUntilWithNullIfEmtpy()
+    {
+        $databaseRow = $this->getDummyDatabaseRow();
+        $databaseRow['valid_until'] = 0;
+        $tinyUrl = TinyUrl::createFromDatabaseRow($databaseRow);
+        $this->assertFalse($tinyUrl->hasValidUntil());
+    }
+
     public function testEnableDeleteOnUseSetsDeleteOnUseToTrue()
     {
         $tinyUrl = TinyUrl::createNew();
