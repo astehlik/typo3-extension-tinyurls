@@ -81,7 +81,7 @@ interface TinyUrlRepository extends SingletonInterface
      * Updates an existing TinyURL in the storage.
      *
      * @param TinyUrl $tinyUrl
-     * @return mixed
+     * @return void
      */
     public function updateTinyUrl(TinyUrl $tinyUrl);
 }
