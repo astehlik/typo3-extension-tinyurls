@@ -26,9 +26,9 @@
     },
     "require-dev": {
         "namelesscoder/typo3-repository-client": "^1.2.0",
-        "phpunit/phpunit": "^6.0",
         "squizlabs/php_codesniffer": "^2.6",
-        "de-swebhosting/php-codestyle": "dev-master"
+        "de-swebhosting/php-codestyle": "dev-master",
+        "phpunit/phpunit": "^6.0"
     },
     "replace": {
         "tinyurls": "self.version",
