@@ -112,7 +112,7 @@ abstract class AbstractTinyUrlDatabaseRepository
             'target_url' => $tinyUrl->getTargetUrl(),
             'target_url_hash' => $tinyUrl->getTargetUrlHash(),
             'delete_on_use' => (int)$tinyUrl->getDeleteOnUse(),
-            'valid_until' => $tinyUrl->hasValidUntil() ? (int)$tinyUrl->getValidUntil()->getTimestamp() : null,
+            'valid_until' => $tinyUrl->hasValidUntil() ? (int)$tinyUrl->getValidUntil()->getTimestamp() : 0,
         ];
     }
 
