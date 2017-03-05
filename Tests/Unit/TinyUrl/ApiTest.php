@@ -38,15 +38,6 @@ class ApiTest extends TestCase
         $this->tinyUrlApi->setTinyUrlGenerator($this->tinyUrlGeneratorMock);
     }
 
-    public function setValidUntilSetsValidUntilOptionInUrlGenerator()
-    {
-        $this->tinyUrlGeneratorMock->expects($this->once())
-            ->method('setOptionValidUntil')
-            ->with(12434);
-
-        $this->tinyUrlApi->setValidUntil(12434);
-    }
-
     public function testGetTinyUrlUsesTinyUrlGeneratorForCreatingUrl()
     {
         $this->tinyUrlGeneratorMock->expects($this->once())
@@ -98,5 +89,14 @@ class ApiTest extends TestCase
             ->with('the url key');
 
         $this->tinyUrlApi->setUrlKey('the url key');
+    }
+
+    public function testSetValidUntilSetsValidUntilOptionInUrlGenerator()
+    {
+        $this->tinyUrlGeneratorMock->expects($this->once())
+            ->method('setOptionValidUntil')
+            ->with(12434);
+
+        $this->tinyUrlApi->setValidUntil(12434);
     }
 }

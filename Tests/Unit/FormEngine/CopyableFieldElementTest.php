@@ -46,13 +46,26 @@ class CopyableFieldElementTest extends TestCase
 
     protected function setUp()
     {
-        $nodeFactory = $this->getNodeFactoryMock();
         $data = ['parameterArray' => ['itemFormElValue' => 'testval']];
-        $this->copyableFieldElement = new CopyableFieldElement($nodeFactory, $data);
+        $this->createCopyableFieldElement($data);
+    }
 
-        $this->copyableFieldElement->injectGeneralUtilityWrapper($this->getGeneralUtilityWrapperMock());
-        $this->copyableFieldElement->injectIconFactory($this->getIconFactoryMock());
-        $this->copyableFieldElement->setFormFieldView($this->createFormFieldViewMock());
+    public function testGetFieldValueCallsConfiguredUserFunc()
+    {
+        $data = [
+            'parameterArray' => [
+                'itemFormElValue' => 'testval',
+                'fieldConf' => ['config' => ['valueFunc' => 'thefunc']],
+            ],
+        ];
+
+        $this->createCopyableFieldElement($data);
+
+        $this->generalUtilityWrapperMock->expects($this->once())
+            ->method('callUserFunction')
+            ->with('thefunc', $data, $this->copyableFieldElement);
+
+        $this->copyableFieldElement->render();
     }
 
     public function testRenderAssignsClipboardIconToTemplate()
@@ -62,8 +75,8 @@ class CopyableFieldElementTest extends TestCase
             ->withConsecutive(
                 [],
                 [
-                'clipboardIcon',
-                'icon html',
+                    'clipboardIcon',
+                    'icon html',
                 ]
             );
 
@@ -76,8 +89,8 @@ class CopyableFieldElementTest extends TestCase
             ->method('assign')
             ->withConsecutive(
                 [
-                'fieldValue',
-                'testval',
+                    'fieldValue',
+                    'testval',
                 ]
             );
 
@@ -141,6 +154,16 @@ class CopyableFieldElementTest extends TestCase
 
         $result = $this->copyableFieldElement->render();
         $this->assertEquals('The final html', $result['html']);
+    }
+
+    protected function createCopyableFieldElement(array $data)
+    {
+        $nodeFactory = $this->getNodeFactoryMock();
+        $this->copyableFieldElement = new CopyableFieldElement($nodeFactory, $data);
+
+        $this->copyableFieldElement->injectGeneralUtilityWrapper($this->getGeneralUtilityWrapperMock());
+        $this->copyableFieldElement->injectIconFactory($this->getIconFactoryMock());
+        $this->copyableFieldElement->setFormFieldView($this->createFormFieldViewMock());
     }
 
     /**

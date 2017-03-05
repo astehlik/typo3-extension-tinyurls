@@ -13,10 +13,10 @@ namespace Tx\Tinyurls\Tests\Unit\Controller;
  *                                                                        */
 
 use PHPUnit\Framework\TestCase;
-use Tx\Tinyurls\Domain\Model\TinyUrl;
-use Tx\Tinyurls\Utils\HttpUtilityWrapper;
 use Tx\Tinyurls\Controller\EidController;
+use Tx\Tinyurls\Domain\Model\TinyUrl;
 use Tx\Tinyurls\Domain\Repository\TinyUrlRepository;
+use Tx\Tinyurls\Utils\HttpUtilityWrapper;
 use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
 
 /**

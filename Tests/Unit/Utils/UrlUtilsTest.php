@@ -47,6 +47,39 @@ class UrlUtilsTest extends TestCase
         $this->urlUtils->injectGeneralUtility($this->generalUtilityMock);
     }
 
+    /**
+     * @backupGlobals enabled
+     */
+    public function testBuildTinyUrlCreatesEidUrlIfSpeakingUrlsAreDisabled()
+    {
+        $this->generalUtilityMock->expects($this->once())
+            ->method('getIndpEnv')
+            ->with('TYPO3_SITE_URL')
+            ->willReturn('http://the-site.url/');
+
+        $this->extensionConfigurationMock->expects($this->once())
+            ->method('areSpeakingUrlsEnabled')
+            ->willReturn(false);
+
+        $this->assertEquals(
+            'http://the-site.url/?eID=tx_tinyurls&tx_tinyurls[key]=thekey',
+            $this->urlUtils->buildTinyUrl('thekey')
+        );
+    }
+
+    public function testBuildTinyUrlCreatesSpeakingUrlIfEnabled()
+    {
+        $this->extensionConfigurationMock
+            ->method('getSpeakingUrlTemplate')
+            ->willReturn('http://base.url/###TINY_URL_KEY###');
+
+        $this->extensionConfigurationMock->expects($this->once())
+            ->method('areSpeakingUrlsEnabled')
+            ->willReturn(true);
+
+        $this->assertEquals('http://base.url/thekey', $this->urlUtils->buildTinyUrl('thekey'));
+    }
+
     public function testCreateSpeakingTinyUrlReplacesIndependentEnvironmentMarker()
     {
         $this->extensionConfigurationMock->expects($this->once())
@@ -78,5 +111,18 @@ class UrlUtilsTest extends TestCase
             ->willReturn('###TINY_URL_KEY###');
         $speakingUrl = $this->urlUtils->createSpeakingTinyUrl('testkey');
         $this->assertEquals('testkey', $speakingUrl);
+    }
+
+    public function testGenerateTinyurlHashCreatesHash()
+    {
+        $this->assertEquals(
+            'ee85c8ee5b024efa864c06a98ed613286d134aad',
+            $this->urlUtils->generateTinyurlHash('http://the-url.tld')
+        );
+    }
+
+    public function testGenerateTinyurlKeyForUidGeneratesKey()
+    {
+        $this->assertRegExp('/ci\-[0-9a-f]+/', $this->urlUtils->generateTinyurlKeyForUid(132));
     }
 }

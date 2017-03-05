@@ -37,6 +37,11 @@ class TinyUrlValidatorTest extends TestCase
         $this->tinyUrlValidator->injectTinyUrlRepository($this->tinyUrlRepositoryMock);
     }
 
+    public function testGetOptionsReturnsEmptyArray()
+    {
+        $this->assertEquals([], $this->tinyUrlValidator->getOptions());
+    }
+
     public function testValidateReturnsErrorIdValidUntilIsInThePast()
     {
         $tinyUrl = TinyUrl::createNew();

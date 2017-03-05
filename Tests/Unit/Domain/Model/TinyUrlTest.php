@@ -77,6 +77,14 @@ class TinyUrlTest extends TestCase
         $this->assertEquals(new \DateTime('2017-10-10 12:30:00.000000+0000'), $tinyUrl->getValidUntil());
     }
 
+    public function testEnableDeleteOnUseSetsDeleteOnUseToTrue()
+    {
+        $tinyUrl = TinyUrl::createNew();
+        $this->assertFalse($tinyUrl->getDeleteOnUse());
+        $tinyUrl->enableDeleteOnUse();
+        $this->assertTrue($tinyUrl->getDeleteOnUse());
+    }
+
     public function testEqualsReturnsFalseIfBothTinyUrlsAreNewAndAreNotTheSameObject()
     {
         $tinyUrl = TinyUrl::createNew();
@@ -254,6 +262,13 @@ class TinyUrlTest extends TestCase
         $this->expectException(\InvalidArgumentException::class);
         $tinyUrl = TinyUrl::createNew();
         $tinyUrl->setCustomUrlKey('');
+    }
+
+    public function testSetPidSetsPid()
+    {
+        $tinyUrl = TinyUrl::createNew();
+        $tinyUrl->setPid(103);
+        $this->assertEquals(103, $tinyUrl->getPid());
     }
 
     protected function getDummyDatabaseRow()

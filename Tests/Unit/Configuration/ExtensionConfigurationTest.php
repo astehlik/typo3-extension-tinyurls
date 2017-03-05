@@ -14,6 +14,9 @@ namespace Tx\Tinyurls\Tests\Unit\Configuration;
 
 use PHPUnit\Framework\TestCase;
 use Tx\Tinyurls\Configuration\ExtensionConfiguration;
+use Tx\Tinyurls\Configuration\TypoScriptConfigurator;
+use Tx\Tinyurls\TinyUrl\TinyUrlGenerator;
+use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
 
 /**
  * @backupGlobals enabled
@@ -51,7 +54,6 @@ class ExtensionConfigurationTest extends TestCase
         $this->assertFalse($this->extensionConfiguration->areSpeakingUrlsEnabled());
     }
 
-
     public function testAreSpeakingUrlsEnabledReturnsFalseIfConfigured()
     {
         $GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['tinyurls'] = serialize(['createSpeakingURLs' => '0']);
@@ -76,6 +78,17 @@ class ExtensionConfigurationTest extends TestCase
             'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789',
             $this->extensionConfiguration->getBase62Dictionary()
         );
+    }
+
+    public function testGetExtensionConfigurationReturnsExtensionConfiguration()
+    {
+        $this->assertArrayHasKey('createSpeakingURLs', $this->extensionConfiguration->getExtensionConfiguration());
+    }
+
+    public function testGetExtensionConfigurationValueThrowsExceptionForNonExistingKey()
+    {
+        $this->expectExceptionMessage('The key a non existing key does not exists in the extension configuration');
+        $this->extensionConfiguration->getExtensionConfigurationValue('a non existing key');
     }
 
     public function testGetMinimalRandomKeyLengthReturnsConfiguredValue()
@@ -111,6 +124,28 @@ class ExtensionConfigurationTest extends TestCase
         $this->assertEquals(
             '###TYPO3_SITE_URL###tinyurl/###TINY_URL_KEY###',
             $this->extensionConfiguration->getSpeakingUrlTemplate()
+        );
+    }
+
+    public function testInitializeConfigFromTyposcriptUsesTypoScriptConfiguratorForInitalizingConfig()
+    {
+        /** @var ContentObjectRenderer|\PHPUnit_Framework_MockObject_MockObject $contentObjectRendererMock */
+        $contentObjectRendererMock = $this->createMock(ContentObjectRenderer::class);
+        /** @var TinyUrlGenerator|\PHPUnit_Framework_MockObject_MockObject $tinyUrlGeneratorMock */
+        $tinyUrlGeneratorMock = $this->createMock(TinyUrlGenerator::class);
+        /** @var TypoScriptConfigurator|\PHPUnit_Framework_MockObject_MockObject $typoScriptConfiguratorMock */
+        $typoScriptConfiguratorMock = $this->createMock(TypoScriptConfigurator::class);
+
+        $typoScriptConfiguratorMock->expects($this->once())
+            ->method('initializeConfigFromTyposcript')
+            ->with(['the' => 'config'], $contentObjectRendererMock);
+
+
+        $this->extensionConfiguration->setTypoScriptConfigurator($typoScriptConfiguratorMock);
+        $this->extensionConfiguration->initializeConfigFromTyposcript(
+            ['the' => 'config'],
+            $contentObjectRendererMock,
+            $tinyUrlGeneratorMock
         );
     }
 }

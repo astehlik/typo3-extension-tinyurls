@@ -69,6 +69,22 @@ class TinyurlViewHelperTest extends TestCase
         $this->tinyurlViewHelper->render('http://www.url.tld', true);
     }
 
+    public function testRetrievesUrlFromRenderChildrenIfNotProvidedAsArgument()
+    {
+        $this->tinyurlViewHelper->setRenderChildrenClosure(
+            function () {
+                return 'http://the-children-url.tld';
+            }
+        );
+
+        $this->tinyUrlApi->expects($this->once())
+            ->method('getTinyUrl')
+            ->with('http://the-children-url.tld')
+            ->willReturn('');
+
+        $this->tinyurlViewHelper->render();
+    }
+
     public function testUrlIsPassedToTinyUrlApi()
     {
         $this->tinyUrlApi->expects($this->once())
