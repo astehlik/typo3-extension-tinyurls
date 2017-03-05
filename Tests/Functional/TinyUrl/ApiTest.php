@@ -133,7 +133,7 @@ class ApiTest extends FunctionalTestCase
      */
     public function apiSetsValidUntilIfConfiguredInTypoScript()
     {
-        $validUntilTimestamp = 20000;
+        $validUntilTimestamp = time() + 1000;
         $typoScript = [
             'tinyurl.' => ['validUntil' => $validUntilTimestamp],
         ];
@@ -153,7 +153,7 @@ class ApiTest extends FunctionalTestCase
      */
     public function apiSetsValidationDateIfRequested()
     {
-        $validUntilTimestamp = 20000;
+        $validUntilTimestamp = time() + 2000;
         $this->tinyUrlsApi->setValidUntil($validUntilTimestamp);
         $this->tinyUrlsApi->getTinyUrl('http://mydomain.tld');
         $tinyUrlRow = $this->getDatabaseConnection()->exec_SELECTgetSingleRow(
