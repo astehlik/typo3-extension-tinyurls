@@ -105,6 +105,10 @@ class Base62UrlKeyGenerator implements UrlKeyGenerator
         return $base62Integer;
     }
 
+    /**
+     * @return ExtensionConfiguration
+     * @codeCoverageIgnore
+     */
     protected function getExtensionConfiguration(): ExtensionConfiguration
     {
         if ($this->extensionConfiguration === null) {
@@ -113,6 +117,10 @@ class Base62UrlKeyGenerator implements UrlKeyGenerator
         return $this->extensionConfiguration;
     }
 
+    /**
+     * @return GeneralUtilityWrapper
+     * @codeCoverageIgnore
+     */
     protected function getGeneralUtility(): GeneralUtilityWrapper
     {
         if ($this->generalUtility === null) {

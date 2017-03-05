@@ -69,6 +69,10 @@ class ImplementationManager implements SingletonInterface
         return $this->tinyUrlRepositoryClass;
     }
 
+    /**
+     * @return UrlKeyGenerator
+     * @codeCoverageIgnore
+     */
     public function getUrlKeyGenerator(): UrlKeyGenerator
     {
         if ($this->urlKeyGenerator === null) {
