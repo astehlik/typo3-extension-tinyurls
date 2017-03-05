@@ -15,6 +15,7 @@ namespace Tx\Tinyurls\Tests\Unit\Object;
 use PHPUnit\Framework\TestCase;
 use Tx\Tinyurls\Domain\Repository\TinyUrlRepository;
 use Tx\Tinyurls\Object\ImplementationManager;
+use Tx\Tinyurls\UrlKeyGenerator\Base62UrlKeyGenerator;
 use Tx\Tinyurls\UrlKeyGenerator\UrlKeyGenerator;
 
 class ImplementationManagerTest extends TestCase
@@ -27,6 +28,40 @@ class ImplementationManagerTest extends TestCase
     protected function setUp()
     {
         $this->implementationManager = new ImplementationManager();
+    }
+
+    public function testResetToDefaultsUsesBase62UrlKeyGenerator()
+    {
+        $this->implementationManager->restoreDefaults();
+        $this->assertEquals(Base62UrlKeyGenerator::class, $this->implementationManager->getUrlKeyGeneratorClass());
+    }
+
+    public function testResetToDefaultsUsesDatabaseRepositoryAsFallback()
+    {
+        $this->implementationManager->restoreDefaults();
+        if (!class_exists('TYPO3\\CMS\\Core\\Database\\Query\\QueryBuilder')) {
+            /** @noinspection PhpUnnecessaryFullyQualifiedNameInspection */
+            $this->assertEquals(
+                \Tx\Tinyurls\Domain\Repository\TinyUrlDatabaseRepository::class,
+                $this->implementationManager->getTinyUrlRepositoryClass()
+            );
+        } else {
+            $this->markTestSkipped('Doctrine repository is used.');
+        }
+    }
+
+    public function testResetToDefaultsUsesDoctrineRepositoryIfAvailable()
+    {
+        $this->implementationManager->restoreDefaults();
+        if (class_exists('TYPO3\\CMS\\Core\\Database\\Query\\QueryBuilder')) {
+            /** @noinspection PhpUnnecessaryFullyQualifiedNameInspection */
+            $this->assertEquals(
+                \Tx\Tinyurls\Domain\Repository\TinyUrlDoctrineRepository::class,
+                $this->implementationManager->getTinyUrlRepositoryClass()
+            );
+        } else {
+            $this->markTestSkipped('Doctrine DBAL is not available.');
+        }
     }
 
     public function testSetTinyUrlRepositoryClassSetsClassName()
@@ -55,22 +90,5 @@ class ImplementationManagerTest extends TestCase
         $urlKeyGenerator = $this->createMock(UrlKeyGenerator::class);
         $this->implementationManager->setUrlKeyGenerator($urlKeyGenerator);
         $this->assertEquals($urlKeyGenerator, $this->implementationManager->getUrlKeyGenerator());
-    }
-
-    public function testTinyUrlRepositoryClassDefaultsToDoctrineRepositoryIfExists()
-    {
-        if (class_exists('TYPO3\\CMS\\Core\\Database\\Query\\QueryBuilder')) {
-            /** @noinspection PhpUnnecessaryFullyQualifiedNameInspection */
-            $this->assertEquals(
-                \Tx\Tinyurls\Domain\Repository\TinyUrlDoctrineRepository::class,
-                $this->implementationManager->getTinyUrlRepositoryClass()
-            );
-        } else {
-            /** @noinspection PhpUnnecessaryFullyQualifiedNameInspection */
-            $this->assertEquals(
-                \Tx\Tinyurls\Domain\Repository\TinyUrlDatabaseRepository::class,
-                $this->implementationManager->getTinyUrlRepositoryClass()
-            );
-        }
     }
 }

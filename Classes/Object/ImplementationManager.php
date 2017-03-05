@@ -44,15 +44,7 @@ class ImplementationManager implements SingletonInterface
 
     public function __construct()
     {
-        if (class_exists('TYPO3\\CMS\\Core\\Database\\Query\\QueryBuilder')) {
-            $this->tinyUrlRepositoryClass = TinyUrlDoctrineRepository::class;
-        } else {
-            // @codeCoverageIgnoreStart
-            $this->tinyUrlRepositoryClass = TinyUrlDatabaseRepository::class;
-            // @codeCoverageIgnoreEnd
-        }
-
-        $this->urlKeyGeneratorClass = Base62UrlKeyGenerator::class;
+        $this->restoreDefaults();
     }
 
     public static function getInstance(): ImplementationManager
@@ -90,6 +82,21 @@ class ImplementationManager implements SingletonInterface
         return $this->urlKeyGeneratorClass;
     }
 
+    public function restoreDefaults()
+    {
+        $this->urlKeyGenerator = null;
+        $this->tinyUrlRepository = null;
+
+        if (class_exists('TYPO3\\CMS\\Core\\Database\\Query\\QueryBuilder')) {
+            $this->tinyUrlRepositoryClass = TinyUrlDoctrineRepository::class;
+        } else {
+            // @codeCoverageIgnoreStart
+            $this->tinyUrlRepositoryClass = TinyUrlDatabaseRepository::class;
+            // @codeCoverageIgnoreEnd
+        }
+
+        $this->urlKeyGeneratorClass = Base62UrlKeyGenerator::class;
+    }
 
     public function setTinyUrlRepository(TinyUrlRepository $tinyUrlRepository)
     {
