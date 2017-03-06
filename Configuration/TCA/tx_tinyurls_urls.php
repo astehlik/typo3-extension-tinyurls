@@ -12,9 +12,7 @@ return [
         'searchFields' => 'urlkey,target_url,target_url_hash',
         'rootLevel' => -1,
     ],
-    'interface' => [
-        'showRecordFieldList' => 'urlkey,target_url,target_url_hash,delete_on_use,valid_until',
-    ],
+    'interface' => ['showRecordFieldList' => 'urlkey,target_url,target_url_hash,delete_on_use,valid_until'],
     'columns' => [
         'counter' => [
             'exclude' => 0,
@@ -91,9 +89,7 @@ return [
         ],
     ],
     'types' => [
-        '0' => [
-            'showitem' => 'urldisplay,counter,target_url,target_url_hash,comment,delete_on_use,valid_until',
-        ],
+        '0' => ['showitem' => 'urldisplay,counter,target_url,target_url_hash,comment,delete_on_use,valid_until'],
     ],
     'palettes' => [],
 ];

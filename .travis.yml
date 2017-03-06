@@ -38,7 +38,7 @@ script:
     echo;
     echo "Running phpcs";
     .Build/bin/phpcs --config-set installed_paths $PWD/.Build/vendor/de-swebhosting/php-codestyle/PhpCodeSniffer,Tests/CodeSniffer;
-    .Build/bin/phpcs --standard=PSRTinyurls Classes Configuration/TCA Tests/Unit Tests/Functional ext_localconf.php
+    .Build/bin/phpcs --standard=PSRTinyurls Classes Configuration/TCA Tests/Unit Tests/Functional ext_emconf.php ext_localconf.php
   - >
     echo;
     echo "Running unit tests";

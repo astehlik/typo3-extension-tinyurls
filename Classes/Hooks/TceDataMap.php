@@ -59,7 +59,7 @@ class TceDataMap
      *
      * @param string $status (reference) Status of the current operation, 'new' or 'update
      * @param string $table (refrence) The table currently processing data for
-     * @param string $recordId (reference) The record uid currently processing data for, [integer] or [string] (like 'NEW...')
+     * @param string $recordId (reference) Uid of the currently processed record, [integer] or [string] (like 'NEW...')
      * @param array $fieldArray (reference) The field array of a record
      * @param DataHandler $tcemain Reference to the TCEmain object that calls this hook
      * @see t3lib_TCEmain::hook_processDatamap_afterDatabaseOperations()
