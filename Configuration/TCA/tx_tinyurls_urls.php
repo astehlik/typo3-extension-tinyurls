@@ -1,5 +1,9 @@
 <?php
+use Tx\Tinyurls\Utils\CompatibilityWrapper;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+
 $languagePrefix = 'LLL:EXT:tinyurls/Resources/Private/Language/locallang_db.xlf:tx_tinyurls_urls.';
+$compatiblityWrapper = GeneralUtility::makeInstance(CompatibilityWrapper::class);
 
 return [
     'ctrl' => [
@@ -8,7 +12,7 @@ return [
         'tstamp' => 'tstamp',
         'default_sortby' => 'ORDER BY target_url',
         'enablecolumns' => ['endtime' => 'valid_until'],
-        'iconfile' => \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extRelPath('tinyurls') . 'ext_icon.gif',
+        'iconfile' => $compatiblityWrapper->getExtensionPathPrefixForTcaIconfile() . 'ext_icon.gif',
         'searchFields' => 'urlkey,target_url,target_url_hash',
         'rootLevel' => -1,
     ],
