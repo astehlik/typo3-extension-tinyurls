@@ -20,7 +20,6 @@ addons:
       - parallel
 
 before_install:
-  - phpenv config-rm xdebug.ini
   - composer self-update
   - composer --version
   - if [ "$GITHUB_COMPOSER_AUTH" ]; then composer config -g github-oauth.github.com $GITHUB_COMPOSER_AUTH; fi
@@ -28,6 +27,8 @@ before_install:
 before_script:
   # Rename our working directory, required for Extension upload to TER.
   - cd .. && mv typo3-extension-tinyurls tinyurls && cd tinyurls
+  - source .travis/xdebug.sh
+  - xdebug-disable
   - composer require typo3/cms=$TYPO3_VERSION
   - export TYPO3_PATH_WEB=$PWD/.Build/Web
   - if [ -d $PWD/.Build/vendor/typo3/cms/components ]; then ln -s "$PWD/.Build/vendor/typo3/cms/components" .Build/Web/components; fi
@@ -43,10 +44,14 @@ script:
     echo "Running unit tests";
     COVERAGE_ARGUMENTS=();
     if [[ "${UPLOAD_CODE_COVERAGE}" == "yes" ]]; then
+      xdebug-enable;
       echo "Generating coverage report";
       COVERAGE_ARGUMENTS=("--coverage-clover" ".Build/Logs/clover.xml" "--whitelist" "Classes");
     fi;
-    .Build/bin/phpunit "${COVERAGE_ARGUMENTS[@]}" Tests/Unit/
+    .Build/bin/phpunit "${COVERAGE_ARGUMENTS[@]}" Tests/Unit/;
+    if [[ "${UPLOAD_CODE_COVERAGE}" == "yes" ]]; then
+      xdebug-disable;
+    fi;
   - >
     if [[ "${UPLOAD_CODE_COVERAGE}" == "yes" ]]; then
       composer require --dev codeclimate/php-test-reporter:dev-master;
