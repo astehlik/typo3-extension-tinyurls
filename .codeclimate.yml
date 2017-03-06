@@ -1,0 +1,33 @@
+engines:
+  phpcodesniffer:
+    enabled: true
+    config:
+      file_extensions: "php"
+      standard: "PSR2"
+  fixme:
+    enabled: true
+  phpmd:
+    enabled: true
+  eslint:
+    enabled: true
+    config:
+      extensions:
+        - .js
+  csslint:
+    enabled: false
+  duplication:
+    enabled: true
+    config:
+      languages:
+      - php
+      - javascript
+
+ratings:
+  paths:
+    - "Classes/**/*"
+    - "Configuration/**/*"
+    - "Migrations/**/*"
+    - "Resources/**/*"
+
+exclude_paths:
+  - "Tests/**/*"
