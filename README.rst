@@ -3,7 +3,20 @@ tinyurls TYPO3 Extension
 ========================
 
 .. image:: https://travis-ci.org/astehlik/typo3-extension-tinyurls.svg?branch=master
-    :target: https://travis-ci.org/astehlik/typo3-extension-tinyurls
+   :target: https://travis-ci.org/astehlik/typo3-extension-tinyurls
+   :alt: Travis Build Status
+    
+.. image:: https://lima.codeclimate.com/github/astehlik/typo3-extension-tinyurls/badges/gpa.svg
+   :target: https://lima.codeclimate.com/github/astehlik/typo3-extension-tinyurls
+   :alt: Code Climate
+
+.. image:: https://lima.codeclimate.com/github/astehlik/typo3-extension-tinyurls/badges/coverage.svg
+   :target: https://lima.codeclimate.com/github/astehlik/typo3-extension-tinyurls/coverage
+   :alt: Test Coverage
+
+.. image:: https://lima.codeclimate.com/github/astehlik/typo3-extension-tinyurls/badges/issue_count.svg
+   :target: https://lima.codeclimate.com/github/astehlik/typo3-extension-tinyurls
+   :alt: Issue Count
 
 This is a TYPO3 Extension for converting a normal URL to a tiny URL.
 
