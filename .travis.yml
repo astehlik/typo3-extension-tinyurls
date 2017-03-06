@@ -44,7 +44,7 @@ script:
     COVERAGE_ARGUMENTS=();
     if [[ "${UPLOAD_CODE_COVERAGE}" == "yes" ]]; then
       echo "Generating coverage report";
-      COVERAGE_ARGUMENTS=("--coverage-clover" ".Build/Logs/clover.xml" "--whitelist" "Classes")
+      COVERAGE_ARGUMENTS=("--coverage-clover" ".Build/Logs/clover.xml" "--whitelist" "Classes");
     fi
     .Build/bin/phpunit "${COVERAGE_ARGUMENTS[@]}" Tests/Unit/
   - >
