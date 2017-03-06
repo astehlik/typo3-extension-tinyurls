@@ -43,6 +43,7 @@ class TinyurlViewHelper extends AbstractViewHelper
      * @param int $validUntil Timestamp until generated link is valid
      * @param string $urlKey Custom url key
      * @return string Rendered link
+     * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
      */
     public function render($url = null, $onlyOneTimeValid = false, $validUntil = 0, $urlKey = '')
     {

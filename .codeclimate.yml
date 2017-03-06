@@ -8,6 +8,8 @@ engines:
     enabled: true
   phpmd:
     enabled: true
+    config:
+      rulesets: ".Build/vendor/de-swebhosting/php-codestyle/PhpMd/RulesetTypo3.xml"
   eslint:
     enabled: true
     config:

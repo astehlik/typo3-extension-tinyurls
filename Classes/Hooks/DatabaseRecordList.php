@@ -53,6 +53,8 @@ class DatabaseRecordList implements SingletonInterface
      * @param AbstractDatabaseRecordList $parentRecordList
      * @param string $table
      * @throws \InvalidArgumentException
+     * @SuppressWarnings(PHPMD.CamelCaseMethodName)
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     public function makeQueryArray_post(
         array &$queryParts,

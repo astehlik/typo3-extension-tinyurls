@@ -59,16 +59,18 @@ class TceDataMap
      *
      * @param string $status (reference) Status of the current operation, 'new' or 'update
      * @param string $table (refrence) The table currently processing data for
-     * @param string $id (reference) The record uid currently processing data for, [integer] or [string] (like 'NEW...')
+     * @param string $recordId (reference) The record uid currently processing data for, [integer] or [string] (like 'NEW...')
      * @param array $fieldArray (reference) The field array of a record
      * @param DataHandler $tcemain Reference to the TCEmain object that calls this hook
      * @see t3lib_TCEmain::hook_processDatamap_afterDatabaseOperations()
+     * @SuppressWarnings(PHPMD.CamelCaseMethodName)
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     public function processDatamap_afterDatabaseOperations(
         /** @noinspection PhpUnusedParameterInspection */
         string $status,
         string $table,
-        $id,
+        $recordId,
         array &$fieldArray,
         DataHandler $tcemain
     ) {
@@ -77,9 +79,9 @@ class TceDataMap
         }
 
         $this->dataHandler = $tcemain;
-        $this->isNewRecord = $this->isNewRecord($id);
+        $this->isNewRecord = $this->isNewRecord($recordId);
 
-        $tinyUrlId = $this->getTinyUrlIdFromDataHandlerIfNew($id);
+        $tinyUrlId = $this->getTinyUrlIdFromDataHandlerIfNew($recordId);
 
         try {
             $this->tinyUrl = $this->getTinyUrlRepository()->findTinyUrlByUid($tinyUrlId);
@@ -102,12 +104,12 @@ class TceDataMap
     protected function getTinyUrlIdFromDataHandlerIfNew($originalId): int
     {
         if ($this->isNewRecord) {
-            $id = (int)$this->dataHandler->substNEWwithIDs[$originalId];
+            $tinyUrlId = (int)$this->dataHandler->substNEWwithIDs[$originalId];
         } else {
-            $id = (int)$originalId;
+            $tinyUrlId = (int)$originalId;
         }
 
-        return $id;
+        return $tinyUrlId;
     }
 
     /**
@@ -122,9 +124,9 @@ class TceDataMap
         return $this->tinyUrlRepository;
     }
 
-    protected function isNewRecord($id): bool
+    protected function isNewRecord($recordId): bool
     {
-        return GeneralUtility::isFirstPartOfStr($id, 'NEW');
+        return GeneralUtility::isFirstPartOfStr($recordId, 'NEW');
     }
 
     protected function shouldUrlKeyBeRegenerated(): bool
