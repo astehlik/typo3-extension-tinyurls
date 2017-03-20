@@ -85,8 +85,8 @@ return [
             'label' => 'Valid until',
             'config' => [
                 'type' => 'input',
+                'renderType' => 'inputDateTime',
                 'size' => 10,
-                'max' => 20,
                 'eval' => 'datetime',
                 'default' => 0,
             ],
