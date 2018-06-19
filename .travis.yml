@@ -32,8 +32,8 @@ before_script:
   - cd .. && mv typo3-extension-tinyurls tinyurls && cd tinyurls
   - source .travis/xdebug.sh
   - xdebug-disable
-  - if [ $TYPO3_VERSION = "typo3/minimal=dev-master" ]; then composer config minimum-stability dev; fi
-  - composer require $TYPO3_VERSION
+  - if [ $TYPO3_VERSION = "typo3/minimal=dev-master" ]; then composer config minimum-stability dev && composer require $TYPO3_VERSION --prefer-stable --prefer-dist; fi
+  - if [ $TYPO3_VERSION = "typo3/minimal=dev-master" ]; then composer require $TYPO3_VERSION; fi
   - export TYPO3_PATH_WEB=$PWD/.Build/Web
 
 script:
@@ -67,7 +67,7 @@ script:
     find . -name \*.php ! -path "./.Build/*" | parallel --gnu php -d display_errors=stderr -l {} > /dev/null \;
   - >
     echo;
-    composer require --dev $NIMUT_TESTING_FRAMEWORK;
+    composer require --dev $NIMUT_TESTING_FRAMEWORK  --prefer-dist;
     mkdir -p ".Build/Web/typo3temp/var/tests";
     export typo3DatabaseName="typo3";
     export typo3DatabaseHost="localhost";
