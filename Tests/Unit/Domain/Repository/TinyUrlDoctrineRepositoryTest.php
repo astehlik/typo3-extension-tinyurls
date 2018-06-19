@@ -417,7 +417,7 @@ class TinyUrlDoctrineRepositoryTest extends TestCase
             'target_url' => 'http://the-target.url',
             'target_url_hash' => '59d24fcbfb6c586daeabf73ddd58cd01affb56d4',
             'delete_on_use' => 0,
-            'valid_until' => 1507638600,
+            'valid_until' => time() + 60000,
         ];
     }
 
