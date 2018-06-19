@@ -1,5 +1,6 @@
 <?php
-declare(strict_types = 1);
+declare(strict_types=1);
+
 namespace Tx\Tinyurls\Exception;
 
 /*                                                                        *
@@ -12,6 +13,7 @@ namespace Tx\Tinyurls\Exception;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
+use TYPO3\CMS\Extbase\Error\Error;
 use TYPO3\CMS\Extbase\Error\Result;
 
 class TinyUrlValidationException extends \InvalidArgumentException
@@ -21,6 +23,11 @@ class TinyUrlValidationException extends \InvalidArgumentException
      */
     protected $result;
 
+    public function __construct()
+    {
+        parent::__construct('The given tiny URL data is invalid.', 1529430222);
+    }
+
     public function getResult(): Result
     {
         return $this->result;
@@ -29,5 +36,15 @@ class TinyUrlValidationException extends \InvalidArgumentException
     public function setValidationResult(Result $result)
     {
         $this->result = $result;
+
+        $errorMessages = [];
+        foreach ($result->getFlattenedErrors() as $errors) {
+            /** @var Error $error */
+            foreach ($errors as $error) {
+                $errorMessages[] = $error->getMessage();
+            }
+        }
+
+        $this->message = 'The given tiny URL data is invalid: ' . implode(', ', $errorMessages);
     }
 }
