@@ -46,7 +46,7 @@ class TinyUrlGeneratorTest extends FunctionalTestCase
     public function getTinyUrlSetsTstampOfNewTinyUrl()
     {
         $this->tinyUrlGenerator->getTinyUrl('http://mydomain.tld');
-        $tinyUrlRow = $this->getDatabaseConnection()->exec_SELECTgetSingleRow(
+        $tinyUrlRow = $this->getDatabaseConnection()->selectSingleRow(
             'tstamp',
             'tx_tinyurls_urls',
             'uid=1'
