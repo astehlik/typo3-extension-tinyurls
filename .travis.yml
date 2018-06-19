@@ -1,12 +1,15 @@
 language: php
 
-php:
-  - 7
-
-env:
-  - TYPO3_VERSION=^7.6.0
-  - TYPO3_VERSION=^8.0.0 UPLOAD_CODE_COVERAGE=yes
-  - TYPO3_VERSION=dev-master
+matrix:
+  include:
+    - php: 7.0
+      env: TYPO3_VERSION="typo3/cms=^7.6"
+    - php: 7.1
+      env: TYPO3_VERSION="typo3/cms=^8.7" UPLOAD_CODE_COVERAGE=yes
+    - php: 7.2
+      env: TYPO3_VERSION="typo3/minimal=^9.3"
+    - php: 7.2
+      env: TYPO3_VERSION="typo3/minimal=dev-master"
 
 sudo: false
 cache:
@@ -29,7 +32,7 @@ before_script:
   - cd .. && mv typo3-extension-tinyurls tinyurls && cd tinyurls
   - source .travis/xdebug.sh
   - xdebug-disable
-  - composer require typo3/cms=$TYPO3_VERSION
+  - composer require $TYPO3_VERSION
   - export TYPO3_PATH_WEB=$PWD/.Build/Web
   - if [ -d $PWD/.Build/vendor/typo3/cms/components ]; then ln -s "$PWD/.Build/vendor/typo3/cms/components" .Build/Web/components; fi
 
