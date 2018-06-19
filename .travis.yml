@@ -33,7 +33,7 @@ before_script:
   - source .travis/xdebug.sh
   - xdebug-disable
   - if [ $TYPO3_VERSION = "typo3/minimal=dev-master" ]; then composer config minimum-stability dev && composer require $TYPO3_VERSION --prefer-stable --prefer-dist; fi
-  - if [ $TYPO3_VERSION = "typo3/minimal=dev-master" ]; then composer require $TYPO3_VERSION; fi
+  - if [ $TYPO3_VERSION != "typo3/minimal=dev-master" ]; then composer require $TYPO3_VERSION; fi
   - export TYPO3_PATH_WEB=$PWD/.Build/Web
 
 script:
