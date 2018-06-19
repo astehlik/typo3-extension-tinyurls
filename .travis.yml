@@ -34,7 +34,6 @@ before_script:
   - xdebug-disable
   - composer require $TYPO3_VERSION
   - export TYPO3_PATH_WEB=$PWD/.Build/Web
-  - if [ -d $PWD/.Build/vendor/typo3/cms/components ]; then ln -s "$PWD/.Build/vendor/typo3/cms/components" .Build/Web/components; fi
 
 script:
   - >
