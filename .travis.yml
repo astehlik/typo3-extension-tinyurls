@@ -32,6 +32,7 @@ before_script:
   - cd .. && mv typo3-extension-tinyurls tinyurls && cd tinyurls
   - source .travis/xdebug.sh
   - xdebug-disable
+  - if [ $TYPO3_VERSION = "typo3/minimal=dev-master" ]; then composer config minimum-stability dev; fi
   - composer require $TYPO3_VERSION
   - export TYPO3_PATH_WEB=$PWD/.Build/Web
 
