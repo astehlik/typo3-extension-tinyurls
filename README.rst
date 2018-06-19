@@ -2,7 +2,7 @@
 tinyurls TYPO3 Extension
 ========================
 
-.. image:: https://travis-ci.org/astehlik/typo3-extension-tinyurls.svg?branch=master
+.. image:: https://travis-ci.org/astehlik/typo3-extension-tinyurls.svg?branch=develop
    :target: https://travis-ci.org/astehlik/typo3-extension-tinyurls
    :alt: Travis Build Status
     
