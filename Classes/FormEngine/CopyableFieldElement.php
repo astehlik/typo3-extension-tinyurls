@@ -1,5 +1,6 @@
 <?php
-declare(strict_types = 1);
+declare(strict_types=1);
+
 namespace Tx\Tinyurls\FormEngine;
 
 /*                                                                        *
@@ -134,6 +135,18 @@ class CopyableFieldElement extends AbstractNode implements NodeInterface
     }
 
     /**
+     * @return GeneralUtilityWrapper
+     * @codeCoverageIgnore
+     */
+    protected function getGeneralUtility(): GeneralUtilityWrapper
+    {
+        if ($this->generalUtility === null) {
+            $this->generalUtility = GeneralUtility::makeInstance(GeneralUtilityWrapper::class);
+        }
+        return $this->generalUtility;
+    }
+
+    /**
      * @return IconFactory
      * @codeCoverageIgnore
      */
@@ -148,7 +161,7 @@ class CopyableFieldElement extends AbstractNode implements NodeInterface
     protected function initializeFormFieldViewTemplatePath(StandaloneView $template)
     {
         $template->setTemplatePathAndFilename(
-            $this->generalUtility->getFileAbsFileName(static::TEMPLATE_PATH)
+            $this->getGeneralUtility()->getFileAbsFileName(static::TEMPLATE_PATH)
         );
     }
 }
