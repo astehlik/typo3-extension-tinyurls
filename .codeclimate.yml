@@ -1,15 +1,22 @@
-engines:
+version: "2"
+
+prepare:
+  fetch:
+    - url: "https://raw.githubusercontent.com/astehlik/php-codestyle/master/PhpMd/RulesetTypo3.xml"
+      path: "PhpMdRulesetTypo3.xml"
+
+plugins:
   phpcodesniffer:
     enabled: true
     config:
       file_extensions: "php"
-      standard: "PSR2"
+      standard: "PSR1,PSR2"
   fixme:
     enabled: true
   phpmd:
     enabled: true
     config:
-      rulesets: ".Build/vendor/de-swebhosting/php-codestyle/PhpMd/RulesetTypo3.xml"
+      rulesets: "PhpMdRulesetTypo3.xml"
   eslint:
     enabled: true
     config:
@@ -24,13 +31,6 @@ engines:
       - php
       - javascript
 
-ratings:
-  paths:
-    - "Classes/**/*"
-    - "Configuration/**/*"
-    - "Migrations/**/*"
-    - "Resources/**/*"
-
-exclude_paths:
+exclude_patterns:
   - "Tests/**/*"
   - "Migrations/Code/LegacyClassesForIde.php"
