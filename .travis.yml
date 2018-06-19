@@ -67,8 +67,6 @@ script:
     find . -name \*.php ! -path "./.Build/*" | parallel --gnu php -d display_errors=stderr -l {} > /dev/null \;
   - >
     echo;
-    composer remove phpunit/phpunit --dev;
-    composer require phpunit/phpunit:^5.6 --dev;
     composer require --dev $NIMUT_TESTING_FRAMEWORK;
     mkdir -p ".Build/Web/typo3temp/var/tests";
     export typo3DatabaseName="typo3";
