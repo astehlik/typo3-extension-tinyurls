@@ -31,7 +31,7 @@ before_script:
   # Rename our working directory, required for Extension upload to TER.
   - cd .. && mv typo3-extension-tinyurls tinyurls && cd tinyurls
   - source .travis/xdebug.sh
-  - xdebug-disable
+  - f [[ "${UPLOAD_CODE_COVERAGE}" != "yes" ]]; then phpenv config-rm xdebug.ini; fi
   - if [ $TYPO3_VERSION = "typo3/minimal=dev-master" ]; then composer config minimum-stability dev && composer require $TYPO3_VERSION --prefer-stable --prefer-dist; fi
   - if [ $TYPO3_VERSION != "typo3/minimal=dev-master" ]; then composer require $TYPO3_VERSION; fi
   - export TYPO3_PATH_WEB=$PWD/.Build/Web
@@ -46,7 +46,7 @@ script:
     echo;
     echo "Running unit tests";
     if [[ "${UPLOAD_CODE_COVERAGE}" == "yes" ]]; then
-      bash ./Tests/Scripts/run_unit_tests_with_coverage.sh
+      .Build/bin/phpunit --coverage-clover .Build/Logs/clover.xml --whitelist Classes Tests/Unit/
     else
       .Build/bin/phpunit Tests/Unit/
     fi
