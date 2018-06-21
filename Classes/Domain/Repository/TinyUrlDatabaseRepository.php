@@ -1,5 +1,6 @@
 <?php
-declare(strict_types = 1);
+declare(strict_types=1);
+
 namespace Tx\Tinyurls\Domain\Repository;
 
 /*                                                                        *
@@ -67,9 +68,7 @@ class TinyUrlDatabaseRepository extends AbstractTinyUrlDatabaseRepository implem
         );
 
         if (empty($result)) {
-            throw new TinyUrlNotFoundException(
-                sprintf('The tinyurl with the key %s was not found in the database.', $tinyUrlKey)
-            );
+            throw new TinyUrlNotFoundException($tinyUrlKey);
         }
 
         return $this->createTinyUrlFromDatabaseRow($result);

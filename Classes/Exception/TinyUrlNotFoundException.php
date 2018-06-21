@@ -1,5 +1,6 @@
 <?php
-declare(strict_types = 1);
+declare(strict_types=1);
+
 namespace Tx\Tinyurls\Exception;
 
 /*                                                                        *
@@ -16,5 +17,17 @@ use TYPO3\CMS\Core\Error\Http\PageNotFoundException;
 
 class TinyUrlNotFoundException extends PageNotFoundException
 {
+    public function __construct(string $tinyUrlKey = '')
+    {
+        parent::__construct($this->buildMessage($tinyUrlKey));
+    }
 
+    private function buildMessage(string $tinyUrlKey)
+    {
+        if ($tinyUrlKey !== '') {
+            return sprintf('The tinyurl with the key %s was not found.', $tinyUrlKey);
+        }
+
+        return 'The tinyurl was not found.';
+    }
 }

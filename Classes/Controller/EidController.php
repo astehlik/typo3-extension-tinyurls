@@ -1,5 +1,6 @@
 <?php
-declare(strict_types = 1);
+declare(strict_types=1);
+
 namespace Tx\Tinyurls\Controller;
 
 /*                                                                        *
@@ -12,12 +13,14 @@ namespace Tx\Tinyurls\Controller;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Tx\Tinyurls\Domain\Model\TinyUrl;
 use Tx\Tinyurls\Domain\Repository\TinyUrlRepository;
+use Tx\Tinyurls\Exception\NoTinyUrlKeySubmittedException;
+use Tx\Tinyurls\Exception\TinyUrlNotFoundException;
 use Tx\Tinyurls\Object\ImplementationManager;
-use Tx\Tinyurls\Utils\HttpUtilityWrapper;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Core\Utility\HttpUtility;
 use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
 
 /**
@@ -29,11 +32,6 @@ use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
 class EidController
 {
     /**
-     * @var HttpUtilityWrapper
-     */
-    protected $httpUtility;
-
-    /**
      * @var TinyUrlRepository
      */
     protected $tinyUrlRepository;
@@ -42,14 +40,6 @@ class EidController
      * @var TypoScriptFrontendController
      */
     protected $typoScriptFrontendController;
-
-    /**
-     * @param HttpUtilityWrapper $httpUtility
-     */
-    public function injectHttpUility(HttpUtilityWrapper $httpUtility)
-    {
-        $this->httpUtility = $httpUtility;
-    }
 
     /**
      * @param TinyUrlRepository $tinyUrlRepository
@@ -77,28 +67,39 @@ class EidController
     }
 
     /**
-     * Redirects the user to the target url if a valid tinyurl was
-     * submitted, otherwise the default 404 (not found) page is displayed
-     */
-    public function main()
-    {
-        try {
-            $this->getTinyUrlRepository()->purgeInvalidUrls();
-            $tinyUrl = $this->getTinyUrl();
-            $this->countUrlHit($tinyUrl);
-            $this->getHttpUtility()->redirect($tinyUrl->getTargetUrl(), HttpUtility::HTTP_STATUS_301);
-        } catch (\Exception $exception) {
-            $tsfe = $this->getTypoScriptFrontendController();
-            $tsfe->pageNotFoundAndExit($exception->getMessage());
-        }
-    }
-
-    /**
      * @param TypoScriptFrontendController $typoScriptFrontendController
      */
     public function setTypoScriptFrontendController(TypoScriptFrontendController $typoScriptFrontendController)
     {
         $this->typoScriptFrontendController = $typoScriptFrontendController;
+    }
+
+    public function tinyUrlRedirect(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
+    {
+        $this->getTinyUrlRepository()->purgeInvalidUrls();
+
+        try {
+            $tinyUrl = $this->getTinyUrl($request);
+        } catch (TinyUrlNotFoundException $e) {
+            $this->getTypoScriptFrontendController()->pageNotFoundAndExit($e->getMessage());
+            throw $e;
+        }
+
+        $this->processUrlHit($tinyUrl);
+
+        $noCacheResponse = $this->addNoCacheHeaders($response);
+
+        $redirectResponse = $noCacheResponse->withStatus(301);
+        return $redirectResponse->withAddedHeader('Location', $tinyUrl->getTargetUrl());
+    }
+
+    protected function addNoCacheHeaders(ResponseInterface $response)
+    {
+        $noCacheResponse = $response->withAddedHeader('Expires', '0');
+        $noCacheResponse = $noCacheResponse->withAddedHeader('Last-Modified', gmdate('D, d M Y H:i:s') . ' GMT');
+        $noCacheResponse = $noCacheResponse->withAddedHeader('Cache-Control', 'no-cache, must-revalidate');
+        $noCacheResponse = $noCacheResponse->withAddedHeader('Pragma', 'no-cache');
+        return $noCacheResponse;
     }
 
     /**
@@ -117,40 +118,22 @@ class EidController
     }
 
     /**
-     * @return HttpUtilityWrapper
-     * @codeCoverageIgnore
-     */
-    protected function getHttpUtility(): HttpUtilityWrapper
-    {
-        if ($this->httpUtility === null) {
-            $this->httpUtility = GeneralUtility::makeInstance(HttpUtilityWrapper::class);
-        }
-        return $this->httpUtility;
-    }
-
-    /**
      * Returns the data of the tiny URL record that was found by the submitted tinyurl key.
      *
+     * @param \Psr\Http\Message\ServerRequestInterface $request
      * @return TinyUrl
-     * @throws \RuntimeException If the target url can not be resolved
+     * @throws \Tx\Tinyurls\Exception\TinyUrlNotFoundException
      */
-    protected function getTinyUrl(): TinyUrl
+    protected function getTinyUrl(ServerRequestInterface $request): TinyUrl
     {
-        $getVariables = GeneralUtility::_GET();
-        if (empty($getVariables['tx_tinyurls']['key'])) {
-            throw new \RuntimeException('No tinyurl key was submitted.');
+        $queryParams = $request->getQueryParams();
+        if (empty($queryParams['tx_tinyurls']['key'])) {
+            throw new NoTinyUrlKeySubmittedException();
         }
 
-        $tinyUrlKey = (string)$getVariables['tx_tinyurls']['key'];
+        $tinyUrlKey = (string)$queryParams['tx_tinyurls']['key'];
 
-        $tinyUrl = $this->getTinyUrlRepository()->findTinyUrlByKey($tinyUrlKey);
-
-        if ($tinyUrl->getDeleteOnUse()) {
-            $this->getTinyUrlRepository()->deleteTinyUrlByKey($tinyUrlKey);
-            $this->sendNoCacheHeaders();
-        }
-
-        return $tinyUrl;
+        return $this->getTinyUrlRepository()->findTinyUrlByKey($tinyUrlKey);
     }
 
     /**
@@ -166,14 +149,15 @@ class EidController
     }
 
     /**
-     * Sends headers that the user does not cache the page
+     * @param TinyUrl $tinyUrl
      */
-    protected function sendNoCacheHeaders()
+    protected function processUrlHit($tinyUrl)
     {
-        $httpUtility = $this->getHttpUtility();
-        $httpUtility->header('Expires', '0');
-        $httpUtility->header('Last-Modified', gmdate('D, d M Y H:i:s') . ' GMT');
-        $httpUtility->header('Cache-Control', 'no-cache, must-revalidate');
-        $httpUtility->header('Pragma', 'no-cache');
+        if ($tinyUrl->getDeleteOnUse()) {
+            $this->getTinyUrlRepository()->deleteTinyUrlByKey($tinyUrl->getUrlkey());
+            return;
+        }
+
+        $this->countUrlHit($tinyUrl);
     }
 }

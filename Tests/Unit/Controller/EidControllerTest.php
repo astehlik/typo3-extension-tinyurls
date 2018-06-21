@@ -1,5 +1,6 @@
 <?php
-declare(strict_types = 1);
+declare(strict_types=1);
+
 namespace Tx\Tinyurls\Tests\Unit\Controller;
 
 /*                                                                        *
@@ -13,10 +14,16 @@ namespace Tx\Tinyurls\Tests\Unit\Controller;
  *                                                                        */
 
 use PHPUnit\Framework\TestCase;
+use Psr\Http\Message\ResponseInterface;
 use Tx\Tinyurls\Controller\EidController;
 use Tx\Tinyurls\Domain\Model\TinyUrl;
 use Tx\Tinyurls\Domain\Repository\TinyUrlRepository;
-use Tx\Tinyurls\Utils\HttpUtilityWrapper;
+use Tx\Tinyurls\Exception\NoTinyUrlKeySubmittedException;
+use Tx\Tinyurls\Exception\TinyUrlNotFoundException;
+use TYPO3\CMS\Core\Error\Http\BadRequestException;
+use TYPO3\CMS\Core\Error\Http\PageNotFoundException;
+use TYPO3\CMS\Core\Http\Response;
+use TYPO3\CMS\Core\Http\ServerRequest;
 use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
 
 /**
@@ -28,11 +35,6 @@ class EidControllerTest extends TestCase
      * @var EidController
      */
     protected $eidController;
-
-    /**
-     * @var HttpUtilityWrapper|\PHPUnit_Framework_MockObject_MockObject
-     */
-    protected $httpUtilityMock;
 
     /**
      * @var TinyUrlRepository|\PHPUnit_Framework_MockObject_MockObject
@@ -47,13 +49,18 @@ class EidControllerTest extends TestCase
     protected function setUp()
     {
         $this->tsfeMock = $this->createMock(TypoScriptFrontendController::class);
-        $this->httpUtilityMock = $this->createMock(HttpUtilityWrapper::class);
         $this->tinyUrlRepositoryMock = $this->createMock(TinyUrlRepository::class);
 
         $this->eidController = new EidController();
         $this->eidController->setTypoScriptFrontendController($this->tsfeMock);
-        $this->eidController->injectHttpUility($this->httpUtilityMock);
         $this->eidController->injectTinyUrlRepository($this->tinyUrlRepositoryMock);
+    }
+
+    public function testBadRequestExceptionIfNoUrlKeyIsProvided()
+    {
+        $this->expectException(BadRequestException::class);
+
+        $this->processRequest();
     }
 
     public function testDeleteOnUseUrlIsDeleted()
@@ -61,6 +68,7 @@ class EidControllerTest extends TestCase
         $_GET['tx_tinyurls']['key'] = 'thekey';
         $tinyUrlMock = $this->createMock(TinyUrl::class);
         $tinyUrlMock->method('getDeleteOnUse')->willReturn(true);
+        $tinyUrlMock->method('getUrlkey')->willReturn('thekey');
 
         $this->tinyUrlRepositoryMock->expects($this->once())
             ->method('findTinyUrlByKey')
@@ -70,41 +78,7 @@ class EidControllerTest extends TestCase
             ->method('deleteTinyUrlByKey')
             ->with('thekey');
 
-        $this->eidController->main();
-    }
-
-    public function testDeleteOnUseUrlSendsNoCacheHeaders()
-    {
-        $_GET['tx_tinyurls']['key'] = 'thekey';
-        $tinyUrlMock = $this->createMock(TinyUrl::class);
-        $tinyUrlMock->method('getDeleteOnUse')->willReturn(true);
-
-        $this->tinyUrlRepositoryMock->expects($this->once())
-            ->method('findTinyUrlByKey')
-            ->willReturn($tinyUrlMock);
-
-        $this->httpUtilityMock->expects($this->exactly(4))
-            ->method('header')
-            ->withConsecutive(
-                [
-                    'Expires',
-                    '0',
-                ],
-                [
-                    'Last-Modified',
-                    gmdate('D, d M Y H:i:s') . ' GMT',
-                ],
-                [
-                    'Cache-Control',
-                    'no-cache, must-revalidate',
-                ],
-                [
-                    'Pragma',
-                    'no-cache',
-                ]
-            );
-
-        $this->eidController->main();
+        $this->processRequest();
     }
 
     public function testHitIsCountedIfUrlIsNotDeletedOnUse()
@@ -122,7 +96,7 @@ class EidControllerTest extends TestCase
             ->method('countTinyUrlHit')
             ->with($tinyUrlMock);
 
-        $this->eidController->main();
+        $this->processRequest();
     }
 
     public function testHitIsNotCountedIfUrlIsDeletedOnUse()
@@ -138,40 +112,35 @@ class EidControllerTest extends TestCase
         $this->tinyUrlRepositoryMock->expects($this->never())
             ->method('countTinyUrlHit');
 
-        $this->eidController->main();
+        $this->processRequest();
     }
 
     public function testInvalidUrlsArePurgedBeforeRedirect()
     {
+        $this->expectException(NoTinyUrlKeySubmittedException::class);
+
         $this->tinyUrlRepositoryMock->expects($this->once())
             ->method('purgeInvalidUrls');
 
-        $this->eidController->main();
-    }
-
-    public function testPageNotFoundErrorIfNoUrlKeyIsProvided()
-    {
-        $this->tsfeMock->expects($this->once())
-            ->method('pageNotFoundAndExit')
-            ->with('No tinyurl key was submitted.');
-
-        $this->eidController->main();
+        $this->processRequest();
     }
 
     public function testPageNotFoundErrorIfUrlKeyIsNotFoundInDatabase()
     {
+        $this->expectException(PageNotFoundException::class);
+
         $_GET['tx_tinyurls']['key'] = 'thekey';
 
         $this->tinyUrlRepositoryMock->expects($this->once())
             ->method('findTinyUrlByKey')
             ->with('thekey')
-            ->willThrowException(new \RuntimeException('No tinyurl found with this key'));
+            ->willThrowException(new TinyUrlNotFoundException('thekey'));
 
         $this->tsfeMock->expects($this->once())
             ->method('pageNotFoundAndExit')
-            ->with('No tinyurl found with this key');
+            ->with('The tinyurl with the key thekey was not found.');
 
-        $this->eidController->main();
+        $this->processRequest();
     }
 
     public function testRedirectsToTargetUrl()
@@ -186,10 +155,60 @@ class EidControllerTest extends TestCase
             ->method('findTinyUrlByKey')
             ->willReturn($tinyUrlMock);
 
-        $this->httpUtilityMock->expects($this->once())
-            ->method('redirect')
-            ->with('http://the-target.url', 'HTTP/1.1 301 Moved Permanently');
+        $response = $this->processRequest();
+        $this->assertEquals(301, $response->getStatusCode());
+        $this->assertEquals('Moved Permanently', $response->getReasonPhrase());
+        $this->assertEquals('http://the-target.url', $response->getHeaderLine('Location'));
+    }
 
-        $this->eidController->main();
+    /**
+     * @param string $headerName
+     * @param string $expectedValue
+     * @dataProvider tinyUrlRedirectSendsNoCacheHeadersDataProvider
+     * @test
+     */
+    public function tinyUrlRedirectSendsNoCacheHeaders(string $headerName, string $expectedValue)
+    {
+        $_GET['tx_tinyurls']['key'] = 'thekey';
+        $tinyUrlMock = $this->createMock(TinyUrl::class);
+        $tinyUrlMock->method('getDeleteOnUse')->willReturn(true);
+
+        $this->tinyUrlRepositoryMock->expects($this->once())
+            ->method('findTinyUrlByKey')
+            ->willReturn($tinyUrlMock);
+
+        $response = $this->processRequest();
+
+        $this->assertEquals($expectedValue, $response->getHeaderLine($headerName));
+    }
+
+    public function tinyUrlRedirectSendsNoCacheHeadersDataProvider(): array
+    {
+        return [
+            [
+                'Expires',
+                '0',
+            ],
+            [
+                'Last-Modified',
+                gmdate('D, d M Y H:i:s') . ' GMT',
+            ],
+            [
+                'Cache-Control',
+                'no-cache, must-revalidate',
+            ],
+            [
+                'Pragma',
+                'no-cache',
+            ],
+        ];
+    }
+
+    private function processRequest(): ResponseInterface
+    {
+        $request = new ServerRequest();
+        $request = $request->withQueryParams($_GET);
+        $response = $this->eidController->tinyUrlRedirect($request, new Response());
+        return $response;
     }
 }
