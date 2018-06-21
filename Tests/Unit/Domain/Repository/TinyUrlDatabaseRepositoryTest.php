@@ -77,7 +77,7 @@ class TinyUrlDatabaseRepositoryTest extends TestCase
             ->with(
                 TinyUrlRepository::TABLE_URLS,
                 'uid=3342',
-                ['counter' => '1'],
+                ['counter' => 'counter + 1'],
                 ['counter']
             );
 
