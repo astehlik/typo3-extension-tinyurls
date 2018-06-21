@@ -81,6 +81,10 @@ class TinyUrlDatabaseRepositoryTest extends TestCase
                 ['counter']
             );
 
+        $this->databaseConnectionMock->expects($this->once())
+            ->method('exec_SELECTgetSingleRow')
+            ->willReturn($this->getDummyDatabaseRow());
+
         $tinyUrl = TinyUrl::createNew();
         $tinyUrl->persistPostProcessInsert(3342);
         $this->databaseRepository->countTinyUrlHit($tinyUrl);
