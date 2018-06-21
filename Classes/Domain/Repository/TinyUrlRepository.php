@@ -1,5 +1,6 @@
 <?php
-declare(strict_types = 1);
+declare(strict_types=1);
+
 namespace Tx\Tinyurls\Domain\Repository;
 
 /*                                                                        *
@@ -25,9 +26,9 @@ interface TinyUrlRepository extends SingletonInterface
      * Use of "set counter=counter+1" - avoiding race conditions
      *
      * @param TinyUrl $tinyUrl
-     * @return void
+     * @return TinyUrl A new tiny URL instance with an updated counter.
      */
-    public function countTinyUrlHit(TinyUrl $tinyUrl);
+    public function countTinyUrlHit(TinyUrl $tinyUrl): TinyUrl;
 
     /**
      * Deletes the URL with the given URL key.

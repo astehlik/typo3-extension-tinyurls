@@ -28,8 +28,9 @@ class TinyUrlDatabaseRepository extends AbstractTinyUrlDatabaseRepository implem
      * Use of "set counter=counter+1" - avoiding race conditions
      *
      * @param TinyUrl $tinyUrl
+     * @return TinyUrl
      */
-    public function countTinyUrlHit(TinyUrl $tinyUrl)
+    public function countTinyUrlHit(TinyUrl $tinyUrl): TinyUrl
     {
         $this->getDatabaseConnection()->exec_UPDATEquery(
             static::TABLE_URLS,
@@ -37,6 +38,8 @@ class TinyUrlDatabaseRepository extends AbstractTinyUrlDatabaseRepository implem
             ['counter' => 'counter + 1'],
             ['counter']
         );
+
+        return $this->findTinyUrlByKey($tinyUrl->getUrlkey());
     }
 
     public function deleteTinyUrlByKey(string $tinyUrlKey)

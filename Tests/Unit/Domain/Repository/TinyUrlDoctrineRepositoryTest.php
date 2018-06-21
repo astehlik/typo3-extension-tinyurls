@@ -1,5 +1,6 @@
 <?php
-declare(strict_types = 1);
+declare(strict_types=1);
+
 namespace Tx\Tinyurls\Tests\Unit\Domain\Repository;
 
 /*                                                                        *
@@ -108,12 +109,21 @@ class TinyUrlDoctrineRepositoryTest extends TestCase
 
     public function testCountTinyUrlHitIncreasesCountByOne()
     {
-        $this->databaseQueryBuilderMock->expects($this->once())
-            ->method('set')
-            ->with('counter', 'counter + 1');
+        $resultMock = $this->createMock(Statement::class);
+        $resultMock->expects($this->once())
+            ->method('fetch')
+            ->willReturn($this->getDummyDatabaseRow());
 
         $this->databaseQueryBuilderMock->expects($this->once())
-            ->method('execute');
+            ->method('set')
+            ->with('counter', '1');
+
+        $this->databaseQueryBuilderMock->expects($this->exactly(2))
+            ->method('execute')
+            ->willReturnOnConsecutiveCalls(
+                null,
+                $resultMock
+            );
 
         $tinyUrl = TinyUrl::createNew();
         $tinyUrl->persistPostProcessInsert(3342);
