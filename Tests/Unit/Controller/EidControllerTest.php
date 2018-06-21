@@ -54,6 +54,8 @@ class EidControllerTest extends TestCase
         $this->eidController = new EidController();
         $this->eidController->setTypoScriptFrontendController($this->tsfeMock);
         $this->eidController->injectTinyUrlRepository($this->tinyUrlRepositoryMock);
+
+        $GLOBALS['EXEC_TIME'] = time();
     }
 
     public function testBadRequestExceptionIfNoUrlKeyIsProvided()
@@ -179,6 +181,10 @@ class EidControllerTest extends TestCase
 
         $response = $this->processRequest();
 
+        if ($expectedValue === 'gmdate') {
+            $expectedValue = gmdate('D, d M Y H:i:s', $GLOBALS['EXEC_TIME']) . ' GMT';
+        }
+
         $this->assertEquals($expectedValue, $response->getHeaderLine($headerName));
     }
 
@@ -191,7 +197,7 @@ class EidControllerTest extends TestCase
             ],
             [
                 'Last-Modified',
-                gmdate('D, d M Y H:i:s') . ' GMT',
+                'gmdate',
             ],
             [
                 'Cache-Control',

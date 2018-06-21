@@ -96,7 +96,10 @@ class EidController
     protected function addNoCacheHeaders(ResponseInterface $response)
     {
         $noCacheResponse = $response->withAddedHeader('Expires', '0');
-        $noCacheResponse = $noCacheResponse->withAddedHeader('Last-Modified', gmdate('D, d M Y H:i:s') . ' GMT');
+        $noCacheResponse = $noCacheResponse->withAddedHeader(
+            'Last-Modified',
+            gmdate('D, d M Y H:i:s', $GLOBALS['EXEC_TIME']) . ' GMT'
+        );
         $noCacheResponse = $noCacheResponse->withAddedHeader('Cache-Control', 'no-cache, must-revalidate');
         $noCacheResponse = $noCacheResponse->withAddedHeader('Pragma', 'no-cache');
         return $noCacheResponse;
