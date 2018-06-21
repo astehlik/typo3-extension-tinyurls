@@ -45,16 +45,11 @@ script:
   - >
     echo;
     echo "Running unit tests";
-    COVERAGE_ARGUMENTS=();
     if [[ "${UPLOAD_CODE_COVERAGE}" == "yes" ]]; then
-      xdebug-enable;
-      echo "Generating coverage report";
-      COVERAGE_ARGUMENTS=("--coverage-clover" ".Build/Logs/clover.xml" "--whitelist" "Classes");
-    fi;
-    .Build/bin/phpunit "${COVERAGE_ARGUMENTS[@]}" Tests/Unit/;
-    if [[ "${UPLOAD_CODE_COVERAGE}" == "yes" ]]; then
-      xdebug-disable;
-    fi;
+      bash ./Tests/Scripts/run_unit_tests_with_coverage.sh
+    else
+      .Build/bin/phpunit Tests/Unit/
+    fi
   - >
     if [[ "${UPLOAD_CODE_COVERAGE}" == "yes" ]]; then
       composer require --dev codeclimate/php-test-reporter:dev-master;
