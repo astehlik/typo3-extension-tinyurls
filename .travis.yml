@@ -25,7 +25,6 @@ jobs:
   include:
     - stage: test
       script: ./.travis/test_phpcs.sh
-      php: 7.2
       env: BUILD_TYPE="phpcs" TYPO3_VERSION="typo3/minimal=^9.3"
 
     - script: ./.travis/test_phpunit.sh
