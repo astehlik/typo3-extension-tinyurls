@@ -11,11 +11,12 @@ matrix:
     - php: 7.2
       env: TYPO3_VERSION="typo3/minimal=dev-master" NIMUT_TESTING_FRAMEWORK="nimut/testing-framework=dev-master"
 
-sudo: false
 cache:
   directories:
     - $HOME/.composer/cache
     - $HOME/.cache/composer
+
+sudo: false
 
 addons:
   apt:
@@ -30,56 +31,16 @@ before_install:
 before_script:
   # Rename our working directory, required for Extension upload to TER.
   - cd .. && mv typo3-extension-tinyurls tinyurls && cd tinyurls
-  - source .travis/xdebug.sh
-  - if [ "${UPLOAD_CODE_COVERAGE}" != "yes" ]; then phpenv config-rm xdebug.ini; fi
   - if [ $TYPO3_VERSION = "typo3/minimal=dev-master" ]; then composer config minimum-stability dev && composer require $TYPO3_VERSION --prefer-stable --prefer-dist; fi
   - if [ $TYPO3_VERSION != "typo3/minimal=dev-master" ]; then composer require $TYPO3_VERSION; fi
   - export TYPO3_PATH_WEB=$PWD/.Build/Web
 
-script:
-  - >
-    echo;
-    echo "Running phpcs";
-    .Build/bin/phpcs --config-set installed_paths $PWD/.Build/vendor/de-swebhosting/php-codestyle/PhpCodeSniffer,Tests/CodeSniffer;
-    .Build/bin/phpcs --standard=PSRTinyurls Classes Configuration/TCA Tests/Unit Tests/Functional ext_emconf.php ext_localconf.php
-  - >
-    echo;
-    echo "Running unit tests";
-    if [[ "${UPLOAD_CODE_COVERAGE}" == "yes" ]]; then
-      .Build/bin/phpunit --coverage-clover .Build/Logs/clover.xml --whitelist Classes Tests/Unit/
-    else
-      .Build/bin/phpunit Tests/Unit/
-    fi
-  - >
-    if [[ "${UPLOAD_CODE_COVERAGE}" == "yes" ]]; then
-      composer require --dev codeclimate/php-test-reporter:dev-master;
-      .Build/bin/test-reporter --coverage-report .Build/Logs/clover.xml;
-      composer remove codeclimate/php-test-reporter --dev
-    fi
-  - >
-    echo;
-    echo "Running php lint";
-    find . -name \*.php ! -path "./.Build/*" | parallel --gnu php -d display_errors=stderr -l {} > /dev/null \;
-  - >
-    echo;
-    composer require --dev $NIMUT_TESTING_FRAMEWORK  --prefer-dist;
-    mkdir -p ".Build/Web/typo3temp/var/tests";
-    export typo3DatabaseName="typo3";
-    export typo3DatabaseHost="localhost";
-    export typo3DatabaseUsername="root";
-    export typo3DatabasePassword="";
-    find . -wholename '*Tests/Functional/*Test.php' ! -path "./.Build/*" | parallel --gnu 'echo; echo "Running functional test suite {}"; .Build/bin/phpunit --colors -c .Build/vendor/nimut/testing-framework/res/Configuration/FunctionalTests.xml {}'
-
-after_script:
-  - >
-    if [ -n "$TRAVIS_TAG" ] && [ -n "$TYPO3_ORG_USERNAME" ] && [ -n "$TYPO3_ORG_PASSWORD" ]; then
-      echo -e "Preparing upload of release ${TRAVIS_TAG} to TER\n"
-      curl -sSL https://raw.githubusercontent.com/alrra/travis-after-all/1.4.4/lib/travis-after-all.js | node
-      if [ $? -eq 0 ]; then
-        # Cleanup before we upload
-        git reset --hard HEAD && git clean -fx
-        TAG_MESSAGE=`git tag -n10 -l $TRAVIS_TAG | sed 's/^[0-9.]*[ ]*//g'`
-        echo "Uploading release ${TRAVIS_TAG} to TER"
-        .Build/bin/upload . "$TYPO3_ORG_USERNAME" "$TYPO3_ORG_PASSWORD" "$TAG_MESSAGE"
-      fi;
-    fi;
+jobs:
+  include:
+    - stage: test
+      script: ./.travis/test_phpcs.sh
+    - script: ./.travis/test_phpunit.sh
+    - script: ./.travis/test_lint.sh
+    - script: ./.travis/test_functional.sh
+    - stage: deploy
+      script: ./.travis/deploy_ter.sh
