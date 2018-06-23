@@ -16,8 +16,7 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Tx\\Tinyurls\\Tests\\": "Tests/",
-            "TYPO3\\CMS\\Core\\Tests\\": ".Build/vendor/typo3/cms/typo3/sysext/core/Tests/"
+            "Tx\\Tinyurls\\Tests\\": "Tests/"
         }
     },
     "require": {
