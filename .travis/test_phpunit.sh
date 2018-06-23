@@ -21,5 +21,4 @@ fi
 if [[ "${UPLOAD_CODE_COVERAGE}" == "yes" ]]; then
     composer require --dev codeclimate/php-test-reporter:dev-master;
     .Build/bin/test-reporter --coverage-report .Build/Logs/clover.xml;
-    composer remove codeclimate/php-test-reporter --dev
 fi
