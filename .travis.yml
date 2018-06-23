@@ -19,7 +19,7 @@ before_install:
 
 before_script:
   - export TYPO3_PATH_WEB=$PWD/.Build/Web
-  - chmod +x ./.travis/.sh
+  - chmod +x ./.travis/*.sh
 
 jobs:
   include:
