@@ -1,5 +1,6 @@
 <?php
-declare(strict_types = 1);
+declare(strict_types=1);
+
 namespace Tx\Tinyurls\Tests\Unit\Domain\Repository;
 
 /*                                                                        *
@@ -274,7 +275,7 @@ class TinyUrlDatabaseRepositoryTest extends TestCase
                 'uid=2323',
                 $this->callback(
                     function (array $databaseRow) {
-                        return 'LD-k2kf929' ===  $databaseRow['urlkey'];
+                        return 'LD-k2kf929' === $databaseRow['urlkey'];
                     }
                 )
             );

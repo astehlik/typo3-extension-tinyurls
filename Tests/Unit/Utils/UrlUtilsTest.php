@@ -1,5 +1,6 @@
 <?php
-declare(strict_types = 1);
+declare(strict_types=1);
+
 namespace Tx\Tinyurls\Tests\Utils;
 
 /*                                                                        *
@@ -15,7 +16,6 @@ namespace Tx\Tinyurls\Tests\Utils;
 use PHPUnit\Framework\TestCase;
 use Tx\Tinyurls\Configuration\ExtensionConfiguration;
 use Tx\Tinyurls\Object\ImplementationManager;
-use Tx\Tinyurls\UrlKeyGenerator\Base62UrlKeyGenerator;
 use Tx\Tinyurls\UrlKeyGenerator\UrlKeyGenerator;
 use Tx\Tinyurls\Utils\GeneralUtilityWrapper;
 use Tx\Tinyurls\Utils\UrlUtils;

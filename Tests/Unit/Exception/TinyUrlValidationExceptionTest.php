@@ -1,5 +1,6 @@
 <?php
-declare(strict_types = 1);
+declare(strict_types=1);
+
 namespace Tx\Tinyurls\Tests\Unit\Exception;
 
 /*                                                                        *
@@ -18,7 +19,6 @@ use TYPO3\CMS\Extbase\Error\Result;
 
 class TinyUrlValidationExceptionTest extends TestCase
 {
-
     public function testSetResultSetsResult()
     {
         $result = new Result();

@@ -1,5 +1,6 @@
 <?php
-declare(strict_types = 1);
+declare(strict_types=1);
+
 namespace Tx\Tinyurls\Domain\Validator;
 
 use Tx\Tinyurls\Domain\Model\TinyUrl;

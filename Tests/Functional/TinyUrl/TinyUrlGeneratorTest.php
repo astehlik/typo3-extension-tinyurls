@@ -1,5 +1,6 @@
 <?php
-declare(strict_types = 1);
+declare(strict_types=1);
+
 namespace Tx\Tinyurls\Tests\Functional\TinyUrl;
 
 /*                                                                        *
@@ -12,9 +13,9 @@ namespace Tx\Tinyurls\Tests\Functional\TinyUrl;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
+use Nimut\TestingFramework\TestCase\FunctionalTestCase;
 use Tx\Tinyurls\TinyUrl\TinyUrlGenerator;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use Nimut\TestingFramework\TestCase\FunctionalTestCase;
 
 /**
  * Functional tests for the TinyUrlGenerator.

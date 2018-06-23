@@ -1,5 +1,6 @@
 <?php
-declare(strict_types = 1);
+declare(strict_types=1);
+
 namespace Tx\Tinyurls\Tests\Unit\Configuration;
 
 /*                                                                        *
@@ -139,7 +140,6 @@ class ExtensionConfigurationTest extends TestCase
         $typoScriptConfiguratorMock->expects($this->once())
             ->method('initializeConfigFromTyposcript')
             ->with(['the' => 'config'], $contentObjectRendererMock);
-
 
         $this->extensionConfiguration->setTypoScriptConfigurator($typoScriptConfiguratorMock);
         $this->extensionConfiguration->initializeConfigFromTyposcript(
