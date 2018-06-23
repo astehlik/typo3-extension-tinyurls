@@ -26,6 +26,7 @@ jobs:
     - stage: test
       script: ./.travis/test_phpcs.sh
       env: BUILD_TYPE="PHP code sniffer" TYPO3_VERSION="typo3/minimal=^9.3"
+      php: 7.1
 
     - script: ./.travis/test_phpunit.sh
       php: 7.0
@@ -66,3 +67,4 @@ jobs:
     - stage: deploy
       script: ./.travis/deploy_ter.sh
       env: BUILD_TYPE="TER upload"
+      php: 7.1
