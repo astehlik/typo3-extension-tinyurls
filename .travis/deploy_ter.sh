@@ -4,6 +4,9 @@ set -ev
 
 phpenv config-rm xdebug.ini
 
+# Rename our working directory, required for Extension upload to TER.
+cd .. && mv typo3-extension-tinyurls tinyurls && cd tinyurls
+
 if [ -n "$TRAVIS_TAG" ] && [ -n "$TYPO3_ORG_USERNAME" ] && [ -n "$TYPO3_ORG_PASSWORD" ]; then
 
     echo -e "Preparing upload of release ${TRAVIS_TAG} to TER\n"
