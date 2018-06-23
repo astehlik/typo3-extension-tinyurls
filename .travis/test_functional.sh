@@ -21,5 +21,5 @@ export typo3DatabaseHost="localhost"
 export typo3DatabaseUsername="root"
 export typo3DatabasePassword=""
 
-find . -wholename '*Tests/Functional/*Test.php' ! -path "./.Build/*" | \\
+find . -wholename '*Tests/Functional/*Test.php' ! -path "./.Build/*" | \
     parallel --gnu 'echo; echo "Running functional test suite {}"; .Build/bin/phpunit --colors -c .Build/vendor/nimut/testing-framework/res/Configuration/FunctionalTests.xml {}'
