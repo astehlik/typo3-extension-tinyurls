@@ -25,43 +25,44 @@ jobs:
   include:
     - stage: test
       script: ./.travis/test_phpcs.sh
-      env: BUILD_TYPE="phpcs" TYPO3_VERSION="typo3/minimal=^9.3"
+      env: BUILD_TYPE="PHP code sniffer" TYPO3_VERSION="typo3/minimal=^9.3"
 
     - script: ./.travis/test_phpunit.sh
       php: 7.0
-      env: BUILD_TYPE="phpunit" TYPO3_VERSION="typo3/cms=^7.6"
+      env: BUILD_TYPE="Unit tests" TYPO3_VERSION="typo3/cms=^7.6"
     - script: ./.travis/test_phpunit.sh
       php: 7.1
-      env: BUILD_TYPE="phpunit" TYPO3_VERSION="typo3/cms=^8.7" UPLOAD_CODE_COVERAGE=yes
+      env: BUILD_TYPE="Unit tests" TYPO3_VERSION="typo3/cms=^8.7" UPLOAD_CODE_COVERAGE=yes
     - script: ./.travis/test_phpunit.sh
       php: 7.2
-      env: BUILD_TYPE="phpunit" TYPO3_VERSION="typo3/minimal=^9.3"
+      env: BUILD_TYPE="Unit tests" TYPO3_VERSION="typo3/minimal=^9.3"
     - script: ./.travis/test_phpunit.sh
       php: 7.2
-      env: BUILD_TYPE="phpunit" TYPO3_VERSION="typo3/minimal=dev-master"
+      env: BUILD_TYPE="Unit tests" TYPO3_VERSION="typo3/minimal=dev-master"
 
     - script: ./.travis/test_lint.sh
       php: 7.0
-      env: BUILD_TYPE="lint"
+      env: BUILD_TYPE="PHP lint"
     - script: ./.travis/test_lint.sh
       php: 7.1
-      env: BUILD_TYPE="lint"
+      env: BUILD_TYPE="PHP lint"
     - script: ./.travis/test_lint.sh
       php: 7.2
-      env: BUILD_TYPE="lint"
+      env: BUILD_TYPE="PHP lint"
 
     - script: ./.travis/test_functional.sh
       php: 7.0
-      env: BUILD_TYPE="functional" TYPO3_VERSION="typo3/cms=^7.6" NIMUT_TESTING_FRAMEWORK="nimut/testing-framework"
+      env: BUILD_TYPE="Functional tests" TYPO3_VERSION="typo3/cms=^7.6" NIMUT_TESTING_FRAMEWORK="nimut/testing-framework"
     - script: ./.travis/test_functional.sh
       php: 7.1
-      env: BUILD_TYPE="functional" TYPO3_VERSION="typo3/cms=^8.7" NIMUT_TESTING_FRAMEWORK="nimut/testing-framework"
+      env: BUILD_TYPE="Functional tests" TYPO3_VERSION="typo3/cms=^8.7" NIMUT_TESTING_FRAMEWORK="nimut/testing-framework"
     - script: ./.travis/test_functional.sh
       php: 7.2
-      env: BUILD_TYPE="functional" TYPO3_VERSION="typo3/minimal=^9.3" NIMUT_TESTING_FRAMEWORK="nimut/testing-framework=dev-master"
+      env: BUILD_TYPE="Functional tests" TYPO3_VERSION="typo3/minimal=^9.3" NIMUT_TESTING_FRAMEWORK="nimut/testing-framework=dev-master"
     - script: ./.travis/test_functional.sh
       php: 7.2
-      env: BUILD_TYPE="functional" TYPO3_VERSION="typo3/minimal=dev-master" NIMUT_TESTING_FRAMEWORK="nimut/testing-framework=dev-master"
+      env: BUILD_TYPE="Functional tests" TYPO3_VERSION="typo3/minimal=dev-master" NIMUT_TESTING_FRAMEWORK="nimut/testing-framework=dev-master"
 
     - stage: deploy
       script: ./.travis/deploy_ter.sh
+      env: BUILD_TYPE="TER upload"
