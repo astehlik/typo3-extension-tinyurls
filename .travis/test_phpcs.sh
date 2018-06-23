@@ -14,6 +14,6 @@ composer require --update-no-dev de-swebhosting/php-codestyle:dev-master
 
 cd ..
 
-./codesniffer/bin/phpcs --config-set installed_paths $PWD/.Build/vendor/de-swebhosting/php-codestyle/PhpCodeSniffer,Tests/CodeSniffer
+./codesniffer/bin/phpcs --config-set installed_paths $PWD/codesniffer/vendor/de-swebhosting/php-codestyle/PhpCodeSniffer,Tests/CodeSniffer
 
 ./codesniffer/bin/phpcs --standard=PSRTinyurls Classes Configuration/TCA Tests/Unit Tests/Functional ext_emconf.php ext_localconf.php
