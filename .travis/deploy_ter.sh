@@ -4,9 +4,6 @@ set -ev
 
 phpenv config-rm xdebug.ini
 
-# Rename our working directory, required for Extension upload to TER.
-cd .. && mv typo3-extension-tinyurls tinyurls
-
 if [ -z "$TRAVIS_TAG" ]; then
     echo "No Travis tag is available. Upload only runs for new tags."
     exit 0
@@ -28,6 +25,9 @@ if [ -z "$TAG_MESSAGE" ]; then
     echo "The tag message could not be detected or was empty."
     exit 1
 fi
+
+# Rename our working directory, required for Extension upload to TER.
+cd .. && mv typo3-extension-tinyurls tinyurls
 
 echo "Installing TYPO3 repository client..."
 
