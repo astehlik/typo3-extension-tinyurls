@@ -46,4 +46,4 @@ echo "Setting version to ${TRAVIS_TAG#"v"}"
 ../typo3-repository-client/bin/setversion ${TRAVIS_TAG#"v"}
 
 echo "Uploading release ${TRAVIS_TAG} to TER"
-../typo3-repository-client/bin/upload "$TYPO3_ORG_USERNAME" "$TYPO3_ORG_PASSWORD" "$TAG_MESSAGE"
+../typo3-repository-client/bin/upload . "$TYPO3_ORG_USERNAME" "$TYPO3_ORG_PASSWORD" "$TAG_MESSAGE"
