@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace Tx\Tinyurls\Tests\Functional;
 
 /*                                                                        *
@@ -11,7 +13,7 @@ namespace Tx\Tinyurls\Tests\Functional;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
-use TYPO3\CMS\Core\Tests\FunctionalTestCase;
+use Nimut\TestingFramework\TestCase\FunctionalTestCase;
 
 /**
  * Functional tests for the tinyurls API.
@@ -21,9 +23,7 @@ class TypoScriptTest extends FunctionalTestCase
     /**
      * @var array
      */
-    protected $testExtensionsToLoad = array(
-        'typo3conf/ext/tinyurls',
-    );
+    protected $testExtensionsToLoad = ['typo3conf/ext/tinyurls'];
 
     /**
      * Imports the pages database fixture.
@@ -31,7 +31,7 @@ class TypoScriptTest extends FunctionalTestCase
     public function setUp()
     {
         parent::setUp();
-        $this->importDataSet(ORIGINAL_ROOT . 'typo3/sysext/core/Tests/Functional/Fixtures/pages.xml');
+        $this->importDataSet('ntf://Database/pages.xml');
     }
 
     /**
@@ -39,9 +39,10 @@ class TypoScriptTest extends FunctionalTestCase
      */
     public function typolinkIsConvertedToTinyurlIfConfigured()
     {
-        $this->setUpFrontendRootPage(1, array(
-            'EXT:tinyurls/Tests/Functional/Fixtures/TypoScript/SimpleTinyUrlTypolink.setupts'
-        ));
+        $this->setUpFrontendRootPage(
+            1,
+            ['EXT:tinyurls/Tests/Functional/Fixtures/TypoScript/SimpleTinyUrlTypolink.setupts']
+        );
         $response = $this->getFrontendResponse(0);
         $this->assertRegExp(
             '/http:\/\/localhost\/\?eID=tx_tinyurls&amp;tx_tinyurls\[key\]=b-[a-zA-Z0-9]{7}/',

@@ -4,8 +4,8 @@
  * Handles the click events of the copyable field clipboard buttons.
  */
 define(
-    ['jquery', 'TYPO3/CMS/Backend/Notification', 'TYPO3/CMS/Lang/Lang'],
-    function ($, notification, lang) {
+    ['jquery', 'TYPO3/CMS/Backend/Notification'],
+    function ($, notification) {
         'use strict';
 
         var CopyToClipboard = {
@@ -31,13 +31,13 @@ define(
                         valueField.select();
                         document.execCommand('copy');
                         notification.success(
-                            lang['tx_tinyurls.copy_to_clipboard.success.title'],
-                            lang['tx_tinyurls.copy_to_clipboard.success.message']
+                            TYPO3.lang['tx_tinyurls.copy_to_clipboard.success.title'],
+                            TYPO3.lang['tx_tinyurls.copy_to_clipboard.success.message']
                         );
                     } catch (err) {
                         notification.warning(
-                            lang['tx_tinyurls.copy_to_clipboard.error.title'],
-                            lang['tx_tinyurls.copy_to_clipboard.error.message']
+                            TYPO3.lang['tx_tinyurls.copy_to_clipboard.error.title'],
+                            TYPO3.lang['tx_tinyurls.copy_to_clipboard.error.message']
                         );
                     }
                 });

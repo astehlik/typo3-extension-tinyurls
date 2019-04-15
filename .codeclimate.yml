@@ -1,0 +1,36 @@
+version: "2"
+
+prepare:
+  fetch:
+    - url: "https://raw.githubusercontent.com/astehlik/php-codestyle/master/PhpMd/RulesetTypo3.xml"
+      path: "PhpMdRulesetTypo3.xml"
+
+plugins:
+  phpcodesniffer:
+    enabled: true
+    config:
+      file_extensions: "php"
+      standard: "PSR1,PSR2"
+  fixme:
+    enabled: true
+  phpmd:
+    enabled: true
+    config:
+      rulesets: "PhpMdRulesetTypo3.xml"
+  eslint:
+    enabled: true
+    config:
+      extensions:
+        - .js
+  csslint:
+    enabled: false
+  duplication:
+    enabled: true
+    config:
+      languages:
+      - php
+      - javascript
+
+exclude_patterns:
+  - "Tests/**/*"
+  - "Migrations/Code/LegacyClassesForIde.php"

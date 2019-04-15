@@ -1,5 +1,7 @@
 <?php
-namespace Tx\Tinyurls\FormEngine;
+declare(strict_types=1);
+
+namespace Tx\Tinyurls\UrlKeyGenerator;
 
 /*                                                                        *
  * This script belongs to the TYPO3 extension "tinyurls".                 *
@@ -11,23 +13,23 @@ namespace Tx\Tinyurls\FormEngine;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
-use Tx\Tinyurls\TinyUrl\TinyUrlGenerator;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
+use Tx\Tinyurls\Domain\Model\TinyUrl;
 
-/**
- * Builds the tiny URL for displaying it within Backend forms.
- */
-class TinyUrlDispay
+interface UrlKeyGenerator
 {
     /**
-     * Renders a full tiny URL based on the given form element data.
+     * Generates a unique tinyurl key for the record with the given UID.
      *
-     * @param array $formElementData
+     * @param TinyUrl $tinyUrl
      * @return string
      */
-    public function buildTinyUrlFormFormElementData(array $formElementData)
-    {
-        $tinyUrlGenerator = GeneralUtility::makeInstance(TinyUrlGenerator::class);
-        return $tinyUrlGenerator->buildTinyUrl($formElementData['databaseRow']['urlkey']);
-    }
+    public function generateTinyurlKeyForTinyUrl(TinyUrl $tinyUrl): string;
+
+    /**
+     * Generates a unique tinyurl key for the given UID.
+     *
+     * @param int $uid
+     * @return string
+     */
+    public function generateTinyurlKeyForUid(int $uid): string;
 }

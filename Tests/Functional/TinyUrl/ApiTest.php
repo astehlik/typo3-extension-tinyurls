@@ -1,5 +1,7 @@
 <?php
-namespace Tx\Tinyurls\Tests\Functional;
+declare(strict_types=1);
+
+namespace Tx\Tinyurls\Tests\Functional\TinyUrl;
 
 /*                                                                        *
  * This script belongs to the TYPO3 extension "tinyurls".                 *
@@ -11,22 +13,20 @@ namespace Tx\Tinyurls\Tests\Functional;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
+use Nimut\TestingFramework\TestCase\FunctionalTestCase;
 use Tx\Tinyurls\TinyUrl\Api;
-use TYPO3\CMS\Core\Tests\FunctionalTestCase;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
 
 /**
  * Functional tests for the tinyurls API.
  */
-class TinyurlsApiTest extends FunctionalTestCase
+class ApiTest extends FunctionalTestCase
 {
     /**
      * @var array
      */
-    protected $testExtensionsToLoad = array(
-        'typo3conf/ext/tinyurls',
-    );
+    protected $testExtensionsToLoad = ['typo3conf/ext/tinyurls'];
 
     /**
      * @var Api
@@ -48,7 +48,7 @@ class TinyurlsApiTest extends FunctionalTestCase
     public function apiDoesNotSetDeleteOnUseByDefault()
     {
         $this->tinyUrlsApi->getTinyUrl('http://mydomain.tld');
-        $tinyUrlRow = $this->getDatabaseConnection()->exec_SELECTgetSingleRow(
+        $tinyUrlRow = $this->getDatabaseConnection()->selectSingleRow(
             'delete_on_use',
             'tx_tinyurls_urls',
             'uid=1'
@@ -62,7 +62,7 @@ class TinyurlsApiTest extends FunctionalTestCase
     public function apiDoesNotSetValidationDateByDefault()
     {
         $this->tinyUrlsApi->getTinyUrl('http://mydomain.tld');
-        $tinyUrlRow = $this->getDatabaseConnection()->exec_SELECTgetSingleRow(
+        $tinyUrlRow = $this->getDatabaseConnection()->selectSingleRow(
             'valid_until',
             'tx_tinyurls_urls',
             'uid=1'
@@ -83,17 +83,30 @@ class TinyurlsApiTest extends FunctionalTestCase
     /**
      * @test
      */
+    public function apiSetsComment()
+    {
+        $this->tinyUrlsApi->setComment('My test comment');
+        $this->tinyUrlsApi->getTinyUrl('http://mydomain.tld');
+        $tinyUrlRow = $this->getDatabaseConnection()->selectSingleRow(
+            'comment',
+            'tx_tinyurls_urls',
+            'uid=1'
+        );
+        $this->assertEquals('My test comment', $tinyUrlRow['comment']);
+    }
+
+    /**
+     * @test
+     */
     public function apiSetsDeleteOnUseIfConfiguredInTypoScript()
     {
-        $typoScript = array(
-            'tinyurl.' => array(
-                'deleteOnUse' => 1,
-            )
-        );
+        $typoScript = [
+            'tinyurl.' => ['deleteOnUse' => 1],
+        ];
         $contentObject = GeneralUtility::makeInstance(ContentObjectRenderer::class);
         $this->tinyUrlsApi->initializeConfigFromTyposcript($typoScript, $contentObject);
         $this->tinyUrlsApi->getTinyUrl('http://mydomain.tld');
-        $tinyUrlRow = $this->getDatabaseConnection()->exec_SELECTgetSingleRow(
+        $tinyUrlRow = $this->getDatabaseConnection()->selectSingleRow(
             'delete_on_use',
             'tx_tinyurls_urls',
             'uid=1'
@@ -108,7 +121,7 @@ class TinyurlsApiTest extends FunctionalTestCase
     {
         $this->tinyUrlsApi->setDeleteOnUse(true);
         $this->tinyUrlsApi->getTinyUrl('http://mydomain.tld');
-        $tinyUrlRow = $this->getDatabaseConnection()->exec_SELECTgetSingleRow(
+        $tinyUrlRow = $this->getDatabaseConnection()->selectSingleRow(
             'delete_on_use',
             'tx_tinyurls_urls',
             'uid=1'
@@ -121,16 +134,14 @@ class TinyurlsApiTest extends FunctionalTestCase
      */
     public function apiSetsValidUntilIfConfiguredInTypoScript()
     {
-        $validUntilTimestamp = 20000;
-        $typoScript = array(
-            'tinyurl.' => array(
-                'validUntil' => $validUntilTimestamp,
-            )
-        );
+        $validUntilTimestamp = time() + 1000;
+        $typoScript = [
+            'tinyurl.' => ['validUntil' => $validUntilTimestamp],
+        ];
         $contentObject = GeneralUtility::makeInstance(ContentObjectRenderer::class);
         $this->tinyUrlsApi->initializeConfigFromTyposcript($typoScript, $contentObject);
         $this->tinyUrlsApi->getTinyUrl('http://mydomain.tld');
-        $tinyUrlRow = $this->getDatabaseConnection()->exec_SELECTgetSingleRow(
+        $tinyUrlRow = $this->getDatabaseConnection()->selectSingleRow(
             'valid_until',
             'tx_tinyurls_urls',
             'uid=1'
@@ -143,10 +154,10 @@ class TinyurlsApiTest extends FunctionalTestCase
      */
     public function apiSetsValidationDateIfRequested()
     {
-        $validUntilTimestamp = 20000;
+        $validUntilTimestamp = time() + 2000;
         $this->tinyUrlsApi->setValidUntil($validUntilTimestamp);
         $this->tinyUrlsApi->getTinyUrl('http://mydomain.tld');
-        $tinyUrlRow = $this->getDatabaseConnection()->exec_SELECTgetSingleRow(
+        $tinyUrlRow = $this->getDatabaseConnection()->selectSingleRow(
             'valid_until',
             'tx_tinyurls_urls',
             'uid=1'

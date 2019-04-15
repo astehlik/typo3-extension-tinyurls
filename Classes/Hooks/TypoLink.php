@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace Tx\Tinyurls\Hooks;
 
 /*                                                                        *
@@ -23,6 +25,11 @@ use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
 class TypoLink
 {
     /**
+     * @var Api
+     */
+    protected $tinyUrlApi;
+
+    /**
      * Will be called by the typolink hook and replace the original url
      * with a tinyurl if this was set in the typolink configuration.
      *
@@ -35,7 +42,7 @@ class TypoLink
      *
      * @param ContentObjectRenderer $contentObject The parent content object
      */
-    public function convertTypolinkToTinyUrl($parameters, $contentObject)
+    public function convertTypolinkToTinyUrl(array $parameters, ContentObjectRenderer $contentObject)
     {
         $config = $parameters['conf'];
         $finalTagParts = $parameters['finalTagParts'];
@@ -50,7 +57,7 @@ class TypoLink
 
         $targetUrl = $finalTagParts['url'];
 
-        $tinyUrlApi = GeneralUtility::makeInstance(Api::class);
+        $tinyUrlApi = $this->getTinyUrlApi();
         $tinyUrlApi->initializeConfigFromTyposcript($config, $contentObject);
         $tinyUrl = $tinyUrlApi->getTinyUrl($targetUrl);
 
@@ -61,5 +68,25 @@ class TypoLink
         );
         $parameters['finalTagParts']['url'] = $tinyUrl;
         $contentObject->lastTypoLinkUrl = $tinyUrl;
+    }
+
+    /**
+     * @param Api $tinyUrlApi
+     */
+    public function setTinyUrlApi(Api $tinyUrlApi)
+    {
+        $this->tinyUrlApi = $tinyUrlApi;
+    }
+
+    /**
+     * @return Api
+     * @codeCoverageIgnore
+     */
+    protected function getTinyUrlApi(): Api
+    {
+        if ($this->tinyUrlApi === null) {
+            $this->tinyUrlApi = GeneralUtility::makeInstance(Api::class);
+        }
+        return $this->tinyUrlApi;
     }
 }

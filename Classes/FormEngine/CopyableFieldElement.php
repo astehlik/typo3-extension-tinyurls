@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace Tx\Tinyurls\FormEngine;
 
 /*                                                                        *
@@ -11,6 +13,7 @@ namespace Tx\Tinyurls\FormEngine;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
+use Tx\Tinyurls\Utils\GeneralUtilityWrapper;
 use TYPO3\CMS\Backend\Form\AbstractNode;
 use TYPO3\CMS\Backend\Form\NodeInterface;
 use TYPO3\CMS\Core\Imaging\Icon;
@@ -24,6 +27,39 @@ use TYPO3\CMS\Fluid\View\StandaloneView;
  */
 class CopyableFieldElement extends AbstractNode implements NodeInterface
 {
+    const TEMPLATE_PATH = 'EXT:tinyurls/Resources/Private/Templates/FormEngine/CopyableField.html';
+
+    /**
+     * @var StandaloneView
+     */
+    protected $formFieldView;
+
+    /**
+     * @var GeneralUtilityWrapper
+     */
+    protected $generalUtility;
+
+    /**
+     * @var IconFactory
+     */
+    protected $iconFactory;
+
+    /**
+     * @param GeneralUtilityWrapper $generalUtility
+     */
+    public function injectGeneralUtilityWrapper(GeneralUtilityWrapper $generalUtility)
+    {
+        $this->generalUtility = $generalUtility;
+    }
+
+    /**
+     * @param IconFactory $iconFactory
+     */
+    public function injectIconFactory(IconFactory $iconFactory)
+    {
+        $this->iconFactory = $iconFactory;
+    }
+
     /**
      * Renders the copyable field and loads all required JavaScript / language files.
      *
@@ -33,8 +69,8 @@ class CopyableFieldElement extends AbstractNode implements NodeInterface
     {
         $result = $this->initializeResultArray();
 
-
         $template = $this->getFormFieldView();
+        $this->initializeFormFieldViewTemplatePath($template);
         $template->assign('fieldValue', $this->getFieldValue());
         $template->assign('clipboardIcon', $this->getClipboardIcon());
         $result['html'] = $template->render();
@@ -47,30 +83,39 @@ class CopyableFieldElement extends AbstractNode implements NodeInterface
     }
 
     /**
+     * @param StandaloneView $formFieldView
+     */
+    public function setFormFieldView(StandaloneView $formFieldView)
+    {
+        $this->formFieldView = $formFieldView;
+    }
+
+    /**
      * Uses the icon factory to build a clipboard icon.
      *
      * @return string
      */
-    protected function getClipboardIcon()
+    protected function getClipboardIcon(): string
     {
-        $iconFactory = GeneralUtility::makeInstance(IconFactory::class);
+        $iconFactory = $this->getIconFactory();
         return $iconFactory->getIcon('actions-edit-copy', Icon::SIZE_SMALL)->render();
     }
 
     /**
      * Returns the value that should be displayed in the field.
+     *
      * If configured, a custom user function is called to retrieve the value.
      * Otherwise the current field value is used.
      *
      * @return string
      */
-    protected function getFieldValue()
+    protected function getFieldValue(): string
     {
         $parameterArray = $this->data['parameterArray'];
         if (empty($parameterArray['fieldConf']['config']['valueFunc'])) {
             return $parameterArray['itemFormElValue'];
         }
-        return GeneralUtility::callUserFunction(
+        return (string)$this->generalUtility->callUserFunction(
             $parameterArray['fieldConf']['config']['valueFunc'],
             $this->data,
             $this
@@ -78,16 +123,45 @@ class CopyableFieldElement extends AbstractNode implements NodeInterface
     }
 
     /**
-     * Returns a Fluid standalone view for the copyable form field template.
-     *
      * @return StandaloneView
+     * @codeCoverageIgnore
      */
-    protected function getFormFieldView()
+    protected function getFormFieldView(): StandaloneView
     {
-        $template = GeneralUtility::makeInstance(StandaloneView::class);
+        if ($this->formFieldView === null) {
+            $this->formFieldView = GeneralUtility::makeInstance(StandaloneView::class);
+        }
+        return $this->formFieldView;
+    }
+
+    /**
+     * @return GeneralUtilityWrapper
+     * @codeCoverageIgnore
+     */
+    protected function getGeneralUtility(): GeneralUtilityWrapper
+    {
+        if ($this->generalUtility === null) {
+            $this->generalUtility = GeneralUtility::makeInstance(GeneralUtilityWrapper::class);
+        }
+        return $this->generalUtility;
+    }
+
+    /**
+     * @return IconFactory
+     * @codeCoverageIgnore
+     */
+    protected function getIconFactory(): IconFactory
+    {
+        if ($this->iconFactory === null) {
+            $this->iconFactory = GeneralUtility::makeInstance(IconFactory::class);
+        }
+        return $this->iconFactory;
+    }
+
+    protected function initializeFormFieldViewTemplatePath(StandaloneView $template)
+    {
         $template->setTemplatePathAndFilename(
-            GeneralUtility::getFileAbsFileName('EXT:tinyurls/Resources/Private/Templates/FormEngine/CopyableField.html')
+            $this->getGeneralUtility()->getFileAbsFileName(static::TEMPLATE_PATH)
         );
-        return $template;
     }
 }

@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace Tx\Tinyurls\Hooks;
 
 /*                                                                        *
@@ -11,8 +13,11 @@ namespace Tx\Tinyurls\Hooks;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
-use Tx\Tinyurls\Utils\UrlUtils;
-use TYPO3\CMS\Backend\Utility\BackendUtility;
+use Tx\Tinyurls\Domain\Model\TinyUrl;
+use Tx\Tinyurls\Domain\Repository\TinyUrlRepository;
+use Tx\Tinyurls\Exception\TinyUrlNotFoundException;
+use Tx\Tinyurls\Object\ImplementationManager;
+use TYPO3\CMS\Core\DataHandling\DataHandler;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
@@ -24,18 +29,30 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 class TceDataMap
 {
     /**
-     * Tiny URL utilities
+     * The DataHandler instance that calls the hook.
      *
-     * @var UrlUtils
+     * @var DataHandler
      */
-    protected $urlUtils;
+    protected $dataHandler;
 
     /**
-     * Initializes the URL utils
+     * @var bool
      */
-    public function __construct()
+    protected $isNewRecord;
+
+    /**
+     * @var TinyUrl
+     */
+    protected $tinyUrl;
+
+    /**
+     * @var TinyUrlRepository
+     */
+    protected $tinyUrlRepository;
+
+    public function injectTinyUrlRepository(TinyUrlRepository $tinyUrlRepository)
     {
-        $this->urlUtils = GeneralUtility::makeInstance(UrlUtils::class);
+        $this->tinyUrlRepository = $tinyUrlRepository;
     }
 
     /**
@@ -43,54 +60,97 @@ class TceDataMap
      *
      * @param string $status (reference) Status of the current operation, 'new' or 'update
      * @param string $table (refrence) The table currently processing data for
-     * @param string $id (reference) The record uid currently processing data for, [integer] or [string] (like 'NEW...')
+     * @param string $recordId (reference) Uid of the currently processed record, [integer] or [string] (like 'NEW...')
      * @param array $fieldArray (reference) The field array of a record
-     * @param \TYPO3\CMS\Core\DataHandling\DataHandler $tcemain Reference to the TCEmain object that calls this hook
+     * @param DataHandler $tcemain Reference to the TCEmain object that calls this hook
      * @see t3lib_TCEmain::hook_processDatamap_afterDatabaseOperations()
+     * @SuppressWarnings(PHPMD.CamelCaseMethodName)
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     public function processDatamap_afterDatabaseOperations(
         /** @noinspection PhpUnusedParameterInspection */
-        $status,
-        $table,
-        $id,
-        &$fieldArray,
-        $tcemain
+        string $status,
+        string $table,
+        $recordId,
+        array &$fieldArray,
+        DataHandler $tcemain
     ) {
-        if ($table != 'tx_tinyurls_urls') {
+        if ($table != TinyUrlRepository::TABLE_URLS) {
             return;
         }
 
-        $regenerateUrlKey = false;
+        $this->dataHandler = $tcemain;
+        $this->isNewRecord = $this->isNewRecord($recordId);
 
-        if (GeneralUtility::isFirstPartOfStr($id, 'NEW')) {
-            $id = $tcemain->substNEWwithIDs[$id];
-            $regenerateUrlKey = true;
+        $tinyUrlId = $this->getTinyUrlIdFromDataHandlerIfNew($recordId);
+
+        try {
+            $this->tinyUrl = $this->getTinyUrlRepository()->findTinyUrlByUid($tinyUrlId);
+        } catch (TinyUrlNotFoundException $exception) {
+            return;
         }
 
-        $tinyUrlData = BackendUtility::getRecord('tx_tinyurls_urls', $id);
-        $updateArray['target_url_hash'] = $this->urlUtils->generateTinyurlHash($tinyUrlData['target_url']);
+        $updateArray = $this->updateTinyUrlAndGetChangedFields();
 
-        // If the hash has changed we regenerate the URL key
-        if ($updateArray['target_url_hash'] !== $tinyUrlData['target_url_hash']) {
-            $regenerateUrlKey = true;
+        if ($updateArray === []) {
+            return;
         }
 
-        if ($regenerateUrlKey) {
-            $updateArray['urlkey'] = $this->urlUtils->generateTinyurlKeyForUid($id);
-        }
-
-        // Update the data in the field array so that it is consistent
-        // with the data in the database.
+        // Update the data in the field array so that it is consistent with the data in the database.
         $fieldArray = array_merge($fieldArray, $updateArray);
 
-        $this->getDatabaseConnection()->exec_UPDATEquery('tx_tinyurls_urls', 'uid=' . $id, $updateArray);
+        $this->getTinyUrlRepository()->updateTinyUrl($this->tinyUrl);
+    }
+
+    protected function getTinyUrlIdFromDataHandlerIfNew($originalId): int
+    {
+        if ($this->isNewRecord) {
+            $tinyUrlId = (int)$this->dataHandler->substNEWwithIDs[$originalId];
+        } else {
+            $tinyUrlId = (int)$originalId;
+        }
+
+        return $tinyUrlId;
     }
 
     /**
-     * @return \TYPO3\CMS\Core\Database\DatabaseConnection
+     * @return TinyUrlRepository
+     * @codeCoverageIgnore
      */
-    protected function getDatabaseConnection()
+    protected function getTinyUrlRepository(): TinyUrlRepository
     {
-        return $GLOBALS['TYPO3_DB'];
+        if ($this->tinyUrlRepository === null) {
+            $this->tinyUrlRepository = ImplementationManager::getInstance()->getTinyUrlRepository();
+        }
+        return $this->tinyUrlRepository;
+    }
+
+    protected function isNewRecord($recordId): bool
+    {
+        return GeneralUtility::isFirstPartOfStr($recordId, 'NEW');
+    }
+
+    protected function shouldUrlKeyBeRegenerated(): bool
+    {
+        if ($this->isNewRecord) {
+            return true;
+        }
+        return $this->tinyUrl->getTargetUrlHasChanged();
+    }
+
+    protected function updateTinyUrlAndGetChangedFields(): array
+    {
+        $updateArray = [];
+
+        if ($this->tinyUrl->getTargetUrlHasChanged()) {
+            $updateArray['target_url_hash'] = $this->tinyUrl->getTargetUrlHash();
+        }
+
+        if ($this->shouldUrlKeyBeRegenerated()) {
+            $this->tinyUrl->regenerateUrlKey();
+            $updateArray['urlkey'] = $this->tinyUrl->getUrlkey();
+        }
+
+        return $updateArray;
     }
 }

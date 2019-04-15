@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace Tx\Tinyurls\Utils;
 
 /*                                                                        *
@@ -11,8 +13,9 @@ namespace Tx\Tinyurls\Utils;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
-use TYPO3\CMS\Core\Html\HtmlParser;
-use TYPO3\CMS\Core\Service\MarkerBasedTemplateService;
+use Tx\Tinyurls\Configuration\ExtensionConfiguration;
+use Tx\Tinyurls\Domain\Model\TinyUrl;
+use Tx\Tinyurls\Object\ImplementationManager;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -24,57 +27,50 @@ class UrlUtils implements SingletonInterface
     /**
      * Contains the extension configration
      *
-     * @var ConfigUtils
+     * @var ExtensionConfiguration
      */
-    protected $configUtils;
+    protected $extensionConfiguration;
 
     /**
-     * Initializes the extension configuration
+     * @var GeneralUtilityWrapper
      */
-    public function __construct()
+    protected $generalUtility;
+
+    public function injectExtensionConfiguration(ExtensionConfiguration $extensionConfiguration)
     {
-        $this->configUtils = $this->getConfigUtils();
+        $this->extensionConfiguration = $extensionConfiguration;
     }
 
-    /**
-     * This mehtod converts the given base 10 integer to a base62
-     *
-     * Thanks to http://jeremygibbs.com/2012/01/16/how-to-make-a-url-shortener
-     *
-     * @param int $base10Integer The integer that will converted
-     * @param string $base62Dictionary the dictionary for generating the base62 integer
-     * @return string A base62 encoded integer using a custom dictionary
-     */
-    protected function convertIntToBase62($base10Integer, $base62Dictionary)
+    public function injectGeneralUtility(GeneralUtilityWrapper $generalUtility)
     {
-        $base62Integer = '';
-        $base = 62;
+        $this->generalUtility = $generalUtility;
+    }
 
-        do {
-            $base62Integer = $base62Dictionary[($base10Integer % $base)] . $base62Integer;
-            $base10Integer = floor($base10Integer / $base);
-        } while ($base10Integer > 0);
-
-        return $base62Integer;
+    public function buildTinyUrl(string $tinyUrlKey): string
+    {
+        if ($this->getExtensionConfiguration()->areSpeakingUrlsEnabled()) {
+            $tinyUrl = $this->createSpeakingTinyUrl($tinyUrlKey);
+            return $tinyUrl;
+        } else {
+            $tinyUrl = $this->getGeneralUtility()->getIndpEnv('TYPO3_SITE_URL');
+            $tinyUrl .= '?eID=tx_tinyurls&tx_tinyurls[key]=' . $tinyUrlKey;
+            return $tinyUrl;
+        }
     }
 
     /**
      * Generates a speaking tinyurl based on the speaking url template
      *
-     * @param $tinyUrlKey
+     * @param string $tinyUrlKey
      * @return string
      */
-    public function createSpeakingTinyUrl($tinyUrlKey)
+    public function createSpeakingTinyUrl(string $tinyUrlKey): string
     {
-        $speakingUrl = $this->configUtils->getExtensionConfigurationValue('speakingUrlTemplate');
+        $speakingUrl = $this->getExtensionConfiguration()->getSpeakingUrlTemplate();
 
-        $speakingUrl = $this->getMarkerBasedTemplateService()->substituteMarker(
-            $speakingUrl,
-            '###TINY_URL_KEY###',
-            $tinyUrlKey
-        );
+        $speakingUrl = str_replace('###TINY_URL_KEY###', $tinyUrlKey, $speakingUrl);
 
-        $matches = array();
+        $matches = [];
         preg_match_all('/###(.*?)###/', $speakingUrl, $matches);
 
         if (empty($matches[1])) {
@@ -82,10 +78,10 @@ class UrlUtils implements SingletonInterface
         }
 
         foreach ($matches[1] as $match) {
-            $speakingUrl = $this->getMarkerBasedTemplateService()->substituteMarker(
-                $speakingUrl,
+            $speakingUrl = str_replace(
                 '###' . $match . '###',
-                $this->getIndependentEnvironmentVariable($match)
+                $this->getGeneralUtility()->getIndpEnv($match),
+                $speakingUrl
             );
         }
 
@@ -93,67 +89,53 @@ class UrlUtils implements SingletonInterface
     }
 
     /**
-     * Generates a unique tinyurl key for the record with the given UID
-     *
-     * @param int $insertedUid
-     * @return array
-     */
-    public function generateTinyurlKeyForUid($insertedUid)
-    {
-        $tinyUrlKey = $this->convertIntToBase62(
-            $insertedUid,
-            $this->configUtils->getExtensionConfigurationValue('base62Dictionary')
-        );
-
-        $numberOfFillupChars =
-            $this->configUtils->getExtensionConfigurationValue('minimalTinyurlKeyLength') - strlen($tinyUrlKey);
-
-        if ($numberOfFillupChars < $this->configUtils->getExtensionConfigurationValue('minimalRandomKeyLength')) {
-            $numberOfFillupChars = $this->configUtils->getExtensionConfigurationValue('minimalRandomKeyLength');
-        }
-
-        if ($numberOfFillupChars < 1) {
-            return $tinyUrlKey;
-        }
-
-        $tinyUrlKey .= '-' . GeneralUtility::getRandomHexString($numberOfFillupChars);
-
-        return $tinyUrlKey;
-    }
-
-    /**
      * Generates a sha1 hash of the given URL
      *
+     * @deprecated Use TinyUrl model for hash generation instead.
      * @param string $url
      * @return string
      */
-    public function generateTinyurlHash($url)
+    public function generateTinyurlHash(string $url): string
     {
-        return sha1($url);
+        $tinyUrl = TinyUrl::createNew();
+        $tinyUrl->setTargetUrl($url);
+        return $tinyUrl->getTargetUrlHash();
     }
 
     /**
-     * @param string $indpEnvKey
+     * Generates a unique tinyurl key for the record with the given UID
+     *
+     * @deprecated Use the UrlKeyGenerator for generating the URL key.
+     * @param int $uid
      * @return string
      */
-    protected function getIndependentEnvironmentVariable($indpEnvKey)
+    public function generateTinyurlKeyForUid(int $uid): string
     {
-        return GeneralUtility::getIndpEnv($indpEnvKey);
+        $urlKeyGenerator = ImplementationManager::getInstance()->getUrlKeyGenerator();
+        return $urlKeyGenerator->generateTinyurlKeyForUid($uid);
     }
 
     /**
-     * @return ConfigUtils
+     * @return ExtensionConfiguration
+     * @codeCoverageIgnore
      */
-    protected function getConfigUtils()
+    protected function getExtensionConfiguration(): ExtensionConfiguration
     {
-        return GeneralUtility::makeInstance(ConfigUtils::class);
+        if ($this->extensionConfiguration === null) {
+            $this->extensionConfiguration = GeneralUtility::makeInstance(ExtensionConfiguration::class);
+        }
+        return $this->extensionConfiguration;
     }
 
     /**
-     * @return MarkerBasedTemplateService
+     * @return GeneralUtilityWrapper
+     * @codeCoverageIgnore
      */
-    protected function getMarkerBasedTemplateService()
+    protected function getGeneralUtility(): GeneralUtilityWrapper
     {
-        return GeneralUtility::makeInstance(MarkerBasedTemplateService::class);
+        if ($this->generalUtility === null) {
+            $this->generalUtility = GeneralUtility::makeInstance(GeneralUtilityWrapper::class);
+        }
+        return $this->generalUtility;
     }
 }

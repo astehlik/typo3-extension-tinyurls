@@ -1,7 +1,6 @@
-
 page = PAGE
 page.10 = TEXT
 page.10 {
-	typolink.parameter = http://mydomain.tld
-	typolink.tinyurl = 1
+    typolink.parameter = http://mydomain.tld
+    typolink.tinyurl = 1
 }

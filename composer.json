@@ -2,7 +2,7 @@
     "name": "de-swebhosting-typo3-extension/tinyurls",
     "description": "This extensions allows you to cut down long URLs. It basically works like bitly or TinyURL.",
     "type": "typo3-cms-extension",
-    "license": "GPL-3.0+",
+    "license": "GPL-3.0-or-later",
     "authors": [
         {
             "name": "Alexander Stehlik",
@@ -16,17 +16,15 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Tx\\Tinyurls\\Tests\\": "Tests/",
-            "TYPO3\\CMS\\Core\\Tests\\": ".Build/vendor/typo3/cms/typo3/sysext/core/Tests/"
+            "Tx\\Tinyurls\\Tests\\": "Tests/"
         }
     },
     "require": {
-        "typo3/cms-core": "^7.6|^8.0"
+        "php": "^7.0",
+        "typo3/cms-core": "^7.6|^8.7|^9.3"
     },
     "require-dev": {
-        "namelesscoder/typo3-repository-client": "1.1.x-dev",
-        "phpunit/phpunit": "~4.8.0",
-        "squizlabs/php_codesniffer": "^2.6"
+        "phpunit/phpunit": "^6.0"
     },
     "replace": {
         "tinyurls": "self.version",

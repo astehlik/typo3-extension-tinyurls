@@ -1,0 +1,6 @@
+page = PAGE
+page.10 = FLUIDTEMPLATE
+page.10 {
+    templateName = TinyurlViewHelper
+    templateRootPaths.10 = EXT:tinyurls/Tests/Functional/Fixtures/Templates
+}
