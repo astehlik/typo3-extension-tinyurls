@@ -31,13 +31,15 @@ fi
 
 echo "Extracted tag message: $TAG_MESSAGE"
 
-echo "Installing TYPO3 repository client..."
-
-composer create-project --no-dev namelesscoder/typo3-repository-client typo3-repository-client
 
 echo "Renaming repository folder to match extension key..."
 cd ..
 mv typo3-extension-tinyurls tinyurls
+
+echo "Installing TYPO3 repository client..."
+
+composer create-project --no-dev namelesscoder/typo3-repository-client typo3-repository-client
+
 cd tinyurls
 
 echo "Setting version to ${TRAVIS_TAG#"v"}"
