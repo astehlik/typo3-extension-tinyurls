@@ -22,7 +22,7 @@ if [[ -z "$TYPO3_ORG_PASSWORD" ]]; then
     exit 1
 fi
 
-TAG_MESSAGE=`git tag -n10 -l ${TRAVIS_TAG} | sed 's/^[0-9.]*[ ]*//g'`
+TAG_MESSAGE=`git tag -n10 -l ${TRAVIS_TAG} | sed 's/^v[0-9.]*[ ]*//g'`
 
 if [[ -z "$TAG_MESSAGE" ]]; then
     echo "The tag message could not be detected or was empty."
