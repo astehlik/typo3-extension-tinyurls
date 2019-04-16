@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+extensionName="tinyurls"
+projectDirectory="typo3-extension-tinyurls"
+
 set -ev
 
 phpenv config-rm xdebug.ini
@@ -34,13 +37,13 @@ echo "Extracted tag message: $TAG_MESSAGE"
 
 echo "Renaming repository folder to match extension key..."
 cd ..
-mv typo3-extension-tinyurls tinyurls
+mv "${projectDirectory}" "${extensionName}"
 
 echo "Installing TYPO3 repository client..."
 
 composer create-project --no-dev namelesscoder/typo3-repository-client typo3-repository-client
 
-cd tinyurls
+cd ${extensionName}
 
 echo "Setting version to ${TRAVIS_TAG#"v"}"
 ../typo3-repository-client/bin/setversion ${TRAVIS_TAG#"v"}
