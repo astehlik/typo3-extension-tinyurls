@@ -59,10 +59,6 @@ jobs:
       php: "7.3"
       script: ./.travis/test_lint.sh
 
-    - name: "Functional tests PHP 7.0 TYPO3 8"
-      php: "7.0"
-      env: TYPO3_VERSION="typo3/cms=^8.7"
-      script: ./.travis/test_functional.sh
     - name: "Functional tests PHP 7.1 TYPO3 8"
       php: "7.1"
       env: TYPO3_VERSION="typo3/cms=^8.7"
