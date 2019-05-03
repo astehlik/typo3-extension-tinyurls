@@ -12,6 +12,11 @@ addons:
     packages:
       - parallel
 
+stages:
+  - test
+  - name: deploy
+    if: tag
+
 before_install:
   - composer self-update
   - composer --version
@@ -24,41 +29,61 @@ before_script:
 jobs:
   include:
     - stage: test
+      name: "Composer validate"
+      php: "7.3"
+      script: composer validate
+    - name: "PHP code sniffer"
+      php: "7.3"
       script: ./.travis/test_phpcs.sh
-      env: BUILD_TYPE="PHP code sniffer"
-      php: 7.2
 
-    - script: ./.travis/test_phpunit.sh
-      php: 7.1
-      env: BUILD_TYPE="Unit tests" TYPO3_VERSION="typo3/cms=^8.7" UPLOAD_CODE_COVERAGE=yes
-    - script: ./.travis/test_phpunit.sh
-      php: 7.2
-      env: BUILD_TYPE="Unit tests" TYPO3_VERSION="typo3/minimal=^9.3"
-    - script: ./.travis/test_phpunit.sh
-      php: 7.2
-      env: BUILD_TYPE="Unit tests" TYPO3_VERSION="typo3/minimal=dev-master"
+    - name: "Unit tests PHP 7.0 TYPO3 8"
+      php: "7.0"
+      env: TYPO3_VERSION="typo3/cms=^8.7"
+      script: ./.travis/test_phpunit.sh
+    - name: "Unit tests PHP 7.1 TYPO3 8"
+      php: "7.1"
+      env: TYPO3_VERSION="typo3/cms=^8.7" UPLOAD_CODE_COVERAGE=yes
+      script: ./.travis/test_phpunit.sh
+    - name: "Unit tests PHP 7.2 TYPO3 9"
+      php: "7.2"
+      env: TYPO3_VERSION="typo3/minimal=^9.3"
+      script: ./.travis/test_phpunit.sh
+    - name: "Unit tests PHP 7.3 TYPO3 master"
+      php: "7.3"
+      env: TYPO3_VERSION="typo3/minimal=dev-master"
+      script: ./.travis/test_phpunit.sh
 
-    - script: ./.travis/test_lint.sh
-      php: 7.0
-      env: BUILD_TYPE="PHP lint"
-    - script: ./.travis/test_lint.sh
-      php: 7.1
-      env: BUILD_TYPE="PHP lint"
-    - script: ./.travis/test_lint.sh
-      php: 7.2
-      env: BUILD_TYPE="PHP lint"
+    - name: "PHP linting PHP 7.0"
+      php: "7.0"
+      script: ./.travis/test_lint.sh
+    - name: "PHP linting PHP 7.1"
+      php: "7.1"
+      script: ./.travis/test_lint.sh
+    - name: "PHP linting PHP 7.2"
+      php: "7.2"
+      script: ./.travis/test_lint.sh
+    - name: "PHP linting PHP 7.3"
+      php: "7.3"
+      script: ./.travis/test_lint.sh
 
-    - script: ./.travis/test_functional.sh
-      php: 7.1
-      env: BUILD_TYPE="Functional tests" TYPO3_VERSION="typo3/cms=^8.7"
-    - script: ./.travis/test_functional.sh
-      php: 7.2
-      env: BUILD_TYPE="Functional tests" TYPO3_VERSION="typo3/minimal=^9.3"
-    - script: ./.travis/test_functional.sh
-      php: 7.2
-      env: BUILD_TYPE="Functional tests" TYPO3_VERSION="typo3/minimal=dev-master"
+    - name: "Functional tests PHP 7.0 TYPO3 8"
+      php: "7.0"
+      env: TYPO3_VERSION="typo3/cms=^8.7"
+      script: ./.travis/test_functional.sh
+    - name: "Functional tests PHP 7.1 TYPO3 8"
+      php: "7.1"
+      env: TYPO3_VERSION="typo3/cms=^8.7"
+      script: ./.travis/test_functional.sh
+    - name: "Functional tests PHP 7.2 TYPO3 8"
+      php: "7.2"
+      env: TYPO3_VERSION="typo3/minimal=^9.3"
+      script: ./.travis/test_functional.sh
+    - name: "Functional tests PHP 7.2 TYPO3 master"
+      php: "7.3"
+      env: TYPO3_VERSION="typo3/minimal=dev-master"
+      script: ./.travis/test_functional.sh
 
     - stage: deploy
+      name: "Deploy to TER"
+      php: "7.3"
       script: ./.travis/deploy_ter.sh
-      env: BUILD_TYPE="TER upload"
-      php: 7.2
