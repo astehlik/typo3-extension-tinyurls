@@ -13,27 +13,25 @@ namespace Tx\Tinyurls\Tests\Unit\ViewHelpers;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
-use PHPUnit\Framework\TestCase;
+use Closure;
+use Nimut\TestingFramework\TestCase\ViewHelperBaseTestcase;
+use PHPUnit_Framework_MockObject_MockObject;
 use Tx\Tinyurls\TinyUrl\Api;
 use Tx\Tinyurls\ViewHelpers\TinyurlViewHelper;
 
-class TinyurlViewHelperTest extends TestCase
+class TinyurlViewHelperTest extends ViewHelperBaseTestcase
 {
     /**
-     * @var Api|\PHPUnit_Framework_MockObject_MockObject
+     * @var Api|PHPUnit_Framework_MockObject_MockObject
      */
     protected $tinyUrlApi;
 
-    /**
-     * @var TinyurlViewHelper
-     */
-    protected $tinyurlViewHelper;
-
-    protected function setUp()
+    public function setUp()
     {
+        parent::setUp();
+
         $this->tinyUrlApi = $this->createMock(Api::class);
-        $this->tinyurlViewHelper = new TinyurlViewHelper();
-        $this->tinyurlViewHelper->setTinyUrlApi($this->tinyUrlApi);
+        TinyurlViewHelper::setTinyUrlApi($this->tinyUrlApi);
     }
 
     public function testCustomUrlKeyIsPassedToTinyUrlApi()
@@ -42,22 +40,13 @@ class TinyurlViewHelperTest extends TestCase
             ->method('setUrlKey')
             ->with('theurl-key')
             ->willReturn('');
-        $this->tinyurlViewHelper->render('http://the-url.tld', false, 0, 'theurl-key');
-    }
 
-    public function testHtmlCharsInUrlAreEscapedIfRequired()
-    {
-        $this->tinyUrlApi->expects($this->once())
-            ->method('getTinyUrl')
-            ->willReturn('http://the-url.tld?test=1&test2=2');
+        $arguments = [
+            'url' => 'http://the-url.tld',
+            'urlKey' => 'theurl-key',
+        ];
 
-        $result = $this->tinyurlViewHelper->render('http://the-url.tld');
-
-        if (property_exists($this->tinyurlViewHelper, 'escapeOutput')) {
-            $this->assertEquals('http://the-url.tld?test=1&test2=2', $result);
-        } else {
-            $this->assertEquals('http://the-url.tld?test=1&amp;test2=2', $result);
-        }
+        $this->callRenderStatic($arguments);
     }
 
     public function testOnlyOneTimeValidSetsDeleteOnUse()
@@ -67,23 +56,25 @@ class TinyurlViewHelperTest extends TestCase
             ->with(true)
             ->willReturn('');
 
-        $this->tinyurlViewHelper->render('http://www.url.tld', true);
+        $arguments = [
+            'url' => 'http://www.url.tld',
+            'onlyOneTimeValid' => true,
+        ];
+        $this->callRenderStatic($arguments);
     }
 
     public function testRetrievesUrlFromRenderChildrenIfNotProvidedAsArgument()
     {
-        $this->tinyurlViewHelper->setRenderChildrenClosure(
-            function () {
-                return 'http://the-children-url.tld';
-            }
-        );
+        $renderChildrenClosure = function () {
+            return 'http://the-children-url.tld';
+        };
 
         $this->tinyUrlApi->expects($this->once())
             ->method('getTinyUrl')
             ->with('http://the-children-url.tld')
             ->willReturn('');
 
-        $this->tinyurlViewHelper->render();
+        $this->callRenderStaticWithRenderChildrenClosure([], $renderChildrenClosure);
     }
 
     public function testUrlIsPassedToTinyUrlApi()
@@ -92,7 +83,9 @@ class TinyurlViewHelperTest extends TestCase
             ->method('getTinyUrl')
             ->with('http://the-url.tld')
             ->willReturn('');
-        $this->tinyurlViewHelper->render('http://the-url.tld');
+
+        $arguments = ['url' => 'http://the-url.tld'];
+        $this->callRenderStatic($arguments);
     }
 
     public function testValidUntilIsPassedToTinyUrlApi()
@@ -101,6 +94,42 @@ class TinyurlViewHelperTest extends TestCase
             ->method('setValidUntil')
             ->with(3848909)
             ->willReturn('');
-        $this->tinyurlViewHelper->render('http://the-url.tld', false, 3848909);
+
+        $arguments = [
+            'url' => 'http://the-url.tld',
+            'validUntil' => 3848909,
+        ];
+
+        $this->callRenderStatic($arguments);
+    }
+
+    private function buildArguments(array $arguments)
+    {
+        $viewHelper = new TinyurlViewHelper();
+        $argumentDefinitions = $viewHelper->prepareArguments();
+        foreach ($argumentDefinitions as $argumentName => $argumentDefinition) {
+            if (!isset($arguments[$argumentName])) {
+                $arguments[$argumentName] = $argumentDefinition->getDefaultValue();
+            }
+        }
+        return $arguments;
+    }
+
+    private function callRenderStatic(array $arguments)
+    {
+        $renderChildrenClosure = function () {
+            // Nothing to do here.
+        };
+
+        $this->callRenderStaticWithRenderChildrenClosure($arguments, $renderChildrenClosure);
+    }
+
+    private function callRenderStaticWithRenderChildrenClosure(array $arguments, Closure $renderChildrenClosure)
+    {
+        TinyurlViewHelper::renderStatic(
+            $this->buildArguments($arguments),
+            $renderChildrenClosure,
+            $this->renderingContext
+        );
     }
 }

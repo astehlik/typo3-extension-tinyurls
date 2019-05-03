@@ -12,8 +12,6 @@ else
     composer require ${TYPO3_VERSION}
 fi
 
-composer require --dev ${NIMUT_TESTING_FRAMEWORK}  --prefer-dist
-
 mkdir -p ".Build/Web/typo3temp/var/tests"
 
 export typo3DatabaseName="typo3"

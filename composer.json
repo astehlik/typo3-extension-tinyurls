@@ -21,10 +21,11 @@
     },
     "require": {
         "php": "^7.0",
-        "typo3/cms-core": "^7.6|^8.7|^9.3"
+        "typo3/cms-core": "^8.7|^9.3"
     },
     "require-dev": {
-        "phpunit/phpunit": "^6.0"
+        "phpunit/phpunit": "^7.0",
+        "nimut/testing-framework": "^4.1.5"
     },
     "replace": {
         "tinyurls": "self.version",
