@@ -7,6 +7,34 @@
                 <source>Counter</source>
                 <target>Zähler</target>
             </trans-unit>
+            <trans-unit id="tx_tinyurls_urls.comment">
+                <source>Comment</source>
+                <target>Kommentar</target>
+            </trans-unit>
+            <trans-unit id="tx_tinyurls_urls.url_key">
+                <source>URL key</source>
+                <target>URL Schlüssel</target>
+            </trans-unit>
+            <trans-unit id="tx_tinyurls_urls.tiny_url">
+                <source>Tiny URL</source>
+                <target>Tiny URL</target>
+            </trans-unit>
+            <trans-unit id="tx_tinyurls_urls.target_url">
+                <source>Target URL</source>
+                <target>Ziel URL</target>
+            </trans-unit>
+            <trans-unit id="tx_tinyurls_urls.target_url_hash">
+                <source>Target URL Hash</source>
+                <target>Ziel URL Hash</target>
+            </trans-unit>
+            <trans-unit id="tx_tinyurls_urls.delete_on_use">
+                <source>Delete on use</source>
+                <target>Bei Verwendung löschen</target>
+            </trans-unit>
+            <trans-unit id="tx_tinyurls_urls.valid_until">
+                <source>Valid until</source>
+                <target>Gültig bis</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>
