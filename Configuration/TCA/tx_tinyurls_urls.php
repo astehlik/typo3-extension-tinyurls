@@ -1,4 +1,6 @@
 <?php
+
+use Tx\Tinyurls\FormEngine\TinyUrlDisplay;
 use Tx\Tinyurls\Utils\CompatibilityWrapper;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -50,7 +52,7 @@ return [
             'label' => 'Tiny URL',
             'config' => [
                 'type' => 'tx_tinyurls_copyable_field',
-                'valueFunc' => \Tx\Tinyurls\FormEngine\TinyUrlDisplay::class . '->buildTinyUrlFormFormElementData',
+                'valueFunc' => TinyUrlDisplay::class . '->buildTinyUrlFormFormElementData',
                 'size' => 30,
             ],
         ],
