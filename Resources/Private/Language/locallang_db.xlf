@@ -6,6 +6,27 @@
             <trans-unit id="tx_tinyurls_urls.counter">
                 <source>Counter</source>
             </trans-unit>
+            <trans-unit id="tx_tinyurls_urls.comment">
+                <source>Comment</source>
+            </trans-unit>
+            <trans-unit id="tx_tinyurls_urls.url_key">
+                <source>URL key</source>
+            </trans-unit>
+            <trans-unit id="tx_tinyurls_urls.tiny_url">
+                <source>Tiny URL</source>
+            </trans-unit>
+            <trans-unit id="tx_tinyurls_urls.target_url">
+                <source>Target URL</source>
+            </trans-unit>
+            <trans-unit id="tx_tinyurls_urls.target_url_hash">
+                <source>Target URL Hash</source>
+            </trans-unit>
+            <trans-unit id="tx_tinyurls_urls.delete_on_use">
+                <source>Delete on use</source>
+            </trans-unit>
+            <trans-unit id="tx_tinyurls_urls.valid_until">
+                <source>Valid until</source>
+            </trans-unit>
         </body>
     </file>
 </xliff>
