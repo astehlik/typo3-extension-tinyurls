@@ -28,7 +28,6 @@
         "nimut/testing-framework": "^4.1.5"
     },
     "replace": {
-        "tinyurls": "self.version",
         "typo3-ter/tinyurls": "self.version"
     },
     "config": {
