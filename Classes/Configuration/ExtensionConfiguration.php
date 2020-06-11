@@ -13,7 +13,9 @@ namespace Tx\Tinyurls\Configuration;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
+use InvalidArgumentException;
 use Tx\Tinyurls\TinyUrl\TinyUrlGenerator;
+use TYPO3\CMS\Core\Configuration\ExtensionConfiguration as TYPO3ExtensionConfiguration;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
@@ -54,8 +56,8 @@ class ExtensionConfiguration implements SingletonInterface
      * if the user set his own values they are parsed through stdWrap
      *
      * @param array $config
-     * @param \TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer $contentObject
-     * @param \Tx\Tinyurls\TinyUrl\TinyUrlGenerator $tinyUrlGenerator
+     * @param ContentObjectRenderer $contentObject
+     * @param TinyUrlGenerator $tinyUrlGenerator
      * @deprecated Please use the TypoScriptConfigurator class instead.
      */
     public function initializeConfigFromTyposcript(
@@ -97,8 +99,8 @@ class ExtensionConfiguration implements SingletonInterface
     /**
      * Returns the extension configuration
      *
-     * @deprecated Please use the matching getter for retrieving a config value.
      * @return array
+     * @deprecated Please use the matching getter for retrieving a config value.
      */
     public function getExtensionConfiguration(): array
     {
@@ -109,10 +111,10 @@ class ExtensionConfiguration implements SingletonInterface
     /**
      * Returns an extension configuration value
      *
-     * @deprecated Please use the matching getter for retrieving the config value.
      * @param string $key the configuration key
      * @return mixed the configuration value
-     * @throws \InvalidArgumentException if the configuration key does not exist
+     * @throws InvalidArgumentException if the configuration key does not exist
+     * @deprecated Please use the matching getter for retrieving the config value.
      */
     public function getExtensionConfigurationValue(string $key)
     {
@@ -149,7 +151,7 @@ class ExtensionConfiguration implements SingletonInterface
         $this->initializeExtensionConfiguration();
 
         if (!array_key_exists($key, $this->extensionConfiguration)) {
-            throw new \InvalidArgumentException('The key ' . $key . ' does not exists in the extension configuration');
+            throw new InvalidArgumentException('The key ' . $key . ' does not exists in the extension configuration');
         }
 
         return $this->extensionConfiguration[$key];
@@ -181,16 +183,8 @@ class ExtensionConfiguration implements SingletonInterface
             return;
         }
 
-        $extensionConfiguration = [];
+        $extensionConfiguration = $this->loadExtensionConfiguration();
         $finalConfiguration = [];
-
-        if (isset($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['tinyurls'])) {
-            $extensionConfigurationData = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['tinyurls']);
-
-            if (is_array($extensionConfigurationData)) {
-                $extensionConfiguration = $extensionConfigurationData;
-            }
-        }
 
         foreach ($this->extensionConfigurationDefaults as $configKey => $defaultValue) {
             if (array_key_exists($configKey, $extensionConfiguration)) {
@@ -201,5 +195,11 @@ class ExtensionConfiguration implements SingletonInterface
         }
 
         $this->extensionConfiguration = $finalConfiguration;
+    }
+
+    private function loadExtensionConfiguration(): array
+    {
+        $extensionConfiguration = GeneralUtility::makeInstance(TYPO3ExtensionConfiguration::class);
+        return $extensionConfiguration->get('tinyurls');
     }
 }

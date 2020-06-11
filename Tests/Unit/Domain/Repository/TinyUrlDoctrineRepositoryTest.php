@@ -13,9 +13,13 @@ namespace Tx\Tinyurls\Tests\Unit\Domain\Repository;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
+use Closure;
+use DateTime;
 use Doctrine\DBAL\Driver\Statement;
+use InvalidArgumentException;
 use PHPUnit\Framework\Constraint\ArraySubset;
 use PHPUnit\Framework\Constraint\Callback;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Tx\Tinyurls\Configuration\ExtensionConfiguration;
 use Tx\Tinyurls\Database\StoragePageQueryRestriction;
@@ -31,25 +35,28 @@ use TYPO3\CMS\Core\Database\Query\QueryBuilder;
 use TYPO3\CMS\Core\Database\Query\Restriction\QueryRestrictionContainerInterface;
 use TYPO3\CMS\Extbase\Error\Result;
 
+/**
+ * @backupGlobals enabled
+ */
 class TinyUrlDoctrineRepositoryTest extends TestCase
 {
     /**
-     * @var Connection|\PHPUnit_Framework_MockObject_MockObject
+     * @var Connection|MockObject
      */
     protected $databaseConnectionMock;
 
     /**
-     * @var ConnectionPool|\PHPUnit_Framework_MockObject_MockObject
+     * @var ConnectionPool|MockObject
      */
     protected $databaseConnectionPoolMock;
 
     /**
-     * @var QueryBuilder|\PHPUnit_Framework_MockObject_MockObject
+     * @var QueryBuilder|MockObject
      */
     protected $databaseQueryBuilderMock;
 
     /**
-     * @var QueryRestrictionContainerInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var QueryRestrictionContainerInterface|MockObject
      */
     protected $databaseQueryRestrictionsContainerMock;
 
@@ -59,12 +66,13 @@ class TinyUrlDoctrineRepositoryTest extends TestCase
     protected $doctrineRepository;
 
     /**
-     * @var ExtensionConfiguration|\PHPUnit_Framework_MockObject_MockObject
+     * @var ExtensionConfiguration|MockObject
      */
     protected $extensionConfiugrationMock;
 
     protected function setUp()
     {
+        $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['tinyurls'] = [];
 
         $this->databaseConnectionMock = $this->createMock(Connection::class);
         $this->databaseConnectionPoolMock = $this->createMock(ConnectionPool::class);
@@ -253,7 +261,7 @@ class TinyUrlDoctrineRepositoryTest extends TestCase
     {
         $this->prepareInsertQuery(4845);
 
-        /** @var TinyUrl|\PHPUnit_Framework_MockObject_MockObject $tinyUrl */
+        /** @var TinyUrl|MockObject $tinyUrl */
         $tinyUrl = $this->createMock(TinyUrl::class);
         $tinyUrl->expects($this->once())->method('persistPostProcessInsert')->with(4845);
 
@@ -262,7 +270,7 @@ class TinyUrlDoctrineRepositoryTest extends TestCase
 
     public function testInsertNewTinyUrlPreProcessesTinyUrl()
     {
-        /** @var TinyUrl|\PHPUnit_Framework_MockObject_MockObject $tinyUrl */
+        /** @var TinyUrl|MockObject $tinyUrl */
         $tinyUrl = $this->createMock(TinyUrl::class);
         $tinyUrl->expects($this->once())->method('persistPreProcess');
 
@@ -298,7 +306,7 @@ class TinyUrlDoctrineRepositoryTest extends TestCase
         $this->expectException(TinyUrlValidationException::class);
 
         $tinyUrl = TinyUrl::createNew();
-        $validUntil = new \DateTime();
+        $validUntil = new DateTime();
         $validUntil->modify('-1 day');
         $tinyUrl->setValidUntil($validUntil);
 
@@ -373,7 +381,7 @@ class TinyUrlDoctrineRepositoryTest extends TestCase
 
     public function testUpdateTinyUrlPostProcessesTinyUrl()
     {
-        /** @var TinyUrl|\PHPUnit_Framework_MockObject_MockObject $tinyUrl */
+        /** @var TinyUrl|MockObject $tinyUrl */
         $tinyUrl = $this->createMock(TinyUrl::class);
         $tinyUrl->method('isNew')->willReturn(false);
         $tinyUrl->expects($this->once())->method('persistPostProcess');
@@ -383,7 +391,7 @@ class TinyUrlDoctrineRepositoryTest extends TestCase
 
     public function testUpdateTinyUrlPreProcessesTinyUrl()
     {
-        /** @var TinyUrl|\PHPUnit_Framework_MockObject_MockObject $tinyUrl */
+        /** @var TinyUrl|MockObject $tinyUrl */
         $tinyUrl = $this->createMock(TinyUrl::class);
         $tinyUrl->method('isNew')->willReturn(false);
         $tinyUrl->expects($this->once())->method('persistPreProcess');
@@ -393,7 +401,7 @@ class TinyUrlDoctrineRepositoryTest extends TestCase
 
     public function testUpdateTinyUrlThrowsExceptionForNewTinyUrl()
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Only existing TinyUrl records can be updated.');
         $tinyUrl = TinyUrl::createNew();
         $this->doctrineRepository->updateTinyUrl($tinyUrl);
@@ -405,7 +413,7 @@ class TinyUrlDoctrineRepositoryTest extends TestCase
         $tinyUrl = TinyUrl::createNew();
         $tinyUrl->persistPostProcessInsert(238);
 
-        $validUntil = new \DateTime();
+        $validUntil = new DateTime();
         $validUntil->modify('-1 day');
         $tinyUrl->setValidUntil($validUntil);
 
@@ -431,7 +439,7 @@ class TinyUrlDoctrineRepositoryTest extends TestCase
     protected function initializeTinyUrlValidatorMock()
     {
         $result = $this->createMock(Result::class);
-        /** @var TinyUrlValidator|\PHPUnit_Framework_MockObject_MockObject $validator */
+        /** @var TinyUrlValidator|MockObject $validator */
         $validator = $this->createMock(TinyUrlValidator::class);
         $validator->method('validate')->willReturn($result);
         $this->doctrineRepository->setTinyUrlValidator($validator);
@@ -443,7 +451,7 @@ class TinyUrlDoctrineRepositoryTest extends TestCase
             ->method('transactional')
             ->will(
                 $this->returnCallback(
-                    function (\Closure $callback) {
+                    function (Closure $callback) {
                         $callback();
                     }
                 )

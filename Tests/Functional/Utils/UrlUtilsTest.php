@@ -33,9 +33,7 @@ class UrlUtilsTest extends AbstractFunctionalTestCase
     public function createSpeakingTinyUrlReplacesGeneralUtilityMarkers()
     {
         $_SERVER['REMOTE_ADDR'] = '127.0.0.1';
-        $GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['tinyurls'] = serialize(
-            ['speakingUrlTemplate' => '###REMOTE_ADDR###']
-        );
+        $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['tinyurls']['speakingUrlTemplate'] = '###REMOTE_ADDR###';
         $urlUtils = GeneralUtility::makeInstance(UrlUtils::class);
         $this->assertEquals('127.0.0.1', $urlUtils->createSpeakingTinyUrl('test'));
     }

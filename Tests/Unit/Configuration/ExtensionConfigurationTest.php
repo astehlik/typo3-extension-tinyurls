@@ -14,6 +14,7 @@ namespace Tx\Tinyurls\Tests\Unit\Configuration;
  *                                                                        */
 
 use PHPUnit\Framework\TestCase;
+use PHPUnit_Framework_MockObject_MockObject;
 use Tx\Tinyurls\Configuration\ExtensionConfiguration;
 use Tx\Tinyurls\Configuration\TypoScriptConfigurator;
 use Tx\Tinyurls\TinyUrl\TinyUrlGenerator;
@@ -31,11 +32,13 @@ class ExtensionConfigurationTest extends TestCase
 
     protected function setUp()
     {
+        $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['tinyurls'] = [];
         $this->extensionConfiguration = new ExtensionConfiguration();
     }
 
     public function testAppendPidQueryAppendsAndStatementForNonEmptyQuery()
     {
+        $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['tinyurls']['urlRecordStoragePID'] = 0;
         $this->assertEquals('a=1 AND pid=0', $this->extensionConfiguration->appendPidQuery('a=1'));
     }
 
@@ -46,7 +49,7 @@ class ExtensionConfigurationTest extends TestCase
 
     public function testAppendPidQueryAppendsDefaultPid()
     {
-        $GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['tinyurls'] = serialize(['urlRecordStoragePID' => '999']);
+        $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['tinyurls']['urlRecordStoragePID'] = 999;
         $this->assertEquals('pid=999', $this->extensionConfiguration->appendPidQuery(''));
     }
 
@@ -57,19 +60,19 @@ class ExtensionConfigurationTest extends TestCase
 
     public function testAreSpeakingUrlsEnabledReturnsFalseIfConfigured()
     {
-        $GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['tinyurls'] = serialize(['createSpeakingURLs' => '0']);
+        $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['tinyurls']['createSpeakingURLs'] = 0;
         $this->assertFalse($this->extensionConfiguration->areSpeakingUrlsEnabled());
     }
 
     public function testAreSpeakingUrlsEnabledReturnsTrueIfConfigured()
     {
-        $GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['tinyurls'] = serialize(['createSpeakingURLs' => '1']);
+        $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['tinyurls']['createSpeakingURLs'] = 1;
         $this->assertTrue($this->extensionConfiguration->areSpeakingUrlsEnabled());
     }
 
     public function testGetBase62DictionaryReturnsConfiguredValue()
     {
-        $GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['tinyurls'] = serialize(['base62Dictionary' => 'asfduew']);
+        $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['tinyurls']['base62Dictionary'] = 'asfduew';
         $this->assertEquals('asfduew', $this->extensionConfiguration->getBase62Dictionary());
     }
 
@@ -94,7 +97,7 @@ class ExtensionConfigurationTest extends TestCase
 
     public function testGetMinimalRandomKeyLengthReturnsConfiguredValue()
     {
-        $GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['tinyurls'] = serialize(['base62Dictionary' => 'asdf']);
+        $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['tinyurls']['base62Dictionary'] = 'asdf';
         $this->assertEquals('asdf', $this->extensionConfiguration->getBase62Dictionary());
     }
 
@@ -105,7 +108,7 @@ class ExtensionConfigurationTest extends TestCase
 
     public function testGetMinimalTinyurlKeyLengthReturnsConfiguredValue()
     {
-        $GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['tinyurls'] = serialize(['minimalRandomKeyLength' => '31']);
+        $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['tinyurls']['minimalRandomKeyLength'] = '31';
         $this->assertEquals(31, $this->extensionConfiguration->getMinimalRandomKeyLength());
     }
 
@@ -116,7 +119,7 @@ class ExtensionConfigurationTest extends TestCase
 
     public function testGetSpeakingUrlTemplateReturnsConfiguredValue()
     {
-        $GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['tinyurls'] = serialize(['speakingUrlTemplate' => 'koaidp']);
+        $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['tinyurls']['speakingUrlTemplate'] = 'koaidp';
         $this->assertEquals('koaidp', $this->extensionConfiguration->getSpeakingUrlTemplate());
     }
 
@@ -130,11 +133,11 @@ class ExtensionConfigurationTest extends TestCase
 
     public function testInitializeConfigFromTyposcriptUsesTypoScriptConfiguratorForInitalizingConfig()
     {
-        /** @var ContentObjectRenderer|\PHPUnit_Framework_MockObject_MockObject $contentObjectRendererMock */
+        /** @var ContentObjectRenderer|PHPUnit_Framework_MockObject_MockObject $contentObjectRendererMock */
         $contentObjectRendererMock = $this->createMock(ContentObjectRenderer::class);
-        /** @var TinyUrlGenerator|\PHPUnit_Framework_MockObject_MockObject $tinyUrlGeneratorMock */
+        /** @var TinyUrlGenerator|PHPUnit_Framework_MockObject_MockObject $tinyUrlGeneratorMock */
         $tinyUrlGeneratorMock = $this->createMock(TinyUrlGenerator::class);
-        /** @var TypoScriptConfigurator|\PHPUnit_Framework_MockObject_MockObject $typoScriptConfiguratorMock */
+        /** @var TypoScriptConfigurator|PHPUnit_Framework_MockObject_MockObject $typoScriptConfiguratorMock */
         $typoScriptConfiguratorMock = $this->createMock(TypoScriptConfigurator::class);
 
         $typoScriptConfiguratorMock->expects($this->once())
