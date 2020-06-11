@@ -65,9 +65,6 @@ class TinyUrlDoctrineRepositoryTest extends TestCase
 
     protected function setUp()
     {
-        if (!class_exists('TYPO3\\CMS\\Core\\Database\\Query\\QueryBuilder')) {
-            $this->markTestSkipped('The new Doctrine DBAL QueryBuilder class does not exist.');
-        }
 
         $this->databaseConnectionMock = $this->createMock(Connection::class);
         $this->databaseConnectionPoolMock = $this->createMock(ConnectionPool::class);
