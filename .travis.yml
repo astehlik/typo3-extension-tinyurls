@@ -1,11 +1,13 @@
 language: php
 
+env:
+  global:
+    - TYPO3_EXTENSION_KEY=tinyurls
+
 cache:
   directories:
     - $HOME/.composer/cache
     - $HOME/.cache/composer
-
-sudo: false
 
 addons:
   apt:
@@ -17,62 +19,42 @@ stages:
   - name: deploy
     if: tag
 
-before_install:
-  - composer self-update
-  - composer --version
-  - if [ "$GITHUB_COMPOSER_AUTH" ]; then composer config -g github-oauth.github.com $GITHUB_COMPOSER_AUTH; fi
-
 before_script:
-  - export TYPO3_PATH_WEB=$PWD/.Build/Web
-  - chmod +x ./.travis/*.sh
+  - if [ "$GITHUB_COMPOSER_AUTH" ]; then composer config -g github-oauth.github.com $GITHUB_COMPOSER_AUTH; fi
+  - composer install
 
 jobs:
   include:
     - stage: test
       name: "Composer validate"
-      php: "7.3"
-      script: composer validate
+      php: "7.4"
+      script: bash .Build/bin/t3_run_tests.sh -s composerValidate -p $TRAVIS_PHP_VERSION
     - name: "PHP code sniffer"
-      php: "7.3"
-      script: ./.travis/test_phpcs.sh
+      php: "7.4"
+      script: bash .Build/bin/t3_check_codestyle.sh PSRTinyurls
 
-    - name: "Unit tests PHP 7.1 TYPO3 8"
-      php: "7.1"
-      env: TYPO3_VERSION="typo3/cms=^8.7" UPLOAD_CODE_COVERAGE=yes
-      script: ./.travis/test_phpunit.sh
-    - name: "Unit tests PHP 7.2 TYPO3 9"
-      php: "7.2"
-      env: TYPO3_VERSION="typo3/minimal=^9.3"
-      script: ./.travis/test_phpunit.sh
-    - name: "Unit tests PHP 7.3 TYPO3 master"
+    - name: "Unit tests PHP 7.3"
       php: "7.3"
-      env: TYPO3_VERSION="typo3/minimal=dev-master"
-      script: ./.travis/test_phpunit.sh
+      script: bash .Build/bin/t3_run_tests.sh -s unit -p $TRAVIS_PHP_VERSION
+    - name: "Unit tests PHP 7.4"
+      php: "7.4"
+      script: bash .Build/bin/t3_run_tests.sh -s unit -p $TRAVIS_PHP_VERSION
 
-    - name: "PHP linting PHP 7.1"
-      php: "7.1"
-      script: ./.travis/test_lint.sh
-    - name: "PHP linting PHP 7.2"
-      php: "7.2"
-      script: ./.travis/test_lint.sh
+    - name: "Functional tests on SQLite PHP 7.3"
+      php: "7.3"
+      script: bash .Build/bin/t3_run_tests.sh -s functional -d sqlite -p $TRAVIS_PHP_VERSION
+    - name: "Functional tests on MySQL PHP 7.4"
+      php: "7.4"
+      script: bash .Build/bin/t3_run_tests.sh -s functional -p $TRAVIS_PHP_VERSION
+
     - name: "PHP linting PHP 7.3"
       php: "7.3"
-      script: ./.travis/test_lint.sh
-
-    - name: "Functional tests PHP 7.1 TYPO3 8"
-      php: "7.1"
-      env: TYPO3_VERSION="typo3/cms=^8.7"
-      script: ./.travis/test_functional.sh
-    - name: "Functional tests PHP 7.2 TYPO3 8"
-      php: "7.2"
-      env: TYPO3_VERSION="typo3/minimal=^9.3"
-      script: ./.travis/test_functional.sh
-    - name: "Functional tests PHP 7.2 TYPO3 master"
-      php: "7.3"
-      env: TYPO3_VERSION="typo3/minimal=dev-master"
-      script: ./.travis/test_functional.sh
+      script: bash .Build/bin/t3_run_tests.sh -s lint -p $TRAVIS_PHP_VERSION
+    - name: "PHP linting PHP 7.4"
+      php: "7.4"
+      script: bash .Build/bin/t3_run_tests.sh -s lint -p $TRAVIS_PHP_VERSION
 
     - stage: deploy
       name: "Deploy to TER"
-      php: "7.3"
-      script: ./.travis/deploy_ter.sh
+      php: "7.4"
+      script: bash .Build/bin/t3_deploy_to_ter.sh

@@ -14,15 +14,18 @@ namespace Tx\Tinyurls\Tests\Unit\ViewHelpers;
  *                                                                        */
 
 use Closure;
-use Nimut\TestingFramework\TestCase\ViewHelperBaseTestcase;
-use PHPUnit_Framework_MockObject_MockObject;
+use PHPUnit\Framework\MockObject\MockObject;
 use Tx\Tinyurls\TinyUrl\Api;
 use Tx\Tinyurls\ViewHelpers\TinyurlViewHelper;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\TestingFramework\Fluid\Unit\ViewHelpers\ViewHelperBaseTestcase;
 
 class TinyurlViewHelperTest extends ViewHelperBaseTestcase
 {
+    protected $resetSingletonInstances = true;
+
     /**
-     * @var Api|PHPUnit_Framework_MockObject_MockObject
+     * @var Api|MockObject
      */
     protected $tinyUrlApi;
 

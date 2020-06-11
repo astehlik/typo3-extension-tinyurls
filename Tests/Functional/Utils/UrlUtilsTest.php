@@ -13,14 +13,14 @@ namespace Tx\Tinyurls\Tests\Functional\Utils;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
-use Nimut\TestingFramework\TestCase\FunctionalTestCase;
+use Tx\Tinyurls\Tests\Functional\AbstractFunctionalTestCase;
 use Tx\Tinyurls\Utils\UrlUtils;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * Functional tests for the tinyurls API.
  */
-class UrlUtilsTest extends FunctionalTestCase
+class UrlUtilsTest extends AbstractFunctionalTestCase
 {
     /**
      * @var array
