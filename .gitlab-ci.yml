@@ -1,0 +1,81 @@
+image: intera/docker-ci-php:7.4-ubuntu
+
+variables:
+  MYSQL_DATABASE: "typo3"
+  MYSQL_ROOT_PASSWORD: "MyRootPass"
+
+stages:
+  - build
+  - test
+  - report
+
+build:composer:
+  stage: build
+  cache:
+    paths:
+      - .composercache
+  script:
+    - echo "Testing changed PHP files"
+    - export COMPOSER_CACHE_DIR="$PWD/.composercache"
+    - composer.phar install
+  artifacts:
+    expire_in: 1 hour
+    paths:
+      - .Build/
+
+build:cc-reporter:
+  stage: build
+  script:
+    - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
+    - chmod +x ./cc-test-reporter
+    - ./cc-test-reporter before-build
+  artifacts:
+    expire_in: 1 hour
+    paths:
+      - ./cc-test-reporter
+
+test:unit:
+  stage: test
+  dependencies:
+    - build:composer
+    - build:cc-reporter
+  script:
+    - phpenmod xdebug
+    - .Build/bin/phpunit --coverage-clover .Build/Logs/clover.xml --whitelist Classes -c .Build/vendor/typo3/testing-framework/Resources/Core/Build/UnitTests.xml .Build/Web/typo3conf/ext/tinyurls/Tests/Unit
+    - ./cc-test-reporter format-coverage -t clover -o .Build/Logs/clover-unit.json .Build/Logs/clover.xml
+  artifacts:
+    expire_in: 1 hour
+    paths:
+      - .Build/Logs/clover-unit.json
+
+test:functional:
+  stage: test
+  services:
+    - name: mysql:5.7
+      alias: db
+  dependencies:
+    - build:composer
+    - build:cc-reporter
+  script:
+    - export typo3DatabaseName="$MYSQL_DATABASE"
+    - export typo3DatabasePassword="$MYSQL_ROOT_PASSWORD"
+    - phpenmod xdebug
+    - .Build/bin/phpunit --coverage-clover .Build/Logs/clover.xml --whitelist Classes -c .Build/vendor/typo3/testing-framework/Resources/Core/Build/FunctionalTests.xml .Build/Web/typo3conf/ext/tinyurls/Tests/Functional
+    - ./cc-test-reporter format-coverage -t clover -o .Build/Logs/clover-functional.json .Build/Logs/clover.xml
+  artifacts:
+    expire_in: 1 hour
+    paths:
+      - .Build/Logs/clover-functional.json
+  variables:
+    typo3DatabaseHost: db
+    typo3DatabaseUsername: root
+
+report:codecoverage:
+  stage: report
+  dependencies:
+    - build:cc-reporter
+    - test:unit
+    - test:functional
+  script:
+    - ./cc-test-reporter sum-coverage --parts=2 --output=.Build/Logs/clover-sum.json .Build/Logs/clover-unit.json .Build/Logs/clover-functional.json
+    - ./cc-test-reporter upload-coverage --input=.Build/Logs/clover-sum.json
