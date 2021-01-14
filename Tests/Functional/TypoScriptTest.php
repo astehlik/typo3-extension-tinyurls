@@ -43,6 +43,7 @@ class TypoScriptTest extends AbstractFunctionalTestCase
             1,
             ['EXT:tinyurls/Tests/Functional/Fixtures/TypoScript/SimpleTinyUrlTypolink.setupts']
         );
+        $this->setUpFrontendSite(1);
         $request = (new InternalRequest())->withPageId(1);
         $response = $this->executeFrontendRequest($request);
         $this->assertMatchesRegularExpression(
