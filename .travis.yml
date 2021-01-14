@@ -9,11 +9,6 @@ cache:
     - $HOME/.composer/cache
     - $HOME/.cache/composer
 
-addons:
-  apt:
-    packages:
-      - parallel
-
 stages:
   - test
   - name: deploy
