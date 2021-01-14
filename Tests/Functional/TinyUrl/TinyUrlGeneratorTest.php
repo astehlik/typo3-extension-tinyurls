@@ -35,7 +35,7 @@ class TinyUrlGeneratorTest extends AbstractFunctionalTestCase
     /**
      * Initializes the test subject.
      */
-    public function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         $this->tinyUrlGenerator = GeneralUtility::makeInstance(TinyUrlGenerator::class);

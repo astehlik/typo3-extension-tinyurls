@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Tx\Tinyurls\Tests\Utils;
+namespace Tx\Tinyurls\Tests\Unit\Utils;
 
 /*                                                                        *
  * This script belongs to the TYPO3 extension "tinyurls".                 *
@@ -13,6 +13,7 @@ namespace Tx\Tinyurls\Tests\Utils;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Tx\Tinyurls\Configuration\ExtensionConfiguration;
 use Tx\Tinyurls\Object\ImplementationManager;
@@ -26,12 +27,12 @@ use Tx\Tinyurls\Utils\UrlUtils;
 class UrlUtilsTest extends TestCase
 {
     /**
-     * @var ExtensionConfiguration|\PHPUnit_Framework_MockObject_MockObject
+     * @var ExtensionConfiguration|MockObject
      */
     protected $extensionConfigurationMock;
 
     /**
-     * @var GeneralUtilityWrapper|\PHPUnit_Framework_MockObject_MockObject
+     * @var GeneralUtilityWrapper|MockObject
      */
     protected $generalUtilityMock;
 
@@ -40,7 +41,7 @@ class UrlUtilsTest extends TestCase
      */
     protected $urlUtils;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->extensionConfigurationMock = $this->createMock(ExtensionConfiguration::class);
         $this->generalUtilityMock = $this->createMock(GeneralUtilityWrapper::class);
@@ -118,6 +119,7 @@ class UrlUtilsTest extends TestCase
 
     public function testGenerateTinyurlHashCreatesHash()
     {
+        /** @noinspection PhpDeprecationInspection */
         $this->assertEquals(
             'ee85c8ee5b024efa864c06a98ed613286d134aad',
             $this->urlUtils->generateTinyurlHash('http://the-url.tld')
@@ -132,6 +134,7 @@ class UrlUtilsTest extends TestCase
             ->with(132)
             ->willReturn('thekey');
         ImplementationManager::getInstance()->setUrlKeyGenerator($urlGeneratorMock);
+        /** @noinspection PhpDeprecationInspection */
         $this->assertEquals('thekey', $this->urlUtils->generateTinyurlKeyForUid(132));
         ImplementationManager::getInstance()->restoreDefaults();
     }

@@ -17,7 +17,6 @@ use Closure;
 use PHPUnit\Framework\MockObject\MockObject;
 use Tx\Tinyurls\TinyUrl\Api;
 use Tx\Tinyurls\ViewHelpers\TinyurlViewHelper;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\TestingFramework\Fluid\Unit\ViewHelpers\ViewHelperBaseTestcase;
 
 class TinyurlViewHelperTest extends ViewHelperBaseTestcase
@@ -29,7 +28,7 @@ class TinyurlViewHelperTest extends ViewHelperBaseTestcase
      */
     protected $tinyUrlApi;
 
-    public function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Tx\Tinyurls\Tests\Unit\FormEngine;
@@ -13,6 +14,8 @@ namespace Tx\Tinyurls\Tests\Unit\FormEngine;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
+use DMS\PHPUnitExtensions\ArraySubset\ArraySubsetAsserts;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Tx\Tinyurls\FormEngine\CopyableFieldElement;
 use Tx\Tinyurls\Utils\GeneralUtilityWrapper;
@@ -25,27 +28,29 @@ use TYPO3\CMS\Fluid\View\StandaloneView;
  */
 class CopyableFieldElementTest extends TestCase
 {
+    use ArraySubsetAsserts;
+
     /**
      * @var CopyableFieldElement
      */
     private $copyableFieldElement;
 
     /**
-     * @var StandaloneView|\PHPUnit_Framework_MockObject_MockObject
+     * @var StandaloneView|MockObject
      */
     private $formFieldViewMock;
 
     /**
-     * @var GeneralUtilityWrapper|\PHPUnit_Framework_MockObject_MockObject
+     * @var GeneralUtilityWrapper|MockObject
      */
     private $generalUtilityWrapperMock;
 
     /**
-     * @var IconFactory|\PHPUnit_Framework_MockObject_MockObject
+     * @var IconFactory|MockObject
      */
     private $iconFactoryMock;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $data = ['parameterArray' => ['itemFormElValue' => 'testval']];
         $this->createCopyableFieldElement($data);
@@ -168,7 +173,7 @@ class CopyableFieldElementTest extends TestCase
     }
 
     /**
-     * @return StandaloneView|\PHPUnit_Framework_MockObject_MockObject
+     * @return StandaloneView|MockObject
      */
     private function createFormFieldViewMock(): StandaloneView
     {
@@ -177,7 +182,7 @@ class CopyableFieldElementTest extends TestCase
     }
 
     /**
-     * @return GeneralUtilityWrapper|\PHPUnit_Framework_MockObject_MockObject
+     * @return GeneralUtilityWrapper|MockObject
      */
     private function getGeneralUtilityWrapperMock(): GeneralUtilityWrapper
     {
@@ -186,7 +191,7 @@ class CopyableFieldElementTest extends TestCase
     }
 
     /**
-     * @return IconFactory|\PHPUnit_Framework_MockObject_MockObject
+     * @return IconFactory|MockObject
      */
     private function getIconFactoryMock(): IconFactory
     {
@@ -199,7 +204,7 @@ class CopyableFieldElementTest extends TestCase
     }
 
     /**
-     * @return NodeFactory|\PHPUnit_Framework_MockObject_MockObject
+     * @return NodeFactory|MockObject
      */
     private function getNodeFactoryMock(): NodeFactory
     {

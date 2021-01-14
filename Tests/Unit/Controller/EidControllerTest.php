@@ -46,7 +46,7 @@ class EidControllerTest extends TestCase
      */
     protected $tsfeMock;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->tsfeMock = $this->createMock(TypoScriptFrontendController::class);
         $this->tinyUrlRepositoryMock = $this->createMock(TinyUrlRepository::class);

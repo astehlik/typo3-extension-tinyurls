@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Tx\Tinyurls\Tests\Unit\Domain\Repository;
@@ -15,9 +16,9 @@ namespace Tx\Tinyurls\Tests\Unit\Domain\Repository;
 
 use Closure;
 use DateTime;
+use DMS\PHPUnitExtensions\ArraySubset\Constraint\ArraySubset;
 use Doctrine\DBAL\Driver\Statement;
 use InvalidArgumentException;
-use PHPUnit\Framework\Constraint\ArraySubset;
 use PHPUnit\Framework\Constraint\Callback;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -70,7 +71,7 @@ class TinyUrlDoctrineRepositoryTest extends TestCase
      */
     protected $extensionConfiugrationMock;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['tinyurls'] = [];
 
@@ -286,7 +287,7 @@ class TinyUrlDoctrineRepositoryTest extends TestCase
         $this->prepareInsertQuery(2323);
 
         $this->doctrineRepository->insertNewTinyUrl($tinyUrl);
-        $this->assertRegExp('/LD\-[a-z0-9]+/', $tinyUrl->getUrlkey());
+        $this->assertMatchesRegularExpression('/LD\-[a-z0-9]+/', $tinyUrl->getUrlkey());
     }
 
     public function testInsertNewTinyUrlSetsStoragePid()
@@ -325,7 +326,7 @@ class TinyUrlDoctrineRepositoryTest extends TestCase
                 TinyUrlRepository::TABLE_URLS,
                 $this->callback(
                     function (array $databaseRow) {
-                        return preg_match('/LD\-[0-9a-z]+/', $databaseRow['urlkey']) === 1;
+                        return preg_match('/LD-[0-9a-z]+/', $databaseRow['urlkey']) === 1;
                     }
                 )
             );
@@ -420,7 +421,7 @@ class TinyUrlDoctrineRepositoryTest extends TestCase
         $this->doctrineRepository->updateTinyUrl($tinyUrl);
     }
 
-    protected function getDummyDatabaseRow()
+    protected function getDummyDatabaseRow(): array
     {
         return [
             'uid' => 945,
@@ -460,6 +461,6 @@ class TinyUrlDoctrineRepositoryTest extends TestCase
         $this->databaseConnectionMock->expects($this->once())
             ->method('lastInsertId')
             ->with(TinyUrlRepository::TABLE_URLS, 'uid')
-            ->willReturn($newUid);
+            ->willReturn((string)$newUid);
     }
 }

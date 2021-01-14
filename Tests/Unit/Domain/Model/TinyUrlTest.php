@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Tx\Tinyurls\Tests\Unit\Domain\Model;
@@ -13,6 +14,9 @@ namespace Tx\Tinyurls\Tests\Unit\Domain\Model;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
+use DateTime;
+use InvalidArgumentException;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Tx\Tinyurls\Domain\Model\TinyUrl;
 use Tx\Tinyurls\Object\ImplementationManager;
@@ -59,7 +63,7 @@ class TinyUrlTest extends TestCase
     public function testCreateFromDatabaseFillsTstamp()
     {
         $tinyUrl = TinyUrl::createFromDatabaseRow($this->getDummyDatabaseRow());
-        $this->assertEquals(new \DateTime('2017-12-10 12:30:00.000000+0000'), $tinyUrl->getTstamp());
+        $this->assertEquals(new DateTime('2017-12-10 12:30:00.000000+0000'), $tinyUrl->getTstamp());
     }
 
     public function testCreateFromDatabaseFillsUid()
@@ -77,7 +81,7 @@ class TinyUrlTest extends TestCase
     public function testCreateFromDatabaseFillsValidUntil()
     {
         $tinyUrl = TinyUrl::createFromDatabaseRow($this->getDummyDatabaseRow());
-        $this->assertEquals(new \DateTime('2017-10-10 12:30:00.000000+0000'), $tinyUrl->getValidUntil());
+        $this->assertEquals(new DateTime('2017-10-10 12:30:00.000000+0000'), $tinyUrl->getValidUntil());
     }
 
     public function testCreateFromDatabaseFillsValidUntilWithNullIfEmtpy()
@@ -170,7 +174,7 @@ class TinyUrlTest extends TestCase
     public function testHasValidUntilReturnsTrueIfValidUntilSet()
     {
         $tinyUrl = TinyUrl::createNew();
-        $tinyUrl->setValidUntil(new \DateTime());
+        $tinyUrl->setValidUntil(new DateTime());
         $this->assertTrue($tinyUrl->hasValidUntil());
     }
 
@@ -206,7 +210,7 @@ class TinyUrlTest extends TestCase
 
     public function testPersistPostProcessRefusesZeroUid()
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $tinyUrl = TinyUrl::createNew();
         $tinyUrl->persistPostProcessInsert(0);
     }
@@ -242,7 +246,7 @@ class TinyUrlTest extends TestCase
     {
         $tinyUrl = TinyUrl::createNew();
         $tinyUrl->persistPreProcess();
-        $this->assertInstanceOf(\DateTime::class, $tinyUrl->getTstamp());
+        $this->assertInstanceOf(DateTime::class, $tinyUrl->getTstamp());
     }
 
     public function testRegenerateUrlKeySetsUrlKeyProperty()
@@ -250,7 +254,7 @@ class TinyUrlTest extends TestCase
         $tinyUrl = TinyUrl::createNew();
         $tinyUrl->persistPostProcessInsert(2);
 
-        /** @var UrlKeyGenerator|\PHPUnit_Framework_MockObject_MockObject $urlGeneratorMock */
+        /** @var UrlKeyGenerator|MockObject $urlGeneratorMock */
         $urlGeneratorMock = $this->createMock(UrlKeyGenerator::class);
         $urlGeneratorMock->expects($this->once())
             ->method('generateTinyurlKeyForTinyUrl')
@@ -273,7 +277,7 @@ class TinyUrlTest extends TestCase
 
     public function testSetCustomUrlKeyThrowsExceptionIfKeyIsEmpty()
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $tinyUrl = TinyUrl::createNew();
         $tinyUrl->setCustomUrlKey('');
     }
@@ -285,7 +289,7 @@ class TinyUrlTest extends TestCase
         $this->assertEquals(103, $tinyUrl->getPid());
     }
 
-    protected function getDummyDatabaseRow()
+    protected function getDummyDatabaseRow(): array
     {
         return [
             'uid' => '945',

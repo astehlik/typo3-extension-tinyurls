@@ -19,7 +19,7 @@ class TinyUrlRepositoryTest extends AbstractFunctionalTestCase
      */
     private $tinyUrlRepository;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         $this->tinyUrlRepository = ImplementationManager::getInstance()->getTinyUrlRepository();

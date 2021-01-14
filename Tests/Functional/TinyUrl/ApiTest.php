@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Tx\Tinyurls\Tests\Functional\TinyUrl;
@@ -13,8 +14,6 @@ namespace Tx\Tinyurls\Tests\Functional\TinyUrl;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
-use Doctrine\DBAL\FetchMode;
-use PDO;
 use Tx\Tinyurls\Tests\Functional\AbstractFunctionalTestCase;
 use Tx\Tinyurls\TinyUrl\Api;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -38,7 +37,7 @@ class ApiTest extends AbstractFunctionalTestCase
     /**
      * Initializes the test subject.
      */
-    public function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         $this->tinyUrlsApi = GeneralUtility::makeInstance(Api::class);
@@ -71,7 +70,10 @@ class ApiTest extends AbstractFunctionalTestCase
     {
         $this->tinyUrlsApi->setUrlKey('mydomain');
         $tinyUrl = $this->tinyUrlsApi->getTinyUrl('http://mydomain.tld');
-        $this->assertRegExp('/http:\/\/.+\/\?eID=tx_tinyurls&tx_tinyurls\[key\]=mydomain/', $tinyUrl);
+        $this->assertMatchesRegularExpression(
+            '/http:\/\/.+\/\?eID=tx_tinyurls&tx_tinyurls\[key\]=mydomain/',
+            $tinyUrl
+        );
     }
 
     /**

@@ -28,7 +28,7 @@ class TypoScriptTest extends AbstractFunctionalTestCase
     /**
      * Imports the pages database fixture.
      */
-    public function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         $this->importDataSet(__DIR__ . '/Fixtures/Database/pages.xml');
@@ -45,7 +45,7 @@ class TypoScriptTest extends AbstractFunctionalTestCase
         );
         $request = (new InternalRequest())->withPageId(1);
         $response = $this->executeFrontendRequest($request);
-        $this->assertRegExp(
+        $this->assertMatchesRegularExpression(
             '/http:\/\/localhost\/\?eID=tx_tinyurls&amp;tx_tinyurls\[key\]=b-[a-zA-Z0-9]{7}/',
             (string)$response->getBody()
         );

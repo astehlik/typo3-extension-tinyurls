@@ -13,8 +13,8 @@ namespace Tx\Tinyurls\Tests\Unit\Configuration;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use PHPUnit_Framework_MockObject_MockObject;
 use Tx\Tinyurls\Configuration\ExtensionConfiguration;
 use Tx\Tinyurls\Configuration\TypoScriptConfigurator;
 use Tx\Tinyurls\TinyUrl\TinyUrlGenerator;
@@ -30,7 +30,7 @@ class ExtensionConfigurationTest extends TestCase
      */
     protected $extensionConfiguration;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['tinyurls'] = [];
         $this->extensionConfiguration = new ExtensionConfiguration();
@@ -86,12 +86,14 @@ class ExtensionConfigurationTest extends TestCase
 
     public function testGetExtensionConfigurationReturnsExtensionConfiguration()
     {
+        /** @noinspection PhpDeprecationInspection */
         $this->assertArrayHasKey('createSpeakingURLs', $this->extensionConfiguration->getExtensionConfiguration());
     }
 
     public function testGetExtensionConfigurationValueThrowsExceptionForNonExistingKey()
     {
         $this->expectExceptionMessage('The key a non existing key does not exists in the extension configuration');
+        /** @noinspection PhpDeprecationInspection */
         $this->extensionConfiguration->getExtensionConfigurationValue('a non existing key');
     }
 
@@ -133,11 +135,11 @@ class ExtensionConfigurationTest extends TestCase
 
     public function testInitializeConfigFromTyposcriptUsesTypoScriptConfiguratorForInitalizingConfig()
     {
-        /** @var ContentObjectRenderer|PHPUnit_Framework_MockObject_MockObject $contentObjectRendererMock */
+        /** @var ContentObjectRenderer|MockObject $contentObjectRendererMock */
         $contentObjectRendererMock = $this->createMock(ContentObjectRenderer::class);
-        /** @var TinyUrlGenerator|PHPUnit_Framework_MockObject_MockObject $tinyUrlGeneratorMock */
+        /** @var TinyUrlGenerator|MockObject $tinyUrlGeneratorMock */
         $tinyUrlGeneratorMock = $this->createMock(TinyUrlGenerator::class);
-        /** @var TypoScriptConfigurator|PHPUnit_Framework_MockObject_MockObject $typoScriptConfiguratorMock */
+        /** @var TypoScriptConfigurator|MockObject $typoScriptConfiguratorMock */
         $typoScriptConfiguratorMock = $this->createMock(TypoScriptConfigurator::class);
 
         $typoScriptConfiguratorMock->expects($this->once())

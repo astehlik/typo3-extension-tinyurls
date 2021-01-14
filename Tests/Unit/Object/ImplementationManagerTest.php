@@ -27,7 +27,7 @@ class ImplementationManagerTest extends TestCase
      */
     protected $implementationManager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->implementationManager = new ImplementationManager();
     }

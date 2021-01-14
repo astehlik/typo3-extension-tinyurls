@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Tx\Tinyurls\Tests\UrlKeyGenerator;
+namespace Tx\Tinyurls\Tests\Unit\UrlKeyGenerator;
 
 /*                                                                        *
  * This script belongs to the TYPO3 extension "tinyurls".                 *
@@ -13,6 +13,7 @@ namespace Tx\Tinyurls\Tests\UrlKeyGenerator;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Tx\Tinyurls\Configuration\ExtensionConfiguration;
 use Tx\Tinyurls\Domain\Model\TinyUrl;
@@ -30,16 +31,16 @@ class Base62UrlKeyGeneratorTest extends TestCase
     protected $base62UrlKeyGenerator;
 
     /**
-     * @var ExtensionConfiguration|\PHPUnit_Framework_MockObject_MockObject
+     * @var ExtensionConfiguration|MockObject
      */
     protected $extensionConfigurationMock;
 
     /**
-     * @var GeneralUtilityWrapper|\PHPUnit_Framework_MockObject_MockObject
+     * @var GeneralUtilityWrapper|MockObject
      */
     protected $generalUtilityMock;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->extensionConfigurationMock = $this->createMock(ExtensionConfiguration::class);
         $this->generalUtilityMock = $this->createMock(GeneralUtilityWrapper::class);
