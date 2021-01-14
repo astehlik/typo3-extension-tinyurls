@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Tx\Tinyurls\Utils;
@@ -49,13 +50,10 @@ class UrlUtils implements SingletonInterface
     public function buildTinyUrl(string $tinyUrlKey): string
     {
         if ($this->getExtensionConfiguration()->areSpeakingUrlsEnabled()) {
-            $tinyUrl = $this->createSpeakingTinyUrl($tinyUrlKey);
-            return $tinyUrl;
-        } else {
-            $tinyUrl = $this->getGeneralUtility()->getIndpEnv('TYPO3_SITE_URL');
-            $tinyUrl .= '?eID=tx_tinyurls&tx_tinyurls[key]=' . $tinyUrlKey;
-            return $tinyUrl;
+            return $this->createSpeakingTinyUrl($tinyUrlKey);
         }
+
+        return $this->createEidUrl($tinyUrlKey);
     }
 
     /**
@@ -91,9 +89,9 @@ class UrlUtils implements SingletonInterface
     /**
      * Generates a sha1 hash of the given URL
      *
-     * @deprecated Use TinyUrl model for hash generation instead.
      * @param string $url
      * @return string
+     * @deprecated Use TinyUrl model for hash generation instead.
      */
     public function generateTinyurlHash(string $url): string
     {
@@ -105,14 +103,20 @@ class UrlUtils implements SingletonInterface
     /**
      * Generates a unique tinyurl key for the record with the given UID
      *
-     * @deprecated Use the UrlKeyGenerator for generating the URL key.
      * @param int $uid
      * @return string
+     * @deprecated Use the UrlKeyGenerator for generating the URL key.
      */
     public function generateTinyurlKeyForUid(int $uid): string
     {
         $urlKeyGenerator = ImplementationManager::getInstance()->getUrlKeyGenerator();
         return $urlKeyGenerator->generateTinyurlKeyForUid($uid);
+    }
+
+    protected function createEidUrl(string $tinyUrlKey): string
+    {
+        return $this->getGeneralUtility()->getIndpEnv('TYPO3_SITE_URL')
+            . '?eID=tx_tinyurls&tx_tinyurls[key]=' . $tinyUrlKey;
     }
 
     /**
