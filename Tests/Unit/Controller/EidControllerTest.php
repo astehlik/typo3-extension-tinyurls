@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Tx\Tinyurls\Tests\Unit\Controller;
@@ -13,8 +14,10 @@ namespace Tx\Tinyurls\Tests\Unit\Controller;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Tx\Tinyurls\Controller\EidController;
 use Tx\Tinyurls\Domain\Model\TinyUrl;
 use Tx\Tinyurls\Domain\Repository\TinyUrlRepository;
@@ -22,9 +25,8 @@ use Tx\Tinyurls\Exception\NoTinyUrlKeySubmittedException;
 use Tx\Tinyurls\Exception\TinyUrlNotFoundException;
 use TYPO3\CMS\Core\Error\Http\BadRequestException;
 use TYPO3\CMS\Core\Error\Http\PageNotFoundException;
-use TYPO3\CMS\Core\Http\Response;
 use TYPO3\CMS\Core\Http\ServerRequest;
-use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
+use TYPO3\CMS\Frontend\Controller\ErrorController;
 
 /**
  * @backupGlobals enabled
@@ -37,22 +39,22 @@ class EidControllerTest extends TestCase
     protected $eidController;
 
     /**
-     * @var TinyUrlRepository|\PHPUnit_Framework_MockObject_MockObject
+     * @var ErrorController|MockObject
+     */
+    protected $errorControllerMock;
+
+    /**
+     * @var TinyUrlRepository|MockObject
      */
     protected $tinyUrlRepositoryMock;
 
-    /**
-     * @var TypoScriptFrontendController|\PHPUnit_Framework_MockObject_MockObject
-     */
-    protected $tsfeMock;
-
     protected function setUp(): void
     {
-        $this->tsfeMock = $this->createMock(TypoScriptFrontendController::class);
+        $this->errorControllerMock = $this->createMock(ErrorController::class);
         $this->tinyUrlRepositoryMock = $this->createMock(TinyUrlRepository::class);
 
         $this->eidController = new EidController();
-        $this->eidController->setTypoScriptFrontendController($this->tsfeMock);
+        $this->eidController->setErrorController($this->errorControllerMock);
         $this->eidController->injectTinyUrlRepository($this->tinyUrlRepositoryMock);
 
         $GLOBALS['EXEC_TIME'] = time();
@@ -129,8 +131,6 @@ class EidControllerTest extends TestCase
 
     public function testPageNotFoundErrorIfUrlKeyIsNotFoundInDatabase()
     {
-        $this->expectException(PageNotFoundException::class);
-
         $_GET['tx_tinyurls']['key'] = 'thekey';
 
         $this->tinyUrlRepositoryMock->expects($this->once())
@@ -138,11 +138,16 @@ class EidControllerTest extends TestCase
             ->with('thekey')
             ->willThrowException(new TinyUrlNotFoundException('thekey'));
 
-        $this->tsfeMock->expects($this->once())
-            ->method('pageNotFoundAndExit')
-            ->with('The tinyurl with the key thekey was not found.');
+        $errorResponse = $this->getMockBuilder(ResponseInterface::class)->getMock();
+        $this->errorControllerMock->expects($this->once())
+            ->method('pageNotFoundAction')
+            ->with(
+                $this->isInstanceOf(ServerRequestInterface::class),
+                'The tinyurl with the key thekey was not found.'
+            )
+            ->willReturn($errorResponse);
 
-        $this->processRequest();
+        $this->assertEquals($errorResponse, $this->processRequest());
     }
 
     public function testRedirectsToTargetUrl()
@@ -214,7 +219,6 @@ class EidControllerTest extends TestCase
     {
         $request = new ServerRequest();
         $request = $request->withQueryParams($_GET);
-        $response = $this->eidController->tinyUrlRedirect($request, new Response());
-        return $response;
+        return $this->eidController->tinyUrlRedirect($request);
     }
 }

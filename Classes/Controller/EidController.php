@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Tx\Tinyurls\Controller;
@@ -20,8 +21,9 @@ use Tx\Tinyurls\Domain\Repository\TinyUrlRepository;
 use Tx\Tinyurls\Exception\NoTinyUrlKeySubmittedException;
 use Tx\Tinyurls\Exception\TinyUrlNotFoundException;
 use Tx\Tinyurls\Object\ImplementationManager;
+use TYPO3\CMS\Core\Http\Response;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
+use TYPO3\CMS\Frontend\Controller\ErrorController;
 
 /**
  * Handles tiny URLs with the TYPO3 eID mechanism
@@ -37,9 +39,9 @@ class EidController
     protected $tinyUrlRepository;
 
     /**
-     * @var TypoScriptFrontendController
+     * @var ErrorController
      */
-    protected $typoScriptFrontendController;
+    private $errorController;
 
     /**
      * @param TinyUrlRepository $tinyUrlRepository
@@ -49,51 +51,31 @@ class EidController
         $this->tinyUrlRepository = $tinyUrlRepository;
     }
 
-    /**
-     * @return TypoScriptFrontendController
-     * @codeCoverageIgnore
-     */
-    public function getTypoScriptFrontendController(): TypoScriptFrontendController
+    public function setErrorController(ErrorController $errorController): void
     {
-        if ($this->typoScriptFrontendController === null) {
-            $this->typoScriptFrontendController = GeneralUtility::makeInstance(
-                TypoScriptFrontendController::class,
-                $GLOBALS['TYPO3_CONF_VARS'],
-                0,
-                0
-            );
-        }
-        return $this->typoScriptFrontendController;
+        $this->errorController = $errorController;
     }
 
-    /**
-     * @param TypoScriptFrontendController $typoScriptFrontendController
-     */
-    public function setTypoScriptFrontendController(TypoScriptFrontendController $typoScriptFrontendController)
-    {
-        $this->typoScriptFrontendController = $typoScriptFrontendController;
-    }
-
-    public function tinyUrlRedirect(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
+    public function tinyUrlRedirect(ServerRequestInterface $request): ResponseInterface
     {
         $this->getTinyUrlRepository()->purgeInvalidUrls();
 
         try {
             $tinyUrl = $this->getTinyUrl($request);
         } catch (TinyUrlNotFoundException $e) {
-            $this->getTypoScriptFrontendController()->pageNotFoundAndExit($e->getMessage());
-            throw $e;
+            return $this->handleTinyUrlNotFoundError($request, $e);
         }
 
         $this->processUrlHit($tinyUrl);
 
+        $response = new Response();
         $noCacheResponse = $this->addNoCacheHeaders($response);
 
         $redirectResponse = $noCacheResponse->withStatus(301);
         return $redirectResponse->withAddedHeader('Location', $tinyUrl->getTargetUrl());
     }
 
-    protected function addNoCacheHeaders(ResponseInterface $response)
+    protected function addNoCacheHeaders(ResponseInterface $response): ResponseInterface
     {
         $noCacheResponse = $response->withAddedHeader('Expires', '0');
         $noCacheResponse = $noCacheResponse->withAddedHeader(
@@ -110,7 +92,7 @@ class EidController
      *
      * @param TinyUrl $tinyUrl
      */
-    protected function countUrlHit(TinyUrl $tinyUrl)
+    protected function countUrlHit(TinyUrl $tinyUrl): void
     {
         // There is no point in counting the hit of a URL that is already deleted
         if ($tinyUrl->getDeleteOnUse()) {
@@ -120,12 +102,21 @@ class EidController
         $this->getTinyUrlRepository()->countTinyUrlHit($tinyUrl);
     }
 
+    protected function getErrorController(): ErrorController
+    {
+        if ($this->errorController) {
+            return $this->errorController;
+        }
+
+        return GeneralUtility::makeInstance(ErrorController::class);
+    }
+
     /**
      * Returns the data of the tiny URL record that was found by the submitted tinyurl key.
      *
-     * @param \Psr\Http\Message\ServerRequestInterface $request
+     * @param ServerRequestInterface $request
      * @return TinyUrl
-     * @throws \Tx\Tinyurls\Exception\TinyUrlNotFoundException
+     * @throws TinyUrlNotFoundException
      */
     protected function getTinyUrl(ServerRequestInterface $request): TinyUrl
     {
@@ -151,10 +142,15 @@ class EidController
         return $this->tinyUrlRepository;
     }
 
-    /**
-     * @param TinyUrl $tinyUrl
-     */
-    protected function processUrlHit($tinyUrl)
+    protected function handleTinyUrlNotFoundError(
+        ServerRequestInterface $request,
+        TinyUrlNotFoundException $e
+    ): ResponseInterface {
+        $errorController = $this->getErrorController();
+        return $errorController->pageNotFoundAction($request, $e->getMessage());
+    }
+
+    protected function processUrlHit(TinyUrl $tinyUrl): void
     {
         if ($tinyUrl->getDeleteOnUse()) {
             $this->getTinyUrlRepository()->deleteTinyUrlByKey($tinyUrl->getUrlkey());
