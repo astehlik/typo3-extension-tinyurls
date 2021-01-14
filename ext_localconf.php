@@ -1,4 +1,5 @@
 <?php
+
 /** @noinspection PhpFullyQualifiedNameUsageInspection */
 
 if (!defined('TYPO3_MODE')) {

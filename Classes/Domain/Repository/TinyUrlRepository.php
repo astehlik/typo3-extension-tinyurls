@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Tx\Tinyurls\Domain\Repository;
@@ -19,7 +20,7 @@ use TYPO3\CMS\Core\SingletonInterface;
 
 interface TinyUrlRepository extends SingletonInterface
 {
-    const TABLE_URLS = 'tx_tinyurls_urls';
+    public const TABLE_URLS = 'tx_tinyurls_urls';
 
     /**
      * See: http://lists.typo3.org/pipermail/typo3-dev/2007-December/026936.html

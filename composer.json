@@ -22,10 +22,11 @@
     },
     "require": {
         "php": "^7.2",
-        "typo3/cms-core": "^10.4.10"
+        "typo3/cms-core": "^10.4.10",
+        "de-swebhosting/php-codestyle": "^3.0"
     },
     "require-dev": {
-        "de-swebhosting/typo3-extension-buildtools": "^10.1",
+        "de-swebhosting/typo3-extension-buildtools": "dev-master",
         "dms/phpunit-arraysubset-asserts": "^0.2.1"
     },
     "replace": {
