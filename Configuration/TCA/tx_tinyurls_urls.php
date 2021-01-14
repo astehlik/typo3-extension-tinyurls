@@ -49,6 +49,7 @@ return [
             'label' => $languagePrefix . 'tiny_url',
             'config' => [
                 'type' => 'tx_tinyurls_copyable_field',
+                /** @uses TinyUrlDisplay::buildTinyUrlFormFormElementData() */
                 'valueFunc' => TinyUrlDisplay::class . '->buildTinyUrlFormFormElementData',
                 'size' => 30,
             ],
