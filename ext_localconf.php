@@ -1,4 +1,5 @@
 <?php
+/** @noinspection PhpFullyQualifiedNameUsageInspection */
 
 if (!defined('TYPO3_MODE')) {
     die('Access denied.');
@@ -17,8 +18,10 @@ $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['t3lib/class.t3lib_tcemain.php']['proc
     Tx\Tinyurls\Hooks\TceDataMap::class;
 
 // Modify the rendering of the list module.
-$GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['typo3/class.db_list.inc']['makeQueryArray']['tx_tinyurls'] =
+$databaseRecordList = \TYPO3\CMS\Recordlist\RecordList\DatabaseRecordList::class;
+$GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS'][$databaseRecordList]['modifyQuery']['tx_tinyurls'] =
     \Tx\Tinyurls\Hooks\DatabaseRecordList::class;
+unset($databaseRecordList);
 
 $GLOBALS['TYPO3_CONF_VARS']['SYS']['formEngine']['nodeRegistry'][1460107841] = [
     'nodeName' => 'tx_tinyurls_copyable_field',
