@@ -22,10 +22,11 @@
     },
     "require": {
         "php": "^7.2",
-        "typo3/cms-core": "^9.5"
+        "typo3/cms-core": "^10.4.10"
     },
     "require-dev": {
-        "de-swebhosting/typo3-extension-buildtools": "dev-TYPO3_9"
+        "de-swebhosting/typo3-extension-buildtools": "^10.1",
+        "dms/phpunit-arraysubset-asserts": "^0.2.1"
     },
     "replace": {
         "typo3-ter/tinyurls": "self.version"
