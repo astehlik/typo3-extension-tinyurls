@@ -1,9 +1,4 @@
-﻿.. ==================================================
-.. FOR YOUR INFORMATION
-.. --------------------------------------------------
-.. -*- coding: utf-8 -*- with BOM.
-
-.. include:: ../../Includes.txt
+﻿.. include:: ../Includes.txt
 
 .. _admin-speaking-url-configuration:
 
@@ -14,7 +9,9 @@ By default, a tiny URL created by this extension will look like this:
 
 `<http://mytypo3page.tld/index.php?eID=tx_tinyurls&tx_tinyurls[key ]=Aefc-3E>`_
 
-This is not very short and readable. This is why using speaking URLs is recommended. For this to work you need to set createSpeakingURLs to 1 and maybe edit the speakingUrlTemplate . By default, speaking URLs will look like this:
+This is not very short and readable. This is why using speaking URLs is recommended. For this to work you need
+to set createSpeakingURLs to 1 and maybe edit the speakingUrlTemplate . By default, speaking URLs will look
+like this:
 
 http://mytypo3page.tld/goto/Aefc-3E
 
@@ -30,7 +27,7 @@ When you are using mod_rewrite you can use this line in your .htaccess file or y
 
 ::
 
-    RewriteRule ^tinyurl/([a-zA-Z0-9]+(\-[a-zA-Z0-9]+)?)$ /index.php?eID=tx_tinyurls&tx_tinyurls[key]=$1
+    RewriteRule ^tinyurl/([a-zA-Z0-9]+(-[a-zA-Z0-9]+)?)$ /index.php?eID=tx_tinyurls&tx_tinyurls[key]=$1
 
 
 .. _admin-speaking-url-configuration-lighttpd:
@@ -46,4 +43,3 @@ When you use lighttpd you can use this configuration for rewriting tiny URLs:
         # rewrite goto urls to tinyurls extension
         "^/tinyurl/(.*)$" => typo3path + "index.php?eID=tx_tinyurls&tx_tinyurls[key]=$1",
     )
-

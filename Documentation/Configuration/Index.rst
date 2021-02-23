@@ -1,10 +1,4 @@
-﻿.. ==================================================
-.. FOR YOUR INFORMATION
-.. --------------------------------------------------
-.. -*- coding: utf-8 -*- with BOM.
-
-.. include:: ../Includes.txt
-
+﻿.. include:: ../Includes.txt
 
 .. _configuration:
 
@@ -15,9 +9,7 @@ Most of the configuration is done in the extension manager. At the moment there 
 few TypoScript options available.
 
 .. toctree::
-	:maxdepth: 5
-	:titlesonly:
-	:glob:
+   :maxdepth: 3
 
-	ExtensionConfiguration/Index
-	TypoScriptReference/Index
+   ExtensionConfiguration/Index
+   TypoScriptReference/Index

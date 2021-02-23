@@ -1,16 +1,10 @@
-﻿.. ==================================================
-.. FOR YOUR INFORMATION
-.. --------------------------------------------------
-.. -*- coding: utf-8 -*- with BOM.
-
-.. include:: ../Includes.txt
-
+﻿.. include:: ../Includes.txt
 
 .. _changelog:
 
 ChangeLog
 =========
 
-You can find the current problems, TODOs and changelogs on forge:
+You can find the current problems, TODOs and changelogs on GitHub:
 
-https://forge.typo3.org/projects/extension-tinyurls
+https://github.com/astehlik/typo3-extension-tinyurls/issues

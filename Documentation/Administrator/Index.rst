@@ -1,10 +1,4 @@
-﻿.. ==================================================
-.. FOR YOUR INFORMATION
-.. --------------------------------------------------
-.. -*- coding: utf-8 -*- with BOM.
-
-.. include:: ../Includes.txt
-
+﻿.. include:: ../Includes.txt
 
 .. _admin-manual:
 
@@ -47,7 +41,7 @@ You can convert any typolink to a tinyurl by simply setting the property tinyurl
 
 This is a quick example:
 
-::
+.. code-block:: typoscript
 
 	page.30 = TEXT
 	page.30 {
@@ -62,8 +56,6 @@ Further information
 -------------------
 
 .. toctree::
-	:maxdepth: 5
-	:titlesonly:
-	:glob:
+   :maxdepth: 3
 
-	SpeakingUrlConfiguration/Index
+   SpeakingUrlConfiguration/Index

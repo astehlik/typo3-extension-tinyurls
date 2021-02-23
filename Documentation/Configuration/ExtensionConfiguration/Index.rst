@@ -1,9 +1,4 @@
-﻿.. ==================================================
-.. FOR YOUR INFORMATION
-.. --------------------------------------------------
-.. -*- coding: utf-8 -*- with BOM.
-
-.. include:: ../../Includes.txt
+﻿.. include:: ../../Includes.txt
 
 .. _configuration-extension-configuration:
 
@@ -65,7 +60,7 @@ Extension configuration
          minimalRandomKeyLength
 
    Data type
-         int
+         integer
 
    Description
          The minimum length that the random part of the tiny URL must have.
@@ -79,7 +74,7 @@ Extension configuration
          minimalTinyurlKeyLength
 
    Data type
-         int
+         integer
 
    Description
          The minimum length that the whole tiny URL key must have.
@@ -93,7 +88,7 @@ Extension configuration
          urlRecordStoragePID
 
    Data type
-         int
+         integer
 
    Description
          The PID where the tiny URL records are stored, use 0 to store them in the TYPO3 root.
