@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Tx\Tinyurls\Tests\Unit\FormEngine;
@@ -13,6 +14,7 @@ namespace Tx\Tinyurls\Tests\Unit\FormEngine;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Tx\Tinyurls\FormEngine\TinyUrlDisplay;
 use Tx\Tinyurls\Utils\UrlUtils;
@@ -26,7 +28,7 @@ class TinyUrlDisplayTest extends TestCase
     {
         $tinyUrlDisplay = new TinyUrlDisplay();
 
-        /** @var UrlUtils|\PHPUnit_Framework_MockObject_MockObject $tinyUrlGenerator */
+        /** @var UrlUtils|MockObject $tinyUrlGenerator */
         $tinyUrlGenerator = $this->createMock(UrlUtils::class);
         $tinyUrlGenerator->expects($this->once())
             ->method('buildTinyUrl')

@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Tx\Tinyurls\Tests\Unit\Database;
@@ -13,6 +14,7 @@ namespace Tx\Tinyurls\Tests\Unit\Database;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Tx\Tinyurls\Database\StoragePageQueryRestriction;
 use Tx\Tinyurls\Domain\Repository\TinyUrlRepository;
@@ -22,16 +24,16 @@ use TYPO3\CMS\Core\Database\Query\Expression\ExpressionBuilder;
 class StoragePageQueryRestrictionTest extends TestCase
 {
     /**
-     * @var ExpressionBuilder|\PHPUnit_Framework_MockObject_MockObject
+     * @var ExpressionBuilder|MockObject
      */
     protected $expressionBuilderMock;
 
     /**
-     * @var \Tx\Tinyurls\Database\StoragePageQueryRestriction
+     * @var StoragePageQueryRestriction
      */
     protected $storagePageQueryRestriction;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         if (!interface_exists('TYPO3\\CMS\\Core\\Database\\Query\\Restriction\\QueryRestrictionInterface')) {
             $this->markTestSkipped('The new Doctrine DBAL QueryRestrictionInterface does not exist.');

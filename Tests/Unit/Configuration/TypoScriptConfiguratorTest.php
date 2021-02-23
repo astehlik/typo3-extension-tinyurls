@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Tx\Tinyurls\Tests\Unit\Configuration;
@@ -13,6 +14,7 @@ namespace Tx\Tinyurls\Tests\Unit\Configuration;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Tx\Tinyurls\Configuration\TypoScriptConfigurator;
 use Tx\Tinyurls\TinyUrl\TinyUrlGenerator;
@@ -21,12 +23,12 @@ use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
 class TypoScriptConfiguratorTest extends TestCase
 {
     /**
-     * @var ContentObjectRenderer|\PHPUnit_Framework_MockObject_MockObject
+     * @var ContentObjectRenderer|MockObject
      */
     protected $contentObjectRendererMock;
 
     /**
-     * @var TinyUrlGenerator|\PHPUnit_Framework_MockObject_MockObject
+     * @var TinyUrlGenerator|MockObject
      */
     protected $tinyUrlGeneratorMock;
 
@@ -35,7 +37,7 @@ class TypoScriptConfiguratorTest extends TestCase
      */
     protected $typoScriptConfigurator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->tinyUrlGeneratorMock = $this->createMock(TinyUrlGenerator::class);
         $this->contentObjectRendererMock = $this->createMock(ContentObjectRenderer::class);

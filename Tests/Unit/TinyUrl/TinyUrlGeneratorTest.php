@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Tx\Tinyurls\Tests\Unit\TinyUrl;
@@ -13,6 +14,8 @@ namespace Tx\Tinyurls\Tests\Unit\TinyUrl;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
+use DateTime;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Tx\Tinyurls\Domain\Model\TinyUrl;
 use Tx\Tinyurls\Domain\Repository\TinyUrlRepository;
@@ -28,16 +31,16 @@ class TinyUrlGeneratorTest extends TestCase
     protected $tinyUrlGenerator;
 
     /**
-     * @var TinyUrlRepository|\PHPUnit_Framework_MockObject_MockObject
+     * @var TinyUrlRepository|MockObject
      */
     protected $tinyUrlRepositoryMock;
 
     /**
-     * @var UrlUtils|\PHPUnit_Framework_MockObject_MockObject
+     * @var UrlUtils|MockObject
      */
     protected $urlUtilsMock;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->tinyUrlRepositoryMock = $this->createMock(TinyUrlRepository::class);
         $this->urlUtilsMock = $this->createMock(UrlUtils::class);
@@ -53,6 +56,7 @@ class TinyUrlGeneratorTest extends TestCase
             ->method('buildTinyUrl')
             ->with($urlKey)
             ->willReturn('http://the-url.tld/goto/' . $urlKey);
+        /** @noinspection PhpDeprecationInspection */
         $tinyUrl = $this->tinyUrlGenerator->buildTinyUrl($urlKey);
         $this->assertEquals('http://the-url.tld/goto/' . $urlKey, $tinyUrl);
     }
@@ -212,7 +216,7 @@ class TinyUrlGeneratorTest extends TestCase
             ->with(
                 $this->callback(
                     function (TinyUrl $theNewTinyUrl) {
-                        return $theNewTinyUrl->getValidUntil()->diff(new \DateTime('2027-12-16 03:51:30'))->s === 0;
+                        return $theNewTinyUrl->getValidUntil()->diff(new DateTime('2027-12-16 03:51:30'))->s === 0;
                     }
                 )
             );

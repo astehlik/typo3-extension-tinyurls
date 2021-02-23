@@ -1,11 +1,4 @@
-﻿.. ==================================================
-.. FOR YOUR INFORMATION
-.. --------------------------------------------------
-.. -*- coding: utf-8 -*- with BOM.
-
-.. include:: ../../Includes.txt
-
-.. _configuration-typoscript:
+﻿.. _configuration-typoscript:
 
 TypoScript Reference
 --------------------
@@ -20,7 +13,7 @@ These additional properties are available for typolink objects when the extensio
          tinyurl
 
    Data type
-         boolean
+         :ref:`t3tsref:data-type-boolean`
 
    Description
          If you set this to 1 (TRUE) the final typolink URL is converted to a tiny URL.
@@ -36,7 +29,7 @@ These additional properties are available for typolink objects when the extensio
          tinyurl.deleteOnUse
 
    Data type
-         boolean /:ref:`stdWrap <stdwrap>`
+         :ref:`t3tsref:data-type-boolean` /:ref:`t3tsref:stdWrap`
 
    Description
          If this is is true, the tiny URL is deleted from the database on the first hit.
@@ -51,7 +44,7 @@ These additional properties are available for typolink objects when the extensio
          tinyurl.validUntil
 
    Data type
-         int /:ref:`stdWrap <stdwrap>`
+         :ref:`t3tsref:data-type-integer` /:ref:`t3tsref:stdWrap`
 
    Description
          The timestamp until the URL is valid. If this is set to 0 the URL will never be invalid.
@@ -65,7 +58,7 @@ These additional properties are available for typolink objects when the extensio
          tinyurl.urlKey
 
    Data type
-         string /:ref:`stdWrap <stdwrap>`
+         :ref:`t3tsref:data-type-string` /:ref:`t3tsref:stdWrap`
 
    Description
          Normally the URL key is generated automatically. Here you can set you own unique urlKey.

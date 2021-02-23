@@ -1,13 +1,14 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Tx\Tinyurls\Tests\Functional\Domain\Repository;
 
-use Nimut\TestingFramework\TestCase\FunctionalTestCase;
 use Tx\Tinyurls\Domain\Repository\TinyUrlRepository;
 use Tx\Tinyurls\Object\ImplementationManager;
+use Tx\Tinyurls\Tests\Functional\AbstractFunctionalTestCase;
 
-class TinyUrlRepositoryTest extends FunctionalTestCase
+class TinyUrlRepositoryTest extends AbstractFunctionalTestCase
 {
     /**
      * @var array
@@ -19,7 +20,7 @@ class TinyUrlRepositoryTest extends FunctionalTestCase
      */
     private $tinyUrlRepository;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         $this->tinyUrlRepository = ImplementationManager::getInstance()->getTinyUrlRepository();

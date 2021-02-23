@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Tx\Tinyurls\FormEngine;
@@ -27,7 +28,7 @@ use TYPO3\CMS\Fluid\View\StandaloneView;
  */
 class CopyableFieldElement extends AbstractNode implements NodeInterface
 {
-    const TEMPLATE_PATH = 'EXT:tinyurls/Resources/Private/Templates/FormEngine/CopyableField.html';
+    public const TEMPLATE_PATH = 'EXT:tinyurls/Resources/Private/Templates/FormEngine/CopyableField.html';
 
     /**
      * @var StandaloneView

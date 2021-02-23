@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Tx\Tinyurls\Object;
@@ -13,7 +14,6 @@ namespace Tx\Tinyurls\Object;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
-use Tx\Tinyurls\Domain\Repository\TinyUrlDatabaseRepository;
 use Tx\Tinyurls\Domain\Repository\TinyUrlDoctrineRepository;
 use Tx\Tinyurls\Domain\Repository\TinyUrlRepository;
 use Tx\Tinyurls\UrlKeyGenerator\Base62UrlKeyGenerator;
@@ -92,14 +92,7 @@ class ImplementationManager implements SingletonInterface
         $this->urlKeyGenerator = null;
         $this->tinyUrlRepository = null;
 
-        if (class_exists('TYPO3\\CMS\\Core\\Database\\Query\\QueryBuilder')) {
-            $this->tinyUrlRepositoryClass = TinyUrlDoctrineRepository::class;
-        } else {
-            // @codeCoverageIgnoreStart
-            $this->tinyUrlRepositoryClass = TinyUrlDatabaseRepository::class;
-            // @codeCoverageIgnoreEnd
-        }
-
+        $this->tinyUrlRepositoryClass = TinyUrlDoctrineRepository::class;
         $this->urlKeyGeneratorClass = Base62UrlKeyGenerator::class;
     }
 

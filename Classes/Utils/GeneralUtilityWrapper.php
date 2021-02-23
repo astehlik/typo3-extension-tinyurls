@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Tx\Tinyurls\Utils;
@@ -13,6 +14,7 @@ namespace Tx\Tinyurls\Utils;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
+use TYPO3\CMS\Core\Crypto\Random;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -40,11 +42,7 @@ class GeneralUtilityWrapper implements SingletonInterface
 
     public function getRandomHexString(int $count): string
     {
-        return $this->getCompatibilityWrapper()->getRandomHexString($count);
-    }
-
-    protected function getCompatibilityWrapper(): CompatibilityWrapper
-    {
-        return GeneralUtility::makeInstance(CompatibilityWrapper::class);
+        $random = GeneralUtility::makeInstance(Random::class);
+        return $random->generateRandomHexString($count);
     }
 }

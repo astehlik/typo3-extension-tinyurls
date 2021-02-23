@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Tx\Tinyurls\Tests\Unit\Object;
@@ -14,6 +15,7 @@ namespace Tx\Tinyurls\Tests\Unit\Object;
  *                                                                        */
 
 use PHPUnit\Framework\TestCase;
+use Tx\Tinyurls\Domain\Repository\TinyUrlDoctrineRepository;
 use Tx\Tinyurls\Domain\Repository\TinyUrlRepository;
 use Tx\Tinyurls\Object\ImplementationManager;
 use Tx\Tinyurls\UrlKeyGenerator\Base62UrlKeyGenerator;
@@ -26,7 +28,7 @@ class ImplementationManagerTest extends TestCase
      */
     protected $implementationManager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->implementationManager = new ImplementationManager();
     }
@@ -37,32 +39,13 @@ class ImplementationManagerTest extends TestCase
         $this->assertEquals(Base62UrlKeyGenerator::class, $this->implementationManager->getUrlKeyGeneratorClass());
     }
 
-    public function testResetToDefaultsUsesDatabaseRepositoryAsFallback()
-    {
-        $this->implementationManager->restoreDefaults();
-        if (!class_exists('TYPO3\\CMS\\Core\\Database\\Query\\QueryBuilder')) {
-            /** @noinspection PhpUnnecessaryFullyQualifiedNameInspection */
-            $this->assertEquals(
-                \Tx\Tinyurls\Domain\Repository\TinyUrlDatabaseRepository::class,
-                $this->implementationManager->getTinyUrlRepositoryClass()
-            );
-        } else {
-            $this->markTestSkipped('Doctrine repository is used.');
-        }
-    }
-
     public function testResetToDefaultsUsesDoctrineRepositoryIfAvailable()
     {
         $this->implementationManager->restoreDefaults();
-        if (class_exists('TYPO3\\CMS\\Core\\Database\\Query\\QueryBuilder')) {
-            /** @noinspection PhpUnnecessaryFullyQualifiedNameInspection */
-            $this->assertEquals(
-                \Tx\Tinyurls\Domain\Repository\TinyUrlDoctrineRepository::class,
-                $this->implementationManager->getTinyUrlRepositoryClass()
-            );
-        } else {
-            $this->markTestSkipped('Doctrine DBAL is not available.');
-        }
+        $this->assertEquals(
+            TinyUrlDoctrineRepository::class,
+            $this->implementationManager->getTinyUrlRepositoryClass()
+        );
     }
 
     public function testSetTinyUrlRepositoryClassSetsClassName()

@@ -16,18 +16,20 @@
     },
     "autoload-dev": {
         "psr-4": {
+            "TYPO3\\JsonResponse\\": ".Build/vendor/typo3/testing-framework/Resources/Core/Functional/Extensions/json_response/Classes",
             "Tx\\Tinyurls\\Tests\\": "Tests/"
         }
     },
     "require": {
-        "php": "^7.0",
-        "typo3/cms-core": "^7.6|^8.7|^9.3"
+        "php": "^7.2",
+        "typo3/cms-core": "^10.4.10",
+        "de-swebhosting/php-codestyle": "^3.0"
     },
     "require-dev": {
-        "phpunit/phpunit": "^6.0"
+        "de-swebhosting/typo3-extension-buildtools": "dev-master",
+        "dms/phpunit-arraysubset-asserts": "^0.2.1"
     },
     "replace": {
-        "tinyurls": "self.version",
         "typo3-ter/tinyurls": "self.version"
     },
     "config": {
@@ -36,14 +38,15 @@
     },
     "scripts": {
         "post-autoload-dump": [
-            "mkdir -p .Build/Web/typo3conf/ext/",
-            "[ -L .Build/Web/typo3conf/ext/tinyurls ] || ln -snvf ../../../../. .Build/Web/typo3conf/ext/tinyurls"
+            "TYPO3\\TestingFramework\\Composer\\ExtensionTestEnvironment::prepare",
+            "De\\SWebhosting\\Buildtools\\ExtensionTestEnvironment::prepare"
         ]
     },
     "extra": {
         "typo3/cms": {
-            "cms-package-dir": "{$vendor-dir}/typo3/cms",
-            "web-dir": ".Build/Web"
+            "app-dir": ".Build",
+            "web-dir": ".Build/Web",
+            "extension-key": "tinyurls"
         }
     }
 }

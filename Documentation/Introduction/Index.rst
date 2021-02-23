@@ -1,12 +1,4 @@
-﻿.. ==================================================
-.. FOR YOUR INFORMATION
-.. --------------------------------------------------
-.. -*- coding: utf-8 -*- with BOM.
-
-.. include:: ../Includes.txt
-
-
-.. _introduction:
+﻿.. _introduction:
 
 Introduction
 ============
@@ -48,8 +40,6 @@ In-depth information
 --------------------
 
 .. toctree::
-   	:maxdepth: 5
-   	:titlesonly:
-   	:glob:
+   :maxdepth: 3
 
-   	AboutTinyUrlKeys/Index
+   AboutTinyUrlKeys/Index

@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Tx\Tinyurls\ViewHelpers;
@@ -13,9 +14,11 @@ namespace Tx\Tinyurls\ViewHelpers;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
+use Closure;
 use Tx\Tinyurls\TinyUrl\Api as TinyUrlApi;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Fluid\Core\ViewHelper\AbstractViewHelper;
+use TYPO3Fluid\Fluid\Core\Rendering\RenderingContextInterface;
+use TYPO3Fluid\Fluid\Core\ViewHelper\AbstractViewHelper;
 
 /**
  * A view helper for shortening URLs.
@@ -36,23 +39,43 @@ class TinyurlViewHelper extends AbstractViewHelper
     /**
      * @var TinyUrlApi
      */
-    protected $tinyUrlApi;
+    private static $tinyUrlApi;
+
+    public function initializeArguments()
+    {
+        $this->registerArgument('url', 'string', 'The Url to be shortened', false, null);
+        $this->registerArgument(
+            'onlyOneTimeValid',
+            'boolean',
+            'If this is is true, the tiny URL is deleted from the database on the first hit.',
+            false,
+            false
+        );
+        $this->registerArgument('validUntil', 'int', 'Timestamp until generated link is valid', false, 0);
+        $this->registerArgument('urlKey', 'string', 'Custom url key', false, '');
+    }
 
     /**
-     * @param string $url The Url to be shorting
-     * @param bool $onlyOneTimeValid If this is is true, the tiny URL is deleted from the database on the first hit.
-     * @param int $validUntil Timestamp until generated link is valid
-     * @param string $urlKey Custom url key
+     * @param array $arguments
+     * @param Closure $renderChildrenClosure
+     * @param RenderingContextInterface $renderingContext
      * @return string Rendered link
-     * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
      */
-    public function render($url = null, $onlyOneTimeValid = false, $validUntil = 0, $urlKey = '')
-    {
+    public static function renderStatic(
+        array $arguments,
+        Closure $renderChildrenClosure,
+        RenderingContextInterface $renderingContext
+    ) {
+        $url = $arguments['url'];
+        $onlyOneTimeValid = $arguments['onlyOneTimeValid'];
+        $validUntil = $arguments['validUntil'];
+        $urlKey = $arguments['urlKey'];
+
         if ($url === null) {
-            $url = $this->renderChildren();
+            $url = $renderChildrenClosure();
         }
 
-        $tinyUrlApi = $this->getTinyUrlApi();
+        $tinyUrlApi = static::getTinyUrlApi();
 
         if ($onlyOneTimeValid) {
             $tinyUrlApi->setDeleteOnUse($onlyOneTimeValid);
@@ -68,42 +91,28 @@ class TinyurlViewHelper extends AbstractViewHelper
 
         $tinyUrl = $tinyUrlApi->getTinyUrl($url);
 
-        $tinyUrl = $this->escapeOutputForLegacyFluid($tinyUrl);
-
         return $tinyUrl;
     }
 
-    public function setTinyUrlApi(TinyUrlApi $tinyUrlApi)
-    {
-        $this->tinyUrlApi = $tinyUrlApi;
-    }
-
     /**
-     * Backward compatibility for TYPO3 7: we need to do the escaping manually.
-     *
-     * @param string $output
-     * @return string
-     * @codeCoverageIgnore
+     * @param TinyUrlApi $tinyUrlApi
+     * @internal No public API! Currently used for unit testing.
      */
-    protected function escapeOutputForLegacyFluid(string $output): string
+    public static function setTinyUrlApi(TinyUrlApi $tinyUrlApi)
     {
-        // Escaping property exists, no need for additional escaping.
-        if (property_exists($this, 'escapeOutput')) {
-            return $output;
-        } else {
-            return htmlspecialchars($output);
-        }
+        static::$tinyUrlApi = $tinyUrlApi;
     }
 
     /**
      * @return TinyUrlApi
      * @codeCoverageIgnore
      */
-    protected function getTinyUrlApi(): TinyUrlApi
+    protected static function getTinyUrlApi(): TinyUrlApi
     {
-        if ($this->tinyUrlApi === null) {
-            $this->tinyUrlApi = GeneralUtility::makeInstance(TinyUrlApi::class);
+        if (static::$tinyUrlApi) {
+            return static::$tinyUrlApi;
         }
-        return $this->tinyUrlApi;
+
+        return GeneralUtility::makeInstance(TinyUrlApi::class);
     }
 }

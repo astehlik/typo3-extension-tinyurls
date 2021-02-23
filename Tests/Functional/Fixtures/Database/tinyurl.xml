@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <dataset>
+	<pages>
+		<uid>1</uid>
+		<pid>0</pid>
+		<title>Page containing tiny URL</title>
+	</pages>
 	<tx_tinyurls_urls>
 		<uid>1</uid>
 		<pid>0</pid>

@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Tx\Tinyurls\Tests\Functional;
@@ -13,12 +14,12 @@ namespace Tx\Tinyurls\Tests\Functional;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
-use Nimut\TestingFramework\TestCase\FunctionalTestCase;
+use TYPO3\TestingFramework\Core\Functional\Framework\Frontend\InternalRequest;
 
 /**
  * Functional tests for the tinyurls API.
  */
-class TypoScriptTest extends FunctionalTestCase
+class TypoScriptTest extends AbstractFunctionalTestCase
 {
     /**
      * @var array
@@ -28,10 +29,10 @@ class TypoScriptTest extends FunctionalTestCase
     /**
      * Imports the pages database fixture.
      */
-    public function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
-        $this->importDataSet('ntf://Database/pages.xml');
+        $this->importDataSet(__DIR__ . '/Fixtures/Database/pages.xml');
     }
 
     /**
@@ -43,10 +44,12 @@ class TypoScriptTest extends FunctionalTestCase
             1,
             ['EXT:tinyurls/Tests/Functional/Fixtures/TypoScript/SimpleTinyUrlTypolink.setupts']
         );
-        $response = $this->getFrontendResponse(0);
-        $this->assertRegExp(
+        $this->setUpFrontendSite(1);
+        $request = (new InternalRequest())->withPageId(1);
+        $response = $this->executeFrontendRequest($request);
+        $this->assertMatchesRegularExpression(
             '/http:\/\/localhost\/\?eID=tx_tinyurls&amp;tx_tinyurls\[key\]=b-[a-zA-Z0-9]{7}/',
-            $response->getContent()
+            (string)$response->getBody()
         );
     }
 }

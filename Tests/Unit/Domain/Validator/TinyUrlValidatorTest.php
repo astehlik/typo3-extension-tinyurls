@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Tx\Tinyurls\Tests\Unit\Domain\Validator;
@@ -13,6 +14,9 @@ namespace Tx\Tinyurls\Tests\Unit\Domain\Validator;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
+use DateInterval;
+use DateTime;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Tx\Tinyurls\Domain\Model\TinyUrl;
 use Tx\Tinyurls\Domain\Repository\TinyUrlRepository;
@@ -22,7 +26,7 @@ use Tx\Tinyurls\Exception\TinyUrlNotFoundException;
 class TinyUrlValidatorTest extends TestCase
 {
     /**
-     * @var TinyUrlRepository|\PHPUnit_Framework_MockObject_MockObject
+     * @var TinyUrlRepository|MockObject
      */
     protected $tinyUrlRepositoryMock;
 
@@ -31,7 +35,7 @@ class TinyUrlValidatorTest extends TestCase
      */
     protected $tinyUrlValidator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->tinyUrlRepositoryMock = $this->createMock(TinyUrlRepository::class);
         $this->tinyUrlValidator = new TinyUrlValidator();
@@ -46,7 +50,7 @@ class TinyUrlValidatorTest extends TestCase
     public function testValidateReturnsErrorIdValidUntilIsInThePast()
     {
         $tinyUrl = TinyUrl::createNew();
-        $tinyUrl->setValidUntil(new \DateTime('2000-08-10'));
+        $tinyUrl->setValidUntil(new DateTime('2000-08-10'));
         $result = $this->tinyUrlValidator->validate($tinyUrl);
         $this->assertEquals(1488307858, $result->forProperty('validUntil')->getFirstError()->getCode());
     }
@@ -66,8 +70,8 @@ class TinyUrlValidatorTest extends TestCase
 
     public function testValidateReturnsNoErrorIdValidUntilIsInTheFuture()
     {
-        $tomorrow = new \DateTime();
-        $tomorrow->add(\DateInterval::createFromDateString('tomorrow'));
+        $tomorrow = new DateTime();
+        $tomorrow->add(DateInterval::createFromDateString('tomorrow'));
         $tinyUrl = TinyUrl::createNew();
         $tinyUrl->setValidUntil($tomorrow);
         $result = $this->tinyUrlValidator->validate($tinyUrl);

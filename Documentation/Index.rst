@@ -1,64 +1,39 @@
-﻿.. ==================================================
-.. FOR YOUR INFORMATION
-.. --------------------------------------------------
-.. -*- coding: utf-8 -*- with BOM.
+﻿.. every .rst file should include Includes.txt
+.. use correct path!
 
 .. include:: Includes.txt
 
+.. Every manual should have a start label for cross-referencing to
+.. start page. Do not remove this!
 
 .. _start:
 
 =============================================================
-URL shortener
+URL shortener / TinyURLs
 =============================================================
 
-.. only:: html
+:Version:
+   |release|
 
-	:Classification:
-		tinyurls
+:Language:
+   en
 
-	:Version:
-		|release|
+:Author:
+   Alexander Stehlik
 
-	:Language:
-		en
+:License:
+   This extension documentation is published under the
+   `CC BY-NC-SA 4.0 <https://creativecommons.org/licenses/by-nc-sa/4.0/>`__ (Creative Commons)
+   license
 
-	:Description:
-		Manual covering TYPO3 extension URL shortener
-
-	:Keywords:
-		tinyurls,url,shortener
-
-	:Copyright:
-		2015
-
-	:Author:
-		Alexander Stehlik
-
-	:Email:
-		alexander.stehlik.deleteme@gmail.com
-
-	:License:
-		This document is published under the Open Content License
-		available from http://www.opencontent.org/opl.shtml
-
-	:Rendered:
-		|today|
-
-	The content of this document is related to TYPO3,
-	a GNU/GPL CMS/Framework available from `www.typo3.org <http://www.typo3.org/>`_.
-
-
-	**Table of Contents**
+This extensions allows you to cut down long URLs. It basically works like bitly or TinyURL.
 
 .. toctree::
-	:maxdepth: 5
-	:titlesonly:
-	:glob:
+   :maxdepth: 3
 
-	Introduction/Index
-	Administrator/Index
-	Configuration/Index
-	Developer/Index
-	ChangeLog/Index
-	Targets
+   Introduction/Index
+   Administrator/Index
+   Configuration/Index
+   Developer/Index
+   ChangeLog/Index
+   Targets

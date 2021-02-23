@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Tx\Tinyurls\Tests\Functional\Utils;
@@ -13,14 +14,14 @@ namespace Tx\Tinyurls\Tests\Functional\Utils;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
-use Nimut\TestingFramework\TestCase\FunctionalTestCase;
+use Tx\Tinyurls\Tests\Functional\AbstractFunctionalTestCase;
 use Tx\Tinyurls\Utils\UrlUtils;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * Functional tests for the tinyurls API.
  */
-class UrlUtilsTest extends FunctionalTestCase
+class UrlUtilsTest extends AbstractFunctionalTestCase
 {
     /**
      * @var array
@@ -33,9 +34,7 @@ class UrlUtilsTest extends FunctionalTestCase
     public function createSpeakingTinyUrlReplacesGeneralUtilityMarkers()
     {
         $_SERVER['REMOTE_ADDR'] = '127.0.0.1';
-        $GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['tinyurls'] = serialize(
-            ['speakingUrlTemplate' => '###REMOTE_ADDR###']
-        );
+        $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['tinyurls']['speakingUrlTemplate'] = '###REMOTE_ADDR###';
         $urlUtils = GeneralUtility::makeInstance(UrlUtils::class);
         $this->assertEquals('127.0.0.1', $urlUtils->createSpeakingTinyUrl('test'));
     }

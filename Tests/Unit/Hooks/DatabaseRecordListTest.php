@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Tx\Tinyurls\Tests\Unit\Hooks;
@@ -13,17 +14,20 @@ namespace Tx\Tinyurls\Tests\Unit\Hooks;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Tx\Tinyurls\Domain\Repository\TinyUrlRepository;
 use Tx\Tinyurls\Hooks\DatabaseRecordList as DatabaseRecordListHooks;
 use Tx\Tinyurls\Utils\UrlUtils;
-use TYPO3\CMS\Recordlist\RecordList\AbstractDatabaseRecordList;
+use TYPO3\CMS\Core\Database\Query\QueryBuilder as Typo3QueryBuilder;
+use TYPO3\CMS\Recordlist\RecordList\DatabaseRecordList;
 
 /**
  * Contains a hook for the typolink generation to convert a typolink
  * in a tinyurl. Additionally, it contains a public api for generating
  * a tinyurl in another extension.
  */
-class DatabaseRecordList extends TestCase
+class DatabaseRecordListTest extends TestCase
 {
     /**
      * @var DatabaseRecordListHooks
@@ -31,85 +35,138 @@ class DatabaseRecordList extends TestCase
     protected $databaseRecordListHooks;
 
     /**
-     * @var AbstractDatabaseRecordList
+     * @var DatabaseRecordList
      */
     protected $parentRecordListMock;
 
-    protected function setUp()
+    /**
+     * @var MockObject|UrlUtils
+     */
+    private $urlUtilsMock;
+
+    protected function setUp(): void
     {
-        $this->parentRecordListMock = $this->createMock(AbstractDatabaseRecordList::class);
-        $this->databaseRecordListHooks = new DatabaseRecordListHooks();
+        $this->parentRecordListMock = $this->createMock(DatabaseRecordList::class);
+        $this->urlUtilsMock = $this->createMock(UrlUtils::class);
+        $this->databaseRecordListHooks = new DatabaseRecordListHooks($this->urlUtilsMock);
     }
 
-    public function testmakeQueryArrayPostDoesNotChangeQueryPartsForOtherField()
+    public function testQueryDoesNotChangeForNonDefaultFields()
     {
-        $queryPartsOriginal = $queryParts = ['SELECT' => 'otherdisplay'];
-        $this->databaseRecordListHooks->makeQueryArray_post(
-            $queryParts,
-            $this->parentRecordListMock,
-            'tx_tinyurls_urls'
-        );
-        $this->assertEquals($queryPartsOriginal, $queryParts);
+        $queryBuilder = $this->createQueryBuilderMock();
+        $this->assertQueryDoesNotChange($queryBuilder);
+
+        $this->callModifyQuery($queryBuilder, TinyUrlRepository::TABLE_URLS, ['otherdisplay']);
     }
 
-    public function testmakeQueryArrayPostDoesNotChangeQueryPartsForOtherTable()
+    public function testQueryDoesNotChangeForOtherTable()
     {
-        $queryPartsOriginal = $queryParts = ['SELECT' => 'urldisplay'];
-        $this->databaseRecordListHooks->makeQueryArray_post($queryParts, $this->parentRecordListMock, 'othertable');
-        $this->assertEquals($queryPartsOriginal, $queryParts);
+        $queryBuilder = $this->createQueryBuilderMock();
+        $this->assertQueryDoesNotChange($queryBuilder);
+        $this->callModifyQuery($queryBuilder, 'someother_table');
     }
 
-    public function testmakeQueryArrayPostReplacesUrldisplayWithConcatQuery()
+    public function testQueryDoesNotChangeIfTinyUrlIsEmpty()
     {
-        $urlUtilsMock = $this->getUrlUtilsMock();
-        $urlUtilsMock->expects($this->once())
-            ->method('createSpeakingTinyUrl')
-            ->with("', urlkey, '")
-            ->willReturn('http://myurl.tld/goto/' . "', urlkey, '");
-        $this->databaseRecordListHooks->injectUrlUtils($urlUtilsMock);
+        $this->expectBuildTinyUrlCall('');
 
-        $queryPartsExcpected = ['SELECT' => "CONCAT('http://myurl.tld/goto/', urlkey, '') as urldisplay"];
-        $queryParts = ['SELECT' => 'urldisplay'];
-        $this->databaseRecordListHooks->makeQueryArray_post(
-            $queryParts,
-            $this->parentRecordListMock,
-            'tx_tinyurls_urls'
-        );
-        $this->assertEquals($queryPartsExcpected, $queryParts);
+        $queryBuilder = $this->createQueryBuilderMock();
+        $this->assertQueryDoesNotChange($queryBuilder);
+        $this->callModifyQuery($queryBuilder);
     }
 
-    public function testmakeQueryArrayPostReplacesUrldisplayWithConcatQueryFromCache()
+    public function testQueryDoesNotChangeIfTinyUrlOnlyContainsUrlKey()
     {
-        $urlUtilsMock = $this->getUrlUtilsMock();
-        $urlUtilsMock->expects($this->once())
-            ->method('createSpeakingTinyUrl')
-            ->with("', urlkey, '")
-            ->willReturn('http://myurl.tld/goto/' . "', urlkey, '");
-        $this->databaseRecordListHooks->injectUrlUtils($urlUtilsMock);
+        $this->expectBuildTinyUrlCall('###urlkey###');
+
+        $queryBuilder = $this->createQueryBuilderMock();
+        $this->assertQueryDoesNotChange($queryBuilder);
+        $this->callModifyQuery($queryBuilder);
+    }
+
+    public function testUrlDisplaySelectIsAdded()
+    {
+        $this->expectBuildTinyUrlCall();
+
+        $queryBuilder = $this->createQueryBuilderMock();
+        $queryBuilder->expects($this->once())
+            ->method('addSelectLiteral')
+            ->with("CONCAT('https://myurl.tld/goto/', `urlkey`) as urldisplay");
+
+        $this->callModifyQuery($queryBuilder);
+    }
+
+    public function testUrlDisplaySelectIsAddedWithSuffix()
+    {
+        $this->expectBuildTinyUrlCall('https://myurl.tld/goto/###urlkey###/suffix');
+
+        $queryBuilder = $this->createQueryBuilderMock();
+        $queryBuilder->expects($this->once())
+            ->method('addSelectLiteral')
+            ->with("CONCAT('https://myurl.tld/goto/', `urlkey`, '/suffix') as urldisplay");
+
+        $this->callModifyQuery($queryBuilder);
+    }
+
+    public function testUrlDisplaySelectIsAddedFromCache()
+    {
+        $this->expectBuildTinyUrlCall();
+
+        $queryBuilder = $this->createQueryBuilderMock();
+        $queryBuilder->expects($this->exactly(2))
+            ->method('addSelectLiteral')
+            ->with("CONCAT('https://myurl.tld/goto/', `urlkey`) as urldisplay");
 
         // Fill the cache.
-        $queryParts = ['SELECT' => 'urldisplay'];
-        $this->databaseRecordListHooks->makeQueryArray_post(
-            $queryParts,
-            $this->parentRecordListMock,
-            'tx_tinyurls_urls'
-        );
+        $this->callModifyQuery($queryBuilder);
 
-        $queryPartsExcpected = ['SELECT' => "CONCAT('http://myurl.tld/goto/', urlkey, '') as urldisplay"];
-        $queryParts = ['SELECT' => 'urldisplay'];
-        $this->databaseRecordListHooks->makeQueryArray_post(
-            $queryParts,
-            $this->parentRecordListMock,
-            'tx_tinyurls_urls'
-        );
-        $this->assertEquals($queryPartsExcpected, $queryParts);
+        $this->callModifyQuery($queryBuilder);
     }
 
     /**
-     * @return UrlUtils|\PHPUnit_Framework_MockObject_MockObject
+     * @param Typo3QueryBuilder|MockObject $queryBuilder
      */
-    protected function getUrlUtilsMock(): UrlUtils
+    private function assertQueryDoesNotChange(Typo3QueryBuilder $queryBuilder)
     {
-        return $this->createMock(UrlUtils::class);
+        $queryBuilder->expects($this->never())->method('addSelectLiteral');
+    }
+
+    private function callModifyQuery(
+        Typo3QueryBuilder $queryBuilder,
+        $table = TinyUrlRepository::TABLE_URLS,
+        $fieldList = ['*']
+    ): void {
+        $this->databaseRecordListHooks->modifyQuery([], $table, 1, [], $fieldList, $queryBuilder);
+    }
+
+    /**
+     * @return MockObject|Typo3QueryBuilder
+     */
+    private function createQueryBuilderMock(): Typo3QueryBuilder
+    {
+        $queryBuilder = $this->getMockBuilder(Typo3QueryBuilder::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $queryBuilder->method('quote')->willReturnCallback(
+            function (string $value) {
+                return "'" . $value . "'";
+            }
+        );
+        $queryBuilder->method('quoteIdentifier')->willReturnCallback(
+            function (string $value) {
+                return '`' . $value . '`';
+            }
+        );
+
+        return $queryBuilder;
+    }
+
+    private function expectBuildTinyUrlCall(string $returnValue = 'https://myurl.tld/goto/###urlkey###'): void
+    {
+        $this->urlUtilsMock->expects($this->once())
+            ->method('buildTinyUrl')
+            ->with('###urlkey###')
+            ->willReturn($returnValue);
     }
 }

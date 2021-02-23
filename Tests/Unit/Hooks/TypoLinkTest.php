@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Tx\Tinyurls\Tests\Unit\Hooks;
@@ -13,6 +14,7 @@ namespace Tx\Tinyurls\Tests\Unit\Hooks;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Tx\Tinyurls\Hooks\TypoLink;
 use Tx\Tinyurls\TinyUrl\Api;
@@ -46,7 +48,7 @@ class TypoLinkTest extends TestCase
     protected $lastTypoLinkUrlOriginal;
 
     /**
-     * @var Api|\PHPUnit_Framework_MockObject_MockObject
+     * @var Api|MockObject
      */
     protected $tinyUrlApiMock;
 
@@ -65,7 +67,7 @@ class TypoLinkTest extends TestCase
      */
     protected $typoLinkHook;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->tinyUrlApiMock = $this->createMock(Api::class);
         $this->typoLinkHook = new TypoLink();
@@ -160,18 +162,18 @@ class TypoLinkTest extends TestCase
     }
 
     /**
-     * @return ContentObjectRenderer|\PHPUnit_Framework_MockObject_MockObject
+     * @return ContentObjectRenderer|MockObject
      */
     protected function getContentObjectRendererMock()
     {
         $this->lastTypoLinkUrlOriginal = 'http://the-original.tld';
-        /** @var ContentObjectRenderer|\PHPUnit_Framework_MockObject_MockObject $contentObjectRendererMock */
+        /** @var ContentObjectRenderer|MockObject $contentObjectRendererMock */
         $contentObjectRendererMock = $this->createMock(ContentObjectRenderer::class);
         $contentObjectRendererMock->lastTypoLinkUrl = $this->lastTypoLinkUrlOriginal;
         return $contentObjectRendererMock;
     }
 
-    protected function getTypoLinkParameterArray(string $typoLinkType = 'page', $tinyUrlEnabled = true)
+    protected function getTypoLinkParameterArray(string $typoLinkType = 'page', $tinyUrlEnabled = true): array
     {
         $linkText = '';
         $linkDetails = [];

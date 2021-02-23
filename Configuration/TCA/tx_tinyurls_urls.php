@@ -1,9 +1,8 @@
 <?php
-use Tx\Tinyurls\Utils\CompatibilityWrapper;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
+
+use Tx\Tinyurls\FormEngine\TinyUrlDisplay;
 
 $languagePrefix = 'LLL:EXT:tinyurls/Resources/Private/Language/locallang_db.xlf:tx_tinyurls_urls.';
-$compatiblityWrapper = GeneralUtility::makeInstance(CompatibilityWrapper::class);
 
 return [
     'ctrl' => [
@@ -12,7 +11,7 @@ return [
         'tstamp' => 'tstamp',
         'default_sortby' => 'ORDER BY target_url',
         'enablecolumns' => ['endtime' => 'valid_until'],
-        'iconfile' => $compatiblityWrapper->getExtensionPathPrefixForTcaIconfile() . 'ext_icon.gif',
+        'iconfile' => 'EXT:tinyurls/ext_icon.gif',
         'searchFields' => 'urlkey,target_url,target_url_hash',
         'rootLevel' => -1,
     ],
@@ -29,7 +28,7 @@ return [
         ],
         'comment' => [
             'exclude' => 0,
-            'label' => 'Comment',
+            'label' => $languagePrefix . 'comment',
             'config' => [
                 'type' => 'text',
                 'cols' => '30',
@@ -38,7 +37,7 @@ return [
         ],
         'urlkey' => [
             'exclude' => 0,
-            'label' => 'URL key',
+            'label' => $languagePrefix . 'url_key',
             'config' => [
                 'type' => 'input',
                 'size' => 30,
@@ -47,16 +46,17 @@ return [
         ],
         'urldisplay' => [
             'exclude' => 0,
-            'label' => 'Tiny URL',
+            'label' => $languagePrefix . 'tiny_url',
             'config' => [
                 'type' => 'tx_tinyurls_copyable_field',
-                'valueFunc' => \Tx\Tinyurls\FormEngine\TinyUrlDisplay::class . '->buildTinyUrlFormFormElementData',
+                /** @uses TinyUrlDisplay::buildTinyUrlFormFormElementData() */
+                'valueFunc' => TinyUrlDisplay::class . '->buildTinyUrlFormFormElementData',
                 'size' => 30,
             ],
         ],
         'target_url' => [
             'exclude' => 0,
-            'label' => 'Target URL',
+            'label' => $languagePrefix . 'target_url',
             'config' => [
                 'type' => 'input',
                 'size' => 50,
@@ -65,7 +65,7 @@ return [
         ],
         'target_url_hash' => [
             'exclude' => 0,
-            'label' => 'Target URL Hash',
+            'label' => $languagePrefix . 'target_url_hash',
             'config' => [
                 'type' => 'input',
                 'size' => 30,
@@ -75,20 +75,19 @@ return [
         ],
         'delete_on_use' => [
             'exclude' => 0,
-            'label' => 'Delete on use',
+            'label' => $languagePrefix . 'delete_on_use',
             'config' => [
                 'type' => 'check',
                 'default' => 0,
             ],
         ],
         'valid_until' => [
-            'label' => 'Valid until',
+            'label' => $languagePrefix . 'valid_until',
             'config' => [
                 'type' => 'input',
-                'size' => 10,
-                'max' => 20,
-                'eval' => 'datetime',
-                'default' => 0,
+                'renderType' => 'inputDateTime',
+                'eval' => 'datetime,int',
+                'default' => 0
             ],
         ],
     ],

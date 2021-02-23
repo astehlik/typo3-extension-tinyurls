@@ -1,4 +1,6 @@
 <?php
+
+/** @var string $_EXTKEY */
 $EM_CONF[$_EXTKEY] = [
     'title' => 'URL shortener',
     'description' => 'This extensions allows you to cut down long URLs. It basically works like bitly or TinyURL.',
@@ -10,11 +12,11 @@ $EM_CONF[$_EXTKEY] = [
     'author' => 'Alexander Stehlik',
     'author_email' => 'alexander.stehlik.deleteme@gmail.com',
     'author_company' => '',
-    'version' => '2.1.0-dev',
+    'version' => '10.0.0',
     'constraints' => [
         'depends' => [
-            'php' => '5.5.0-0.0.0',
-            'typo3' => '7.6.0-9.5.99',
+            'php' => '7.2.0-7.4.99',
+            'typo3' => '10.4.10-10.4.99',
         ],
         'conflicts' => [],
         'suggests' => [],
