@@ -60,7 +60,9 @@ test:functional:
     - export typo3DatabaseName="$MYSQL_DATABASE"
     - export typo3DatabasePassword="$MYSQL_ROOT_PASSWORD"
     - phpenmod xdebug
-    - .Build/bin/phpunit --coverage-clover .Build/Logs/clover.xml --whitelist Classes -c .Build/vendor/typo3/testing-framework/Resources/Core/Build/FunctionalTests.xml .Build/Web/typo3conf/ext/tinyurls/Tests/Functional
+    - cd .Build
+    - ./bin/phpunit --coverage-clover Logs/clover.xml --whitelist Classes -c vendor/typo3/testing-framework/Resources/Core/Build/FunctionalTests.xml Web/typo3conf/ext/tinyurls/Tests/Functional
+    - cd ..
     - ./cc-test-reporter format-coverage -t clover -o .Build/Logs/clover-functional.json .Build/Logs/clover.xml
   artifacts:
     expire_in: 1 hour
