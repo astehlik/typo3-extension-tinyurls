@@ -86,9 +86,8 @@ return [
             'config' => [
                 'type' => 'input',
                 'renderType' => 'inputDateTime',
-                'size' => 10,
-                'eval' => 'datetime',
-                'default' => 0,
+                'eval' => 'datetime,int',
+                'default' => 0
             ],
         ],
     ],
