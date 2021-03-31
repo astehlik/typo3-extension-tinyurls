@@ -10,7 +10,7 @@ use Tx\Tinyurls\Utils\UrlUtils;
 
 return function (ContainerConfigurator $configurator) {
     $configurator->services()
-        ->defaults()->autowire()
+        ->defaults()->autowire()->autoconfigure()
         ->set(ExtensionConfiguration::class, ExtensionConfiguration::class)
         ->set(DatabaseRecordList::class, DatabaseRecordList::class)
         ->set(GeneralUtilityWrapper::class, GeneralUtilityWrapper::class)
