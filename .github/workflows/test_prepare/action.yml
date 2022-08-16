@@ -18,4 +18,4 @@ jobs:
       - name: Install dependencies
         uses: php-actions/composer@v6
         with:
-          php_version: "${{ github.event.inputs.php_version }}"
+          php_version: "${{ inputs.php_version }}"
