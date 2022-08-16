@@ -59,7 +59,7 @@ jobs:
       - run:
           bash .Build/bin/t3_run_tests.sh -s functional -p $MAIN_PHP_VERSION
 
-  "php-lint":#
+  "php-lint":
     name: "PHP linting"
     strategy:
       matrix:
