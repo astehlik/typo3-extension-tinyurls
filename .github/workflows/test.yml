@@ -2,6 +2,7 @@
 on: push
 
 env:
+  TYPO3_EXTENSION_KEY: tinyurls
   MAIN_PHP_VERSION: 7.4
 
 jobs:
