@@ -26,7 +26,7 @@
         "de-swebhosting/php-codestyle": "^3.0"
     },
     "require-dev": {
-        "de-swebhosting/typo3-extension-buildtools": "^10.0",
+        "de-swebhosting/typo3-extension-buildtools": "dev-TYPO3_10",
         "dms/phpunit-arraysubset-asserts": "^0.4"
     },
     "replace": {
