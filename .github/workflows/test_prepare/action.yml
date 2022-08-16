@@ -1,3 +1,4 @@
+---
 name: Prepare build
 
 on:
@@ -18,9 +19,9 @@ jobs:
         uses: actions/cache@v2
         with:
           path: /tmp/composer-cache
-          key: ${{ runner.os }}-${{ hashFiles('**/composer.json') }}
+          key: "${{ hashFiles('**/composer.json') }}"
 
       - name: Install dependencies
         uses: php-actions/composer@v6
         with:
-          php_version: ${{ inputs.php_version }}
+          php_version: "${{ inputs.php_version }}"
