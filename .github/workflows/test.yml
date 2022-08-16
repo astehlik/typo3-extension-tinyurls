@@ -1,0 +1,62 @@
+---
+on: push
+
+env:
+  MAIN_PHP_VERSION: 7.4
+
+jobs:
+  "composer-validate":
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run:
+          bash .Build/bin/t3_run_tests.sh -s composerValidate -p $MAIN_PHP_VERSION
+
+  "check-codestyle":
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run:
+          bash .Build/bin/t3_check_codestyle.sh PSRTinyurls
+
+  "php-unit-tests-73":
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run:
+          bash .Build/bin/t3_run_tests.sh -s unit -p 7.3
+
+  "php-unit-tests-main":
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run:
+          bash .Build/bin/t3_run_tests.sh -s unit -p $MAIN_PHP_VERSION
+
+  "php-functional-tests-sqlite-73":
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run:
+          bash .Build/bin/t3_run_tests.sh -s functional -d sqlite -p 7.3
+
+  "php-functional-tests-mysql-main":
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run:
+          bash .Build/bin/t3_run_tests.sh -s functional -p $MAIN_PHP_VERSION
+
+  "php-lint-73":
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run:
+          bash .Build/bin/t3_run_tests.sh -s lint -p 7.3
+
+  "php-lint-main":
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run:
+          bash .Build/bin/t3_run_tests.sh -s lint -p $MAIN_PHP_VERSION
