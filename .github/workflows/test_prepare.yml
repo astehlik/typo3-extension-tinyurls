@@ -1,0 +1,25 @@
+name: Prepare build
+
+on:
+  workflow_call:
+    inputs:
+      php_version:
+        required: true
+        type: string
+
+jobs:
+  "prepare-build":
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Cache Composer dependencies
+        uses: actions/cache@v2
+        with:
+          path: /tmp/composer-cache
+          key: ${{ runner.os }}-${{ hashFiles('**/composer.json') }}
+
+      - name: Install dependencies
+        uses: php-actions/composer@v6
+        with:
+          php_version: ${{ inputs.php_version }}
