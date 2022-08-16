@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: ./.github/workflows/test_prepare.yml
+      - uses: ./.github/workflows/test_prepare
         with:
           php_version: $MAIN_PHP_VERSION
       - run:
@@ -22,7 +22,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: ./.github/workflows/test_prepare.yml
+      - uses: ./.github/workflows/test_prepare
         with:
           php_version: $MAIN_PHP_VERSION
       - run:
@@ -36,7 +36,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: ./.github/workflows/test_prepare.yml
+      - uses: ./.github/workflows/test_prepare
         with:
           php_version: $php_version
       - run:
@@ -47,7 +47,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: ./.github/workflows/test_prepare.yml
+      - uses: ./.github/workflows/test_prepare
         with:
           php_version: 7.3
       - run:
@@ -58,7 +58,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: ./.github/workflows/test_prepare.yml
+      - uses: ./.github/workflows/test_prepare
         with:
           php_version: $MAIN_PHP_VERSION
       - run:
@@ -72,7 +72,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: ./.github/workflows/test_prepare.yml
+      - uses: ./.github/workflows/test_prepare
         with:
           php_version: $php_version
       - run:
