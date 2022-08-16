@@ -15,13 +15,7 @@ jobs:
       # We can not use actions/checkout@v2 here because to be able to include
       # the workflow we must checkout the repo first.
 
-      - name: Cache Composer dependencies
-        uses: actions/cache@v2
-        with:
-          path: /tmp/composer-cache
-          key: "${{ hashFiles('**/composer.json') }}"
-
       - name: Install dependencies
         uses: php-actions/composer@v6
         with:
-          php_version: "${{ inputs.php_version }}"
+          php_version: "${{ github.event.inputs.php_version }}"
