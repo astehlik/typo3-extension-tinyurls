@@ -11,7 +11,8 @@ jobs:
   "prepare-build":
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      # We can not use actions/checkout@v2 here because to be able to include
+      # the workflow we must checkout the repo first.
 
       - name: Cache Composer dependencies
         uses: actions/cache@v2
