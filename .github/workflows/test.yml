@@ -16,74 +16,78 @@ jobs:
         with:
           php_version: "${{ env.MAIN_PHP_VERSION }}"
           php_extensions: zip
+      - run: sudo chown -R $(id -u):$(id -g) .
       - run:
-          sudo chown -R $(id -u):$(id -g) .;
-          ls -l
-#          bash .Build/bin/t3_run_tests.sh -s composerValidate -p ${{ env.MAIN_PHP_VERSION }}
+          bash .Build/bin/t3_run_tests.sh -s composerValidate -p ${{ env.MAIN_PHP_VERSION }}
 
-#  "check-codestyle":
-#    name: "PHP code style check"
-#    runs-on: ubuntu-latest
-#    steps:
-#      - uses: actions/checkout@v2
-#      - name: Install dependencies
-#        uses: php-actions/composer@v6
-#        with:
-#          php_version: "${{ env.MAIN_PHP_VERSION }}"
-#          php_extensions: zip
-#      - run:
-#          bash .Build/bin/t3_check_codestyle.sh PSRTinyurls
-#
-#  "php-unit-tests":
-#    name: "PHP Unit tests"
-#    strategy:
-#      matrix:
-#        php_version: ["7.3", "7.4"]
-#    runs-on: ubuntu-latest
-#    steps:
-#      - uses: actions/checkout@v2
-#      - uses: php-actions/composer@v6
-#        with:
-#          php_version: ${{ matrix.php_version }}
-#          php_extensions: zip
-#      - run:
-#          bash .Build/bin/t3_run_tests.sh -s unit -p ${{ matrix.php_version }}
-#
-#  "php-functional-tests-sqlite-73":
-#    name: "Functional tests on SQLite PHP 7.3"
-#    runs-on: ubuntu-latest
-#    steps:
-#      - uses: actions/checkout@v2
-#      - uses: php-actions/composer@v6
-#        with:
-#          php_version: 7.3
-#          php_extensions: zip
-#      - run:
-#          bash .Build/bin/t3_run_tests.sh -s functional -d sqlite -p 7.3
-#
-#  "php-functional-tests-mysql-main":
-#    name: "Functional tests on MySQL"
-#    runs-on: ubuntu-latest
-#    steps:
-#      - uses: actions/checkout@v2
-#      - uses: php-actions/composer@v6
-#        with:
-#          php_version: ${{ env.MAIN_PHP_VERSION }}
-#          php_extensions: zip
-#      - run:
-#          bash .Build/bin/t3_run_tests.sh -s functional -p ${{ env.MAIN_PHP_VERSION }}
-#
-#  "php-lint":
-#    name: "PHP linting"
-#    strategy:
-#      matrix:
-#        php_version: ["7.3", "7.4"]
-#    runs-on: ubuntu-latest
-#    steps:
-#      - uses: actions/checkout@v2
-#      - uses: php-actions/composer@v6
-#        with:
-#          php_version: ${{ matrix.php_version }}
-#          php_extensions: zip
-#      - run:
-#          bash .Build/bin/t3_run_tests.sh -s lint -p ${{ matrix.php_version }}
+  "check-codestyle":
+    name: "PHP code style check"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install dependencies
+        uses: php-actions/composer@v6
+        with:
+          php_version: "${{ env.MAIN_PHP_VERSION }}"
+          php_extensions: zip
+      - run: sudo chown -R $(id -u):$(id -g) .
+      - run:
+          bash .Build/bin/t3_check_codestyle.sh PSRTinyurls
+
+  "php-unit-tests":
+    name: "PHP Unit tests"
+    strategy:
+      matrix:
+        php_version: ["7.3", "7.4"]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: php-actions/composer@v6
+        with:
+          php_version: ${{ matrix.php_version }}
+          php_extensions: zip
+      - run: sudo chown -R $(id -u):$(id -g) .
+      - run:
+          bash .Build/bin/t3_run_tests.sh -s unit -p ${{ matrix.php_version }}
+
+  "php-functional-tests-sqlite-73":
+    name: "Functional tests on SQLite PHP 7.3"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: php-actions/composer@v6
+        with:
+          php_version: 7.3
+          php_extensions: zip
+      - run: sudo chown -R $(id -u):$(id -g) .
+      - run:
+          bash .Build/bin/t3_run_tests.sh -s functional -d sqlite -p 7.3
+
+  "php-functional-tests-mysql-main":
+    name: "Functional tests on MySQL"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: php-actions/composer@v6
+        with:
+          php_version: ${{ env.MAIN_PHP_VERSION }}
+          php_extensions: zip
+      - run: sudo chown -R $(id -u):$(id -g) .
+      - run:
+          bash .Build/bin/t3_run_tests.sh -s functional -p ${{ env.MAIN_PHP_VERSION }}
+
+  "php-lint":
+    name: "PHP linting"
+    strategy:
+      matrix:
+        php_version: ["7.3", "7.4"]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: php-actions/composer@v6
+        with:
+          php_version: ${{ matrix.php_version }}
+          php_extensions: zip
+      - run: sudo chown -R $(id -u):$(id -g) .
+      - run:
+          bash .Build/bin/t3_run_tests.sh -s lint -p ${{ matrix.php_version }}
