@@ -17,7 +17,7 @@ jobs:
           php_version: "${{ env.MAIN_PHP_VERSION }}"
           php_extensions: zip
       - run:
-          sudo chown -R $UID:$GID .;
+          sudo chown -R $(id -u):$(id -g) .;
           ls -l
 #          bash .Build/bin/t3_run_tests.sh -s composerValidate -p ${{ env.MAIN_PHP_VERSION }}
 
