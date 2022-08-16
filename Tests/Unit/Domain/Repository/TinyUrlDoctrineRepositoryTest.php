@@ -287,7 +287,7 @@ class TinyUrlDoctrineRepositoryTest extends TestCase
         $this->prepareInsertQuery(2323);
 
         $this->doctrineRepository->insertNewTinyUrl($tinyUrl);
-        $this->assertMatchesRegularExpression('/LD\-[a-z0-9]+/', $tinyUrl->getUrlkey());
+        $this->assertRegExp('/LD\-[a-z0-9]+/', $tinyUrl->getUrlkey());
     }
 
     public function testInsertNewTinyUrlSetsStoragePid()

@@ -47,7 +47,7 @@ class TypoScriptTest extends AbstractFunctionalTestCase
         $this->setUpFrontendSite(1);
         $request = (new InternalRequest())->withPageId(1);
         $response = $this->executeFrontendRequest($request);
-        $this->assertMatchesRegularExpression(
+        $this->assertRegExp(
             '/http:\/\/localhost\/\?eID=tx_tinyurls&amp;tx_tinyurls\[key\]=b-[a-zA-Z0-9]{7}/',
             (string)$response->getBody()
         );
