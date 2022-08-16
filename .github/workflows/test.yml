@@ -63,8 +63,8 @@ jobs:
       - run: |
           bash .Build/bin/t3_run_tests.sh -s functional -d sqlite -p 7.3
 
-  "php-functional-tests-mysql-main":
-    name: "Functional tests on MySQL"
+  "php-functional-tests-mariadb-main":
+    name: "Functional tests on MariaDB"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
