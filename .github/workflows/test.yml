@@ -137,6 +137,8 @@ jobs:
       - coverage-functional
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/develop'
+    env:
+      CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
     steps:
       - uses: actions/download-artifact@v3
         with:
