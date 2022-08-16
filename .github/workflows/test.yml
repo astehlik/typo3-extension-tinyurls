@@ -138,17 +138,18 @@ jobs:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/develop'
     steps:
-      - run: curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
-      - run: chmod +x ./cc-test-reporter
-      - run: ./cc-test-reporter before-build
       - uses: actions/download-artifact@v3
         with:
           name: coverage-phpunit
-      - run: |
-          - ./cc-test-reporter format-coverage -t clover -o .Build/Logs/clover-unit.json .Build/Logs/clover-unit.xml
       - uses: actions/download-artifact@v3
         with:
           name: coverage-functional
+      - run: curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
+      - run: chmod +x ./cc-test-reporter
+      - run: ./cc-test-reporter before-build
+      - run: |
+          - ./cc-test-reporter format-coverage -t clover -o .Build/Logs/clover-unit.json .Build/Logs/clover-unit.xml
+
       - run: |
           - ./cc-test-reporter format-coverage -t clover -o .Build/Logs/clover-functional.json .Build/Logs/clover-functional.xml
       - run: ./cc-test-reporter sum-coverage --parts=2 --output=.Build/Logs/clover-sum.json .Build/Logs/clover-unit.json .Build/Logs/clover-functional.json
