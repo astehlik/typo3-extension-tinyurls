@@ -15,6 +15,7 @@ jobs:
         uses: php-actions/composer@v6
         with:
           php_version: "${{ env.MAIN_PHP_VERSION }}"
+          php_extensions: zip
       - run:
           bash .Build/bin/t3_run_tests.sh -s composerValidate -p ${{ env.MAIN_PHP_VERSION }}
 
@@ -27,6 +28,7 @@ jobs:
         uses: php-actions/composer@v6
         with:
           php_version: "${{ env.MAIN_PHP_VERSION }}"
+          php_extensions: zip
       - run:
           bash .Build/bin/t3_check_codestyle.sh PSRTinyurls
 
@@ -41,6 +43,7 @@ jobs:
       - uses: php-actions/composer@v6
         with:
           php_version: ${{ matrix.php_version }}
+          php_extensions: zip
       - run:
           bash .Build/bin/t3_run_tests.sh -s unit -p ${{ matrix.php_version }}
 
@@ -52,6 +55,7 @@ jobs:
       - uses: php-actions/composer@v6
         with:
           php_version: 7.3
+          php_extensions: zip
       - run:
           bash .Build/bin/t3_run_tests.sh -s functional -d sqlite -p 7.3
 
@@ -63,6 +67,7 @@ jobs:
       - uses: php-actions/composer@v6
         with:
           php_version: ${{ env.MAIN_PHP_VERSION }}
+          php_extensions: zip
       - run:
           bash .Build/bin/t3_run_tests.sh -s functional -p ${{ env.MAIN_PHP_VERSION }}
 
@@ -77,5 +82,6 @@ jobs:
       - uses: php-actions/composer@v6
         with:
           php_version: ${{ matrix.php_version }}
+          php_extensions: zip
       - run:
           bash .Build/bin/t3_run_tests.sh -s lint -p ${{ matrix.php_version }}
