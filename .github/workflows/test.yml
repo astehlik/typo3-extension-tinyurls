@@ -6,92 +6,92 @@ env:
   MAIN_PHP_VERSION: 7.4
 
 jobs:
-  "composer-validate":
-    name: "Composer validate"
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Install dependencies
-        uses: php-actions/composer@v6
-        with:
-          php_version: "${{ env.MAIN_PHP_VERSION }}"
-          php_extensions: zip
-      - run: sudo chown -R $(id -u):$(id -g) .
-      - run: |
-          bash .Build/bin/t3_run_tests.sh -s composerValidate -p ${{ env.MAIN_PHP_VERSION }}
-
-  "check-codestyle":
-    name: "PHP code style check"
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Install dependencies
-        uses: php-actions/composer@v6
-        with:
-          php_version: "${{ env.MAIN_PHP_VERSION }}"
-          php_extensions: zip
-      - run: sudo chown -R $(id -u):$(id -g) .
-      - run: |
-          bash .Build/bin/t3_check_codestyle.sh PSRTinyurls
-
-  "php-unit-tests":
-    name: "PHP Unit tests"
-    strategy:
-      matrix:
-        php_version: ["7.3", "7.4"]
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: php-actions/composer@v6
-        with:
-          php_version: ${{ matrix.php_version }}
-          php_extensions: zip
-      - run: sudo chown -R $(id -u):$(id -g) .
-      - run: |
-          bash .Build/bin/t3_run_tests.sh -s unit -p ${{ matrix.php_version }}
-
-  "php-functional-tests-sqlite-73":
-    name: "Functional tests on SQLite PHP 7.3"
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: php-actions/composer@v6
-        with:
-          php_version: 7.3
-          php_extensions: zip
-      - run: sudo chown -R $(id -u):$(id -g) .
-      - run: |
-          bash .Build/bin/t3_run_tests.sh -s functional -d sqlite -p 7.3
-
-  "php-functional-tests-mariadb-main":
-    name: "Functional tests on MariaDB"
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: php-actions/composer@v6
-        with:
-          php_version: ${{ env.MAIN_PHP_VERSION }}
-          php_extensions: zip
-      - run: sudo chown -R $(id -u):$(id -g) .
-      - run: |
-          bash .Build/bin/t3_run_tests.sh -s functional -p ${{ env.MAIN_PHP_VERSION }}
-
-  "php-lint":
-    name: "PHP linting"
-    strategy:
-      matrix:
-        php_version: ["7.3", "7.4"]
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: php-actions/composer@v6
-        with:
-          php_version: ${{ matrix.php_version }}
-          php_extensions: zip
-      - run: sudo chown -R $(id -u):$(id -g) .
-      - run: |
-          bash .Build/bin/t3_run_tests.sh -s lint -p ${{ matrix.php_version }}
-
+#  "composer-validate":
+#    name: "Composer validate"
+#    runs-on: ubuntu-latest
+#    steps:
+#      - uses: actions/checkout@v2
+#      - name: Install dependencies
+#        uses: php-actions/composer@v6
+#        with:
+#          php_version: "${{ env.MAIN_PHP_VERSION }}"
+#          php_extensions: zip
+#      - run: sudo chown -R $(id -u):$(id -g) .
+#      - run: |
+#          bash .Build/bin/t3_run_tests.sh -s composerValidate -p ${{ env.MAIN_PHP_VERSION }}
+#
+#  "check-codestyle":
+#    name: "PHP code style check"
+#    runs-on: ubuntu-latest
+#    steps:
+#      - uses: actions/checkout@v2
+#      - name: Install dependencies
+#        uses: php-actions/composer@v6
+#        with:
+#          php_version: "${{ env.MAIN_PHP_VERSION }}"
+#          php_extensions: zip
+#      - run: sudo chown -R $(id -u):$(id -g) .
+#      - run: |
+#          bash .Build/bin/t3_check_codestyle.sh PSRTinyurls
+#
+#  "php-unit-tests":
+#    name: "PHP Unit tests"
+#    strategy:
+#      matrix:
+#        php_version: ["7.3", "7.4"]
+#    runs-on: ubuntu-latest
+#    steps:
+#      - uses: actions/checkout@v2
+#      - uses: php-actions/composer@v6
+#        with:
+#          php_version: ${{ matrix.php_version }}
+#          php_extensions: zip
+#      - run: sudo chown -R $(id -u):$(id -g) .
+#      - run: |
+#          bash .Build/bin/t3_run_tests.sh -s unit -p ${{ matrix.php_version }}
+#
+#  "php-functional-tests-sqlite-73":
+#    name: "Functional tests on SQLite PHP 7.3"
+#    runs-on: ubuntu-latest
+#    steps:
+#      - uses: actions/checkout@v2
+#      - uses: php-actions/composer@v6
+#        with:
+#          php_version: 7.3
+#          php_extensions: zip
+#      - run: sudo chown -R $(id -u):$(id -g) .
+#      - run: |
+#          bash .Build/bin/t3_run_tests.sh -s functional -d sqlite -p 7.3
+#
+#  "php-functional-tests-mariadb-main":
+#    name: "Functional tests on MariaDB"
+#    runs-on: ubuntu-latest
+#    steps:
+#      - uses: actions/checkout@v2
+#      - uses: php-actions/composer@v6
+#        with:
+#          php_version: ${{ env.MAIN_PHP_VERSION }}
+#          php_extensions: zip
+#      - run: sudo chown -R $(id -u):$(id -g) .
+#      - run: |
+#          bash .Build/bin/t3_run_tests.sh -s functional -p ${{ env.MAIN_PHP_VERSION }}
+#
+#  "php-lint":
+#    name: "PHP linting"
+#    strategy:
+#      matrix:
+#        php_version: ["7.3", "7.4"]
+#    runs-on: ubuntu-latest
+#    steps:
+#      - uses: actions/checkout@v2
+#      - uses: php-actions/composer@v6
+#        with:
+#          php_version: ${{ matrix.php_version }}
+#          php_extensions: zip
+#      - run: sudo chown -R $(id -u):$(id -g) .
+#      - run: |
+#          bash .Build/bin/t3_run_tests.sh -s lint -p ${{ matrix.php_version }}
+#
   "coverage-phpunit":
     name: "Test coverage by Unit Tests"
     runs-on: ubuntu-latest
@@ -111,30 +111,30 @@ jobs:
           path: .Build/Logs/clover-unit.xml
           retention-days: 1
 
-  "coverage-functional":
-    name: "Test coverage by Functional Tests"
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/develop'
-    steps:
-      - uses: actions/checkout@v2
-      - uses: php-actions/composer@v6
-        with:
-          php_version: ${{ env.MAIN_PHP_VERSION }}
-          php_extensions: zip
-      - run: sudo chown -R $(id -u):$(id -g) .
-      - run: |
-          bash .Build/bin/t3_run_tests.sh -s functional -d mysql -j 5.7 -p ${{ env.MAIN_PHP_VERSION }} -x -z coverage -e "--coverage-clover Logs/clover-functional.xml --whitelist ../Classes"
-      - uses: actions/upload-artifact@v3
-        with:
-          name: coverage-functional
-          path: .Build/Logs/clover-functional.xml
-          retention-days: 1
+#  "coverage-functional":
+#    name: "Test coverage by Functional Tests"
+#    runs-on: ubuntu-latest
+#    if: github.ref == 'refs/heads/develop'
+#    steps:
+#      - uses: actions/checkout@v2
+#      - uses: php-actions/composer@v6
+#        with:
+#          php_version: ${{ env.MAIN_PHP_VERSION }}
+#          php_extensions: zip
+#      - run: sudo chown -R $(id -u):$(id -g) .
+#      - run: |
+#          bash .Build/bin/t3_run_tests.sh -s functional -d mysql -j 5.7 -p ${{ env.MAIN_PHP_VERSION }} -x -z coverage -e "--coverage-clover Logs/clover-functional.xml --whitelist ../Classes"
+#      - uses: actions/upload-artifact@v3
+#        with:
+#          name: coverage-functional
+#          path: .Build/Logs/clover-functional.xml
+#          retention-days: 1
 
   "coverage-upload":
     name: Upload coverage report to Code Climage
     needs:
       - coverage-phpunit
-      - coverage-functional
+#      - coverage-functional
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/develop'
     env:
@@ -143,16 +143,19 @@ jobs:
       - uses: actions/download-artifact@v3
         with:
           name: coverage-phpunit
-      - uses: actions/download-artifact@v3
-        with:
-          name: coverage-functional
+#      - uses: actions/download-artifact@v3
+#        with:
+#          name: coverage-functional
       - run: curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
       - run: chmod +x ./cc-test-reporter
       - run: ./cc-test-reporter before-build
-      - run: |
-          - ./cc-test-reporter format-coverage -t clover -o .Build/Logs/clover-unit.json .Build/Logs/clover-unit.xml
-
-      - run: |
-          - ./cc-test-reporter format-coverage -t clover -o .Build/Logs/clover-functional.json .Build/Logs/clover-functional.xml
-      - run: ./cc-test-reporter sum-coverage --parts=2 --output=.Build/Logs/clover-sum.json .Build/Logs/clover-unit.json .Build/Logs/clover-functional.json
-      - run: ./cc-test-reporter upload-coverage --input=.Build/Logs/clover-sum.json
+      - run: ls -l
+      - run: pwd
+#      - run: |
+#          - ./cc-test-reporter format-coverage -t clover -o .Build/Logs/clover-unit.json .Build/Logs/clover-unit.xml
+#      - run: |
+#          - ./cc-test-reporter format-coverage -t clover -o .Build/Logs/clover-functional.json .Build/Logs/clover-functional.xml
+#      - run: |
+#            ./cc-test-reporter sum-coverage --parts=2 --output=.Build/Logs/clover-sum.json .Build/Logs/clover-unit.json .Build/Logs/clover-functional.json
+#      - run: |
+#          ./cc-test-reporter upload-coverage --input=.Build/Logs/clover-sum.json
