@@ -150,7 +150,7 @@ jobs:
       - run: chmod +x ./cc-test-reporter
       - run: ./cc-test-reporter before-build
       - run: |
-          - ./cc-test-reporter format-coverage -t clover -o clover-unit.json .clover-unit.xml
+          - ./cc-test-reporter format-coverage -t clover -o clover-unit.json clover-unit.xml
       - run: |
           - ./cc-test-reporter format-coverage -t clover -o clover-functional.json clover-functional.xml
       - run: |
