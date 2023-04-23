@@ -1,0 +1,15 @@
+name: 'composer install'
+description: 'Install composer dependencies for testing'
+inputs:
+  php_version:
+    description: 'PHP version to use'
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - uses: php-actions/composer@v6
+      with:
+        php_version: ${{ inputs.php_version }}
+        php_extensions: zip
+    - run: sudo chown -R $(id -u):$(id -g) .
+      shell: bash

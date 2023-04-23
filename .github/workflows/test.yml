@@ -1,9 +1,11 @@
 ---
-on: push
+on:
+  push:
+  workflow_dispatch:
 
 env:
   TYPO3_EXTENSION_KEY: tinyurls
-  MAIN_PHP_VERSION: 7.4
+  MAIN_PHP_VERSION: 8.2
 
 jobs:
   "composer-validate":
@@ -11,68 +13,81 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Install dependencies
-        uses: php-actions/composer@v6
+      - uses: ./.github/workflows/composer
         with:
           php_version: "${{ env.MAIN_PHP_VERSION }}"
-          php_extensions: zip
-      - run: sudo chown -R $(id -u):$(id -g) .
       - run: |
           bash .Build/bin/t3_run_tests.sh -s composerValidate -p ${{ env.MAIN_PHP_VERSION }}
 
-  "check-codestyle":
+  "composer-normalize":
+    name: "Composer normalize"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ./.github/workflows/composer
+        with:
+          php_version: "${{ env.MAIN_PHP_VERSION }}"
+      - run: |
+          bash .Build/bin/t3_run_tests.sh -s composerNormalize -n -p ${{ env.MAIN_PHP_VERSION }}
+
+  "check-codestyle-codesniffer":
     name: "PHP code style check"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Install dependencies
-        uses: php-actions/composer@v6
+      - uses: ./.github/workflows/composer
         with:
           php_version: "${{ env.MAIN_PHP_VERSION }}"
-          php_extensions: zip
-      - run: sudo chown -R $(id -u):$(id -g) .
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: "${{ env.MAIN_PHP_VERSION }}"
       - run: |
           bash .Build/bin/t3_check_codestyle.sh PSRTinyurls
+
+  "check-codestyle-php-cs-fixer":
+    name: "PHP code style check"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ./.github/workflows/composer
+        with:
+          php_version: "8.1"
+      - run: |
+          bash .Build/bin/t3_run_tests.sh -s cgl -n -p 8.1
 
   "php-unit-tests":
     name: "PHP Unit tests"
     strategy:
       matrix:
-        php_version: ["7.3", "7.4"]
+        php_version: ["7.4", "8.2"]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: php-actions/composer@v6
+      - uses: ./.github/workflows/composer
         with:
           php_version: ${{ matrix.php_version }}
-          php_extensions: zip
-      - run: sudo chown -R $(id -u):$(id -g) .
       - run: |
           bash .Build/bin/t3_run_tests.sh -s unit -p ${{ matrix.php_version }}
 
-  "php-functional-tests-sqlite-73":
-    name: "Functional tests on SQLite PHP 7.3"
+  "php-functional-tests-sqlite-82":
+    name: "Functional tests on SQLite"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: php-actions/composer@v6
+      - uses: ./.github/workflows/composer
         with:
-          php_version: 7.3
-          php_extensions: zip
-      - run: sudo chown -R $(id -u):$(id -g) .
+          php_version: "${{ env.MAIN_PHP_VERSION }}"
       - run: |
-          bash .Build/bin/t3_run_tests.sh -s functional -d sqlite -p 7.3
+          bash .Build/bin/t3_run_tests.sh -s functional -d sqlite -p ${{ env.MAIN_PHP_VERSION }}
 
   "php-functional-tests-mariadb-main":
     name: "Functional tests on MariaDB"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: php-actions/composer@v6
+      - uses: ./.github/workflows/composer
         with:
           php_version: ${{ env.MAIN_PHP_VERSION }}
-          php_extensions: zip
-      - run: sudo chown -R $(id -u):$(id -g) .
       - run: |
           bash .Build/bin/t3_run_tests.sh -s functional -p ${{ env.MAIN_PHP_VERSION }}
 
@@ -80,17 +95,15 @@ jobs:
     name: "PHP linting"
     strategy:
       matrix:
-        php_version: ["7.3", "7.4"]
+        php_version: ["7.4", "8.0", "8.1", "8.2"]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: php-actions/composer@v6
+      - uses: ./.github/workflows/composer
         with:
           php_version: ${{ matrix.php_version }}
-          php_extensions: zip
-      - run: sudo chown -R $(id -u):$(id -g) .
       - run: |
-          bash .Build/bin/t3_run_tests.sh -s lint -p ${{ matrix.php_version }}
+          bash .Build/bin/t3_run_tests.sh -s lintPhp -p ${{ matrix.php_version }}
 
   "coverage-phpunit":
     name: "Test coverage by Unit Tests"
@@ -98,11 +111,9 @@ jobs:
     if: github.ref == 'refs/heads/develop'
     steps:
       - uses: actions/checkout@v2
-      - uses: php-actions/composer@v6
+      - uses: ./.github/workflows/composer
         with:
           php_version: ${{ env.MAIN_PHP_VERSION }}
-          php_extensions: zip
-      - run: sudo chown -R $(id -u):$(id -g) .
       - run: |
           bash .Build/bin/t3_run_tests.sh -s unit -p ${{ env.MAIN_PHP_VERSION }} -x -z coverage -e "--coverage-clover Logs/clover-unit.xml --whitelist ../Classes"
       - uses: actions/upload-artifact@v3
@@ -117,11 +128,9 @@ jobs:
     if: github.ref == 'refs/heads/develop'
     steps:
       - uses: actions/checkout@v2
-      - uses: php-actions/composer@v6
+      - uses: ./.github/workflows/composer
         with:
           php_version: ${{ env.MAIN_PHP_VERSION }}
-          php_extensions: zip
-      - run: sudo chown -R $(id -u):$(id -g) .
       - run: |
           bash .Build/bin/t3_run_tests.sh -s functional -d mysql -j 5.7 -p ${{ env.MAIN_PHP_VERSION }} -x -z coverage -e "--coverage-clover Logs/clover-functional.xml --whitelist ../Classes"
       - uses: actions/upload-artifact@v3
@@ -158,3 +167,16 @@ jobs:
           ./cc-test-reporter sum-coverage --parts=2 --output=clover-sum.json clover-unit.json clover-functional.json
       - run: |
           ./cc-test-reporter upload-coverage --input=clover-sum.json
+
+  "typo3-scan":
+    name: "Scan for deprecated and breaking code using typo3scan"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ./.github/workflows/composer
+        with:
+          php_version: "${{ env.MAIN_PHP_VERSION }}"
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: "${{ env.MAIN_PHP_VERSION }}"
+      - run: php .Build/bin/typo3scan scan --target 11 .
