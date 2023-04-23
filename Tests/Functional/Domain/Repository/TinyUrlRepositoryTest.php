@@ -31,7 +31,7 @@ class TinyUrlRepositoryTest extends AbstractFunctionalTestCase
      */
     public function countTinyUrlHitRaisesCounter()
     {
-        $this->importDataSet(__DIR__ . '/../../Fixtures/Database/tinyurl.xml');
+        $this->importCSVDataSet(__DIR__ . '/../../Fixtures/Database/tinyurl.csv');
 
         $tinyUrl = $this->tinyUrlRepository->findTinyUrlByKey('9499fjf');
         $this->assertEquals(0, $tinyUrl->getCounter());
