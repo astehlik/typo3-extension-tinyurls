@@ -15,7 +15,6 @@ return [
         'searchFields' => 'urlkey,target_url,target_url_hash',
         'rootLevel' => -1,
     ],
-    'interface' => ['showRecordFieldList' => 'urlkey,target_url,target_url_hash,delete_on_use,valid_until'],
     'columns' => [
         'counter' => [
             'exclude' => 0,
