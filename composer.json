@@ -51,7 +51,6 @@
     },
     "scripts": {
         "post-autoload-dump": [
-            "TYPO3\\TestingFramework\\Composer\\ExtensionTestEnvironment::prepare",
             "De\\SWebhosting\\Buildtools\\ExtensionTestEnvironment::prepare"
         ]
     }
