@@ -43,6 +43,9 @@
         "vendor-dir": ".Build/vendor"
     },
     "extra": {
+        "typo3/class-alias-loader": {
+            "always-add-alias-loader": true
+        },
         "typo3/cms": {
             "app-dir": ".Build",
             "extension-key": "tinyurls",
