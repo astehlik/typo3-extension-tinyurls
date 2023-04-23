@@ -8,28 +8,25 @@ define(
     function ($, notification) {
         'use strict';
 
-        var CopyToClipboard = {
-
+        const CopyToClipboard = {
             initialize: function () {
-                var me = this;
+                const me = this;
                 $('.tx-tinyurls-copyable-field-wrap').each(function () {
                     me.initializeSingleField($(this));
                 });
             },
 
             initializeSingleField: function (copyableFieldContainer) {
-
-                var copyButton = copyableFieldContainer.find('.tx-tinyurls-copyable-field-copy-button');
-                var valueField = copyableFieldContainer.find('.tx-tinyurls-copyable-field-value');
+                const copyButton = copyableFieldContainer.find('.tx-tinyurls-copyable-field-copy-button');
+                const valueField = copyableFieldContainer.find('.tx-tinyurls-copyable-field-value');
 
                 valueField.focus(function () {
                     valueField.select();
                 });
 
-                copyButton.click(function () {
+                copyButton.click(async function () {
                     try {
-                        valueField.select();
-                        document.execCommand('copy');
+                        await this.writeToClipboard(valueField);
                         notification.success(
                             TYPO3.lang['tx_tinyurls.copy_to_clipboard.success.title'],
                             TYPO3.lang['tx_tinyurls.copy_to_clipboard.success.message']
@@ -41,9 +38,19 @@ define(
                         );
                     }
                 });
+            },
+
+            writeToClipboard: async function (selectField) {
+                // Fallback to legacy copy method if clipboard API is not available.
+                if (!navigator.clipboard){
+                    selectField.select();
+                    document.execCommand('copy');
+                    return;
+                }
+
+                await navigator.clipboard.writeText(selectField.value);
             }
         };
-
 
         CopyToClipboard.initialize();
 
