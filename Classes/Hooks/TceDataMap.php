@@ -19,10 +19,9 @@ use Tx\Tinyurls\Domain\Repository\TinyUrlRepository;
 use Tx\Tinyurls\Exception\TinyUrlNotFoundException;
 use Tx\Tinyurls\Object\ImplementationManager;
 use TYPO3\CMS\Core\DataHandling\DataHandler;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
- * Hooks for the TYPO3 core engine
+ * Hooks for the TYPO3 core engine.
  *
  * @author Alexander Stehlik <alexander.stehlik.deleteme@gmail.com>
  * @author Sebastian Lemke <s.lemke.deleteme@infoworxx.de>
@@ -31,40 +30,31 @@ class TceDataMap
 {
     /**
      * The DataHandler instance that calls the hook.
-     *
-     * @var DataHandler
      */
-    protected $dataHandler;
+    protected DataHandler $dataHandler;
 
-    /**
-     * @var bool
-     */
-    protected $isNewRecord;
+    protected bool $isNewRecord;
 
-    /**
-     * @var TinyUrl
-     */
-    protected $tinyUrl;
+    protected TinyUrl $tinyUrl;
 
-    /**
-     * @var TinyUrlRepository
-     */
-    protected $tinyUrlRepository;
+    protected ?TinyUrlRepository $tinyUrlRepository = null;
 
-    public function injectTinyUrlRepository(TinyUrlRepository $tinyUrlRepository)
+    public function injectTinyUrlRepository(TinyUrlRepository $tinyUrlRepository): void
     {
         $this->tinyUrlRepository = $tinyUrlRepository;
     }
 
     /**
-     * When a user stores a tinyurl record in the Backend the urlkey and the target_url_hash will be updated
+     * When a user stores a tinyurl record in the Backend the urlkey and the target_url_hash will be updated.
      *
      * @param string $status (reference) Status of the current operation, 'new' or 'update
      * @param string $table (refrence) The table currently processing data for
-     * @param string $recordId (reference) Uid of the currently processed record, [integer] or [string] (like 'NEW...')
+     * @param int|string $recordId (reference) Uid of the currently processed record, [int] or [string] (like 'NEW...')
      * @param array $fieldArray (reference) The field array of a record
      * @param DataHandler $tcemain Reference to the TCEmain object that calls this hook
+     *
      * @see t3lib_TCEmain::hook_processDatamap_afterDatabaseOperations()
+     *
      * @SuppressWarnings(PHPMD.CamelCaseMethodName)
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
@@ -75,8 +65,8 @@ class TceDataMap
         $recordId,
         array &$fieldArray,
         DataHandler $tcemain
-    ) {
-        if ($table != TinyUrlRepository::TABLE_URLS) {
+    ): void {
+        if ($table !== TinyUrlRepository::TABLE_URLS) {
             return;
         }
 
@@ -115,7 +105,6 @@ class TceDataMap
     }
 
     /**
-     * @return TinyUrlRepository
      * @codeCoverageIgnore
      */
     protected function getTinyUrlRepository(): TinyUrlRepository
@@ -128,7 +117,7 @@ class TceDataMap
 
     protected function isNewRecord($recordId): bool
     {
-        return GeneralUtility::isFirstPartOfStr($recordId, 'NEW');
+        return str_contains((string)$recordId, 'NEW');
     }
 
     protected function shouldUrlKeyBeRegenerated(): bool

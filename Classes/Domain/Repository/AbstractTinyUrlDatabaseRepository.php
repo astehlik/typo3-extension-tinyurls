@@ -23,29 +23,20 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 abstract class AbstractTinyUrlDatabaseRepository
 {
     /**
-     * Contains the extension configration
-     *
-     * @var ExtensionConfiguration
+     * Contains the extension configration.
      */
-    protected $extensionConfiguration;
+    protected ?ExtensionConfiguration $extensionConfiguration = null;
 
-    /**
-     * @var TinyUrlValidator
-     */
-    protected $tinyUrlValidator;
+    protected ?TinyUrlValidator $tinyUrlValidator = null;
 
     /**
      * Stores the given URL in the database, returns the inserted UID.
-     *
-     * @param TinyUrl $tinyUrl
-     * @return int
      */
     abstract protected function insertNewTinyUrlInDatabase(TinyUrl $tinyUrl): int;
 
     /**
      * Executes the callback within a transation.
      *
-     * @param \Closure $callback
      * @return mixed
      */
     abstract protected function transactional(\Closure $callback);
@@ -53,28 +44,27 @@ abstract class AbstractTinyUrlDatabaseRepository
     /**
      * Updates the given URL in the database.
      *
-     * @param TinyUrl $tinyUrl
      * @return mixed
      */
     abstract protected function updateTinyUrl(TinyUrl $tinyUrl);
 
-    public function injectExtensionConfiguration(ExtensionConfiguration $extensionConfiguration)
+    public function injectExtensionConfiguration(ExtensionConfiguration $extensionConfiguration): void
     {
         $this->extensionConfiguration = $extensionConfiguration;
     }
 
-    public function insertNewTinyUrl(TinyUrl $tinyUrl)
+    public function insertNewTinyUrl(TinyUrl $tinyUrl): void
     {
         $this->prepareTinyUrlForInsert($tinyUrl);
 
         $this->transactional(
-            function () use ($tinyUrl) {
+            function () use ($tinyUrl): void {
                 $this->insertNewTinyUrlTransaction($tinyUrl);
             }
         );
     }
 
-    public function setTinyUrlValidator(TinyUrlValidator $tinyUrlValidator)
+    public function setTinyUrlValidator(TinyUrlValidator $tinyUrlValidator): void
     {
         $this->tinyUrlValidator = $tinyUrlValidator;
     }
@@ -85,7 +75,6 @@ abstract class AbstractTinyUrlDatabaseRepository
     }
 
     /**
-     * @return ExtensionConfiguration
      * @codeCoverageIgnore
      */
     protected function getExtensionConfiguration(): ExtensionConfiguration
@@ -106,20 +95,19 @@ abstract class AbstractTinyUrlDatabaseRepository
     protected function getTinyUrlDatabaseData(TinyUrl $tinyUrl): array
     {
         return [
-            'pid' => (int)$tinyUrl->getPid(),
-            'tstamp' => (int)$tinyUrl->getTstamp()->getTimestamp(),
-            'counter' => (int)$tinyUrl->getCounter(),
+            'pid' => $tinyUrl->getPid(),
+            'tstamp' => $tinyUrl->getTstamp()->getTimestamp(),
+            'counter' => $tinyUrl->getCounter(),
             'comment' => $tinyUrl->getComment(),
             'urlkey' => $tinyUrl->getUrlkey(),
             'target_url' => $tinyUrl->getTargetUrl(),
             'target_url_hash' => $tinyUrl->getTargetUrlHash(),
             'delete_on_use' => (int)$tinyUrl->getDeleteOnUse(),
-            'valid_until' => $tinyUrl->hasValidUntil() ? (int)$tinyUrl->getValidUntil()->getTimestamp() : 0,
+            'valid_until' => $tinyUrl->hasValidUntil() ? $tinyUrl->getValidUntil()->getTimestamp() : 0,
         ];
     }
 
     /**
-     * @return TinyUrlValidator
      * @codeCoverageIgnore
      */
     protected function getTinyUrlValidator(): TinyUrlValidator
@@ -130,7 +118,7 @@ abstract class AbstractTinyUrlDatabaseRepository
         return $this->tinyUrlValidator;
     }
 
-    protected function insertNewTinyUrlTransaction(TinyUrl $tinyUrl)
+    protected function insertNewTinyUrlTransaction(TinyUrl $tinyUrl): void
     {
         $customUrlKey = $tinyUrl->hasCustomUrlKey() ? $tinyUrl->getCustomUrlKey() : null;
 
@@ -146,14 +134,14 @@ abstract class AbstractTinyUrlDatabaseRepository
         }
     }
 
-    protected function prepareTinyUrlForInsert(TinyUrl $tinyUrl)
+    protected function prepareTinyUrlForInsert(TinyUrl $tinyUrl): void
     {
         $this->validateTinyUrl($tinyUrl);
         $tinyUrl->setPid($this->extensionConfiguration->getUrlRecordStoragePid());
         $tinyUrl->persistPreProcess();
     }
 
-    protected function prepareTinyUrlForUpdate(TinyUrl $tinyUrl)
+    protected function prepareTinyUrlForUpdate(TinyUrl $tinyUrl): void
     {
         if ($tinyUrl->isNew()) {
             throw new \InvalidArgumentException('Only existing TinyUrl records can be updated.');
@@ -164,7 +152,7 @@ abstract class AbstractTinyUrlDatabaseRepository
         $tinyUrl->persistPreProcess();
     }
 
-    protected function validateTinyUrl(TinyUrl $tinyUrl)
+    protected function validateTinyUrl(TinyUrl $tinyUrl): void
     {
         $validator = $this->getTinyUrlValidator();
         $result = $validator->validate($tinyUrl);

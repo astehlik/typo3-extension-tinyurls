@@ -33,46 +33,46 @@ class ImplementationManagerTest extends TestCase
         $this->implementationManager = new ImplementationManager();
     }
 
-    public function testResetToDefaultsUsesBase62UrlKeyGenerator()
+    public function testResetToDefaultsUsesBase62UrlKeyGenerator(): void
     {
         $this->implementationManager->restoreDefaults();
-        $this->assertEquals(Base62UrlKeyGenerator::class, $this->implementationManager->getUrlKeyGeneratorClass());
+        self::assertSame(Base62UrlKeyGenerator::class, $this->implementationManager->getUrlKeyGeneratorClass());
     }
 
-    public function testResetToDefaultsUsesDoctrineRepositoryIfAvailable()
+    public function testResetToDefaultsUsesDoctrineRepositoryIfAvailable(): void
     {
         $this->implementationManager->restoreDefaults();
-        $this->assertEquals(
+        self::assertSame(
             TinyUrlDoctrineRepository::class,
             $this->implementationManager->getTinyUrlRepositoryClass()
         );
     }
 
-    public function testSetTinyUrlRepositoryClassSetsClassName()
+    public function testSetTinyUrlRepositoryClassSetsClassName(): void
     {
         $this->implementationManager->setTinyUrlRepositoryClass('new class');
-        $this->assertEquals('new class', $this->implementationManager->getTinyUrlRepositoryClass());
+        self::assertSame('new class', $this->implementationManager->getTinyUrlRepositoryClass());
     }
 
-    public function testSetTinyUrlRepositorySetsTinyUrlRepositoryInstance()
+    public function testSetTinyUrlRepositorySetsTinyUrlRepositoryInstance(): void
     {
         /** @var TinyUrlRepository $tinyUrlRepository */
         $tinyUrlRepository = $this->createMock(TinyUrlRepository::class);
         $this->implementationManager->setTinyUrlRepository($tinyUrlRepository);
-        $this->assertEquals($tinyUrlRepository, $this->implementationManager->getTinyUrlRepository());
+        self::assertSame($tinyUrlRepository, $this->implementationManager->getTinyUrlRepository());
     }
 
-    public function testSetUrlKeyGeneratorClassSetsClassName()
+    public function testSetUrlKeyGeneratorClassSetsClassName(): void
     {
         $this->implementationManager->setUrlKeyGeneratorClass('new gen class');
-        $this->assertEquals('new gen class', $this->implementationManager->getUrlKeyGeneratorClass());
+        self::assertSame('new gen class', $this->implementationManager->getUrlKeyGeneratorClass());
     }
 
-    public function testSetUrlKeyGeneratorSetsUrlKeyGeneratorInstance()
+    public function testSetUrlKeyGeneratorSetsUrlKeyGeneratorInstance(): void
     {
         /** @var UrlKeyGenerator $urlKeyGenerator */
         $urlKeyGenerator = $this->createMock(UrlKeyGenerator::class);
         $this->implementationManager->setUrlKeyGenerator($urlKeyGenerator);
-        $this->assertEquals($urlKeyGenerator, $this->implementationManager->getUrlKeyGenerator());
+        self::assertSame($urlKeyGenerator, $this->implementationManager->getUrlKeyGenerator());
     }
 }

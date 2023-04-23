@@ -20,17 +20,11 @@ interface UrlKeyGenerator
 {
     /**
      * Generates a unique tinyurl key for the record with the given UID.
-     *
-     * @param TinyUrl $tinyUrl
-     * @return string
      */
     public function generateTinyurlKeyForTinyUrl(TinyUrl $tinyUrl): string;
 
     /**
      * Generates a unique tinyurl key for the given UID.
-     *
-     * @param int $uid
-     * @return string
      */
     public function generateTinyurlKeyForUid(int $uid): string;
 }

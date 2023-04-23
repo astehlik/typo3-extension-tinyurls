@@ -36,27 +36,27 @@ class StoragePageQueryRestrictionTest extends TestCase
     protected function setUp(): void
     {
         if (!interface_exists('TYPO3\\CMS\\Core\\Database\\Query\\Restriction\\QueryRestrictionInterface')) {
-            $this->markTestSkipped('The new Doctrine DBAL QueryRestrictionInterface does not exist.');
+            self::markTestSkipped('The new Doctrine DBAL QueryRestrictionInterface does not exist.');
         }
         $this->expressionBuilderMock = $this->createMock(ExpressionBuilder::class);
         $this->storagePageQueryRestriction = new StoragePageQueryRestriction(38);
     }
 
-    public function testBuildExpressionReturnsEmptyContraintForNonTinyUrlTable()
+    public function testBuildExpressionReturnsEmptyContraintForNonTinyUrlTable(): void
     {
-        $this->expressionBuilderMock->expects($this->never())
+        $this->expressionBuilderMock->expects(self::never())
             ->method('eq');
 
         $expression = $this->storagePageQueryRestriction->buildExpression(
             ['the_table' => 'the_alias'],
             $this->expressionBuilderMock
         );
-        $this->assertEquals(0, $expression->count());
+        self::assertSame(0, $expression->count());
     }
 
-    public function testBuildExpressionReturnsStoragePageContraintForTinyUrlTable()
+    public function testBuildExpressionReturnsStoragePageContraintForTinyUrlTable(): void
     {
-        $this->expressionBuilderMock->expects($this->once())
+        $this->expressionBuilderMock->expects(self::once())
             ->method('eq')
             ->with('the_alias.pid', 38)
             ->willReturn('the constraint');
@@ -64,7 +64,7 @@ class StoragePageQueryRestrictionTest extends TestCase
         $constraints[] = 'the constraint';
         $andContraintMock = $this->createMock(CompositeExpression::class);
 
-        $this->expressionBuilderMock->expects($this->once())
+        $this->expressionBuilderMock->expects(self::once())
             ->method('andX')
             ->with(...$constraints)
             ->willReturn($andContraintMock);
@@ -74,12 +74,12 @@ class StoragePageQueryRestrictionTest extends TestCase
             $this->expressionBuilderMock
         );
 
-        $this->assertEquals($andContraintMock, $expression);
+        self::assertSame($andContraintMock, $expression);
     }
 
-    public function testBuildExpressionUsesTableNameIfAliasIsEmpty()
+    public function testBuildExpressionUsesTableNameIfAliasIsEmpty(): void
     {
-        $this->expressionBuilderMock->expects($this->once())
+        $this->expressionBuilderMock->expects(self::once())
             ->method('eq')
             ->with(TinyUrlRepository::TABLE_URLS . '.pid', 38)
             ->willReturn('the constraint');

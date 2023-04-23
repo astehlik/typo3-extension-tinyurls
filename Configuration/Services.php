@@ -9,7 +9,7 @@ use Tx\Tinyurls\Utils\GeneralUtilityWrapper;
 use Tx\Tinyurls\Utils\UrlUtils;
 use Tx\Tinyurls\ViewHelpers\TinyurlViewHelper;
 
-return function (ContainerConfigurator $configurator) {
+return function (ContainerConfigurator $configurator): void {
     $configurator->services()
         ->defaults()->autowire()->autoconfigure()
         ->set(ExtensionConfiguration::class, ExtensionConfiguration::class)

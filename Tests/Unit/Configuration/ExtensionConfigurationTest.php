@@ -37,113 +37,116 @@ class ExtensionConfigurationTest extends TestCase
         $this->extensionConfiguration = new ExtensionConfiguration();
     }
 
-    public function testAppendPidQueryAppendsAndStatementForNonEmptyQuery()
+    public function testAppendPidQueryAppendsAndStatementForNonEmptyQuery(): void
     {
         $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['tinyurls']['urlRecordStoragePID'] = 0;
-        $this->assertEquals('a=1 AND pid=0', $this->extensionConfiguration->appendPidQuery('a=1'));
+        self::assertSame('a=1 AND pid=0', $this->extensionConfiguration->appendPidQuery('a=1'));
     }
 
-    public function testAppendPidQueryAppendsConfiguredPid()
+    public function testAppendPidQueryAppendsConfiguredPid(): void
     {
-        $this->assertEquals('pid=0', $this->extensionConfiguration->appendPidQuery(''));
+        self::assertSame('pid=0', $this->extensionConfiguration->appendPidQuery(''));
     }
 
-    public function testAppendPidQueryAppendsDefaultPid()
+    public function testAppendPidQueryAppendsDefaultPid(): void
     {
         $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['tinyurls']['urlRecordStoragePID'] = 999;
-        $this->assertEquals('pid=999', $this->extensionConfiguration->appendPidQuery(''));
+        self::assertSame('pid=999', $this->extensionConfiguration->appendPidQuery(''));
     }
 
-    public function testAreSpeakingUrlsEnabledReturnsFalseByDefault()
+    public function testAreSpeakingUrlsEnabledReturnsFalseByDefault(): void
     {
-        $this->assertFalse($this->extensionConfiguration->areSpeakingUrlsEnabled());
+        self::assertFalse($this->extensionConfiguration->areSpeakingUrlsEnabled());
     }
 
-    public function testAreSpeakingUrlsEnabledReturnsFalseIfConfigured()
+    public function testAreSpeakingUrlsEnabledReturnsFalseIfConfigured(): void
     {
         $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['tinyurls']['createSpeakingURLs'] = 0;
-        $this->assertFalse($this->extensionConfiguration->areSpeakingUrlsEnabled());
+        self::assertFalse($this->extensionConfiguration->areSpeakingUrlsEnabled());
     }
 
-    public function testAreSpeakingUrlsEnabledReturnsTrueIfConfigured()
+    public function testAreSpeakingUrlsEnabledReturnsTrueIfConfigured(): void
     {
         $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['tinyurls']['createSpeakingURLs'] = 1;
-        $this->assertTrue($this->extensionConfiguration->areSpeakingUrlsEnabled());
+        self::assertTrue($this->extensionConfiguration->areSpeakingUrlsEnabled());
     }
 
-    public function testGetBase62DictionaryReturnsConfiguredValue()
+    public function testGetBase62DictionaryReturnsConfiguredValue(): void
     {
         $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['tinyurls']['base62Dictionary'] = 'asfduew';
-        $this->assertEquals('asfduew', $this->extensionConfiguration->getBase62Dictionary());
+        self::assertSame('asfduew', $this->extensionConfiguration->getBase62Dictionary());
     }
 
-    public function testGetBase62DictionaryReturnsDefault()
+    public function testGetBase62DictionaryReturnsDefault(): void
     {
-        $this->assertEquals(
+        self::assertSame(
             'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789',
             $this->extensionConfiguration->getBase62Dictionary()
         );
     }
 
-    public function testGetExtensionConfigurationReturnsExtensionConfiguration()
+    public function testGetExtensionConfigurationReturnsExtensionConfiguration(): void
     {
         /** @noinspection PhpDeprecationInspection */
-        $this->assertArrayHasKey('createSpeakingURLs', $this->extensionConfiguration->getExtensionConfiguration());
+        self::assertArrayHasKey('createSpeakingURLs', $this->extensionConfiguration->getExtensionConfiguration());
     }
 
-    public function testGetExtensionConfigurationValueThrowsExceptionForNonExistingKey()
+    public function testGetExtensionConfigurationValueThrowsExceptionForNonExistingKey(): void
     {
         $this->expectExceptionMessage('The key a non existing key does not exists in the extension configuration');
+
         /** @noinspection PhpDeprecationInspection */
         $this->extensionConfiguration->getExtensionConfigurationValue('a non existing key');
     }
 
-    public function testGetMinimalRandomKeyLengthReturnsConfiguredValue()
+    public function testGetMinimalRandomKeyLengthReturnsConfiguredValue(): void
     {
         $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['tinyurls']['base62Dictionary'] = 'asdf';
-        $this->assertEquals('asdf', $this->extensionConfiguration->getBase62Dictionary());
+        self::assertSame('asdf', $this->extensionConfiguration->getBase62Dictionary());
     }
 
-    public function testGetMinimalRandomKeyLengthReturnsDefault()
+    public function testGetMinimalRandomKeyLengthReturnsDefault(): void
     {
-        $this->assertEquals(2, $this->extensionConfiguration->getMinimalRandomKeyLength());
+        self::assertSame(2, $this->extensionConfiguration->getMinimalRandomKeyLength());
     }
 
-    public function testGetMinimalTinyurlKeyLengthReturnsConfiguredValue()
+    public function testGetMinimalTinyurlKeyLengthReturnsConfiguredValue(): void
     {
         $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['tinyurls']['minimalRandomKeyLength'] = '31';
-        $this->assertEquals(31, $this->extensionConfiguration->getMinimalRandomKeyLength());
+        self::assertSame(31, $this->extensionConfiguration->getMinimalRandomKeyLength());
     }
 
-    public function testGetMinimalTinyurlKeyLengthReturnsDefault()
+    public function testGetMinimalTinyurlKeyLengthReturnsDefault(): void
     {
-        $this->assertEquals(2, $this->extensionConfiguration->getMinimalRandomKeyLength());
+        self::assertSame(2, $this->extensionConfiguration->getMinimalRandomKeyLength());
     }
 
-    public function testGetSpeakingUrlTemplateReturnsConfiguredValue()
+    public function testGetSpeakingUrlTemplateReturnsConfiguredValue(): void
     {
         $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['tinyurls']['speakingUrlTemplate'] = 'koaidp';
-        $this->assertEquals('koaidp', $this->extensionConfiguration->getSpeakingUrlTemplate());
+        self::assertSame('koaidp', $this->extensionConfiguration->getSpeakingUrlTemplate());
     }
 
-    public function testGetSpeakingUrlTemplateReturnsDefault()
+    public function testGetSpeakingUrlTemplateReturnsDefault(): void
     {
-        $this->assertEquals(
+        self::assertSame(
             '###TYPO3_SITE_URL###tinyurl/###TINY_URL_KEY###',
             $this->extensionConfiguration->getSpeakingUrlTemplate()
         );
     }
 
-    public function testInitializeConfigFromTyposcriptUsesTypoScriptConfiguratorForInitalizingConfig()
+    public function testInitializeConfigFromTyposcriptUsesTypoScriptConfiguratorForInitalizingConfig(): void
     {
         /** @var ContentObjectRenderer|MockObject $contentObjectRendererMock */
         $contentObjectRendererMock = $this->createMock(ContentObjectRenderer::class);
-        /** @var TinyUrlGenerator|MockObject $tinyUrlGeneratorMock */
+
+        /** @var MockObject|TinyUrlGenerator $tinyUrlGeneratorMock */
         $tinyUrlGeneratorMock = $this->createMock(TinyUrlGenerator::class);
-        /** @var TypoScriptConfigurator|MockObject $typoScriptConfiguratorMock */
+
+        /** @var MockObject|TypoScriptConfigurator $typoScriptConfiguratorMock */
         $typoScriptConfiguratorMock = $this->createMock(TypoScriptConfigurator::class);
 
-        $typoScriptConfiguratorMock->expects($this->once())
+        $typoScriptConfiguratorMock->expects(self::once())
             ->method('initializeConfigFromTyposcript')
             ->with(['the' => 'config'], $contentObjectRendererMock);
 

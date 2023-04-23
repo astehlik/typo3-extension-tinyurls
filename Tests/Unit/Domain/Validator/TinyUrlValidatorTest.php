@@ -14,8 +14,6 @@ namespace Tx\Tinyurls\Tests\Unit\Domain\Validator;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
-use DateInterval;
-use DateTime;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Tx\Tinyurls\Domain\Model\TinyUrl;
@@ -26,7 +24,7 @@ use Tx\Tinyurls\Exception\TinyUrlNotFoundException;
 class TinyUrlValidatorTest extends TestCase
 {
     /**
-     * @var TinyUrlRepository|MockObject
+     * @var MockObject|TinyUrlRepository
      */
     protected $tinyUrlRepositoryMock;
 
@@ -42,66 +40,66 @@ class TinyUrlValidatorTest extends TestCase
         $this->tinyUrlValidator->injectTinyUrlRepository($this->tinyUrlRepositoryMock);
     }
 
-    public function testGetOptionsReturnsEmptyArray()
+    public function testGetOptionsReturnsEmptyArray(): void
     {
-        $this->assertEquals([], $this->tinyUrlValidator->getOptions());
+        self::assertSame([], $this->tinyUrlValidator->getOptions());
     }
 
-    public function testValidateReturnsErrorIdValidUntilIsInThePast()
+    public function testValidateReturnsErrorIdValidUntilIsInThePast(): void
     {
         $tinyUrl = TinyUrl::createNew();
-        $tinyUrl->setValidUntil(new DateTime('2000-08-10'));
+        $tinyUrl->setValidUntil(new \DateTime('2000-08-10'));
         $result = $this->tinyUrlValidator->validate($tinyUrl);
-        $this->assertEquals(1488307858, $result->forProperty('validUntil')->getFirstError()->getCode());
+        self::assertSame(1488307858, $result->forProperty('validUntil')->getFirstError()->getCode());
     }
 
-    public function testValidateReturnsErrorIfCustomUrlKeyExists()
+    public function testValidateReturnsErrorIfCustomUrlKeyExists(): void
     {
         $tinyUrl = TinyUrl::createNew();
         $tinyUrl->setCustomUrlKey('the custom key');
         $existingTinyUrl = TinyUrl::createNew();
-        $this->tinyUrlRepositoryMock->expects($this->once())
+        $this->tinyUrlRepositoryMock->expects(self::once())
             ->method('findTinyUrlByKey')
             ->with('the custom key')
             ->willReturn($existingTinyUrl);
         $result = $this->tinyUrlValidator->validate($tinyUrl);
-        $this->assertEquals(1488317930, $result->forProperty('customUrlKey')->getFirstError()->getCode());
+        self::assertSame(1488317930, $result->forProperty('customUrlKey')->getFirstError()->getCode());
     }
 
-    public function testValidateReturnsNoErrorIdValidUntilIsInTheFuture()
+    public function testValidateReturnsNoErrorIdValidUntilIsInTheFuture(): void
     {
-        $tomorrow = new DateTime();
-        $tomorrow->add(DateInterval::createFromDateString('tomorrow'));
+        $tomorrow = new \DateTime();
+        $tomorrow->add(\DateInterval::createFromDateString('tomorrow'));
         $tinyUrl = TinyUrl::createNew();
         $tinyUrl->setValidUntil($tomorrow);
         $result = $this->tinyUrlValidator->validate($tinyUrl);
-        $this->assertEmpty($result->forProperty('validUntil')->getFlattenedErrors());
+        self::assertEmpty($result->forProperty('validUntil')->getFlattenedErrors());
     }
 
-    public function testValidateReturnsNoErrorIfCustomUrlKeyDoesNotExist()
+    public function testValidateReturnsNoErrorIfCustomUrlKeyDoesNotExist(): void
     {
         $tinyUrl = TinyUrl::createNew();
         $tinyUrl->setCustomUrlKey('the custom key');
-        $this->tinyUrlRepositoryMock->expects($this->once())
+        $this->tinyUrlRepositoryMock->expects(self::once())
             ->method('findTinyUrlByKey')
             ->with('the custom key')
             ->willThrowException(new TinyUrlNotFoundException());
         $result = $this->tinyUrlValidator->validate($tinyUrl);
-        $this->assertEmpty($result->forProperty('customUrlKey')->getFlattenedErrors());
+        self::assertEmpty($result->forProperty('customUrlKey')->getFlattenedErrors());
     }
 
-    public function testValidateReturnsNoErrorIfCustomUrlKeyExistsAndBelongsToSameUrl()
+    public function testValidateReturnsNoErrorIfCustomUrlKeyExistsAndBelongsToSameUrl(): void
     {
         $tinyUrl = TinyUrl::createNew();
         $tinyUrl->persistPostProcessInsert(2);
         $tinyUrl->setCustomUrlKey('the custom key');
         $existingTinyUrl = TinyUrl::createNew();
         $existingTinyUrl->persistPostProcessInsert(2);
-        $this->tinyUrlRepositoryMock->expects($this->once())
+        $this->tinyUrlRepositoryMock->expects(self::once())
             ->method('findTinyUrlByKey')
             ->with('the custom key')
             ->willReturn($existingTinyUrl);
         $result = $this->tinyUrlValidator->validate($tinyUrl);
-        $this->assertEmpty($result->forProperty('customUrlKey')->getFlattenedErrors());
+        self::assertEmpty($result->forProperty('customUrlKey')->getFlattenedErrors());
     }
 }

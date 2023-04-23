@@ -52,7 +52,7 @@ class DatabaseRecordList implements SingletonInterface
         array $additionalConstraints,
         array $fieldList,
         Typo3QueryBuilder $queryBuilder
-    ) {
+    ): void {
         if ($table !== TinyUrlRepository::TABLE_URLS) {
             return;
         }

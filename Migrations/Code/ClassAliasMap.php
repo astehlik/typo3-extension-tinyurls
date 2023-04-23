@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 return [
     'tx_tinyurls_hooks_eidprocessor' => 'Tx\\Tinyurls\\Hooks\\EidProcessor',
     'tx_tinyurls_hooks_tce' => 'Tx\\Tinyurls\\Hooks\\TceDataMap',

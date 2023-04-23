@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Tx\Tinyurls\FormEngine\TinyUrlDisplay;
 
 $languagePrefix = 'LLL:EXT:tinyurls/Resources/Private/Language/locallang_db.xlf:tx_tinyurls_urls.';
@@ -86,7 +88,7 @@ return [
                 'type' => 'input',
                 'renderType' => 'inputDateTime',
                 'eval' => 'datetime,int',
-                'default' => 0
+                'default' => 0,
             ],
         ],
     ],

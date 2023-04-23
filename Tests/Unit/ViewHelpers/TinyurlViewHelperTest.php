@@ -14,13 +14,13 @@ namespace Tx\Tinyurls\Tests\Unit\ViewHelpers;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
-use Closure;
 use PHPUnit\Framework\MockObject\MockObject;
 use Tx\Tinyurls\TinyUrl\Api;
 use Tx\Tinyurls\ViewHelpers\TinyurlViewHelper;
-use TYPO3\TestingFramework\Fluid\Unit\ViewHelpers\ViewHelperBaseTestcase;
+use TYPO3\TestingFramework\Core\Unit\UnitTestCase;
+use TYPO3Fluid\Fluid\Core\Rendering\RenderingContextInterface;
 
-class TinyurlViewHelperTest extends ViewHelperBaseTestcase
+class TinyurlViewHelperTest extends UnitTestCase
 {
     protected $resetSingletonInstances = true;
 
@@ -37,12 +37,11 @@ class TinyurlViewHelperTest extends ViewHelperBaseTestcase
         TinyurlViewHelper::setTinyUrlApi($this->tinyUrlApi);
     }
 
-    public function testCustomUrlKeyIsPassedToTinyUrlApi()
+    public function testCustomUrlKeyIsPassedToTinyUrlApi(): void
     {
-        $this->tinyUrlApi->expects($this->once())
+        $this->tinyUrlApi->expects(self::once())
             ->method('setUrlKey')
-            ->with('theurl-key')
-            ->willReturn('');
+            ->with('theurl-key');
 
         $arguments = [
             'url' => 'http://the-url.tld',
@@ -52,12 +51,11 @@ class TinyurlViewHelperTest extends ViewHelperBaseTestcase
         $this->callRenderStatic($arguments);
     }
 
-    public function testOnlyOneTimeValidSetsDeleteOnUse()
+    public function testOnlyOneTimeValidSetsDeleteOnUse(): void
     {
-        $this->tinyUrlApi->expects($this->once())
+        $this->tinyUrlApi->expects(self::once())
             ->method('setDeleteOnUse')
-            ->with(true)
-            ->willReturn('');
+            ->with(true);
 
         $arguments = [
             'url' => 'http://www.url.tld',
@@ -66,13 +64,13 @@ class TinyurlViewHelperTest extends ViewHelperBaseTestcase
         $this->callRenderStatic($arguments);
     }
 
-    public function testRetrievesUrlFromRenderChildrenIfNotProvidedAsArgument()
+    public function testRetrievesUrlFromRenderChildrenIfNotProvidedAsArgument(): void
     {
         $renderChildrenClosure = function () {
             return 'http://the-children-url.tld';
         };
 
-        $this->tinyUrlApi->expects($this->once())
+        $this->tinyUrlApi->expects(self::once())
             ->method('getTinyUrl')
             ->with('http://the-children-url.tld')
             ->willReturn('');
@@ -80,9 +78,9 @@ class TinyurlViewHelperTest extends ViewHelperBaseTestcase
         $this->callRenderStaticWithRenderChildrenClosure([], $renderChildrenClosure);
     }
 
-    public function testUrlIsPassedToTinyUrlApi()
+    public function testUrlIsPassedToTinyUrlApi(): void
     {
-        $this->tinyUrlApi->expects($this->once())
+        $this->tinyUrlApi->expects(self::once())
             ->method('getTinyUrl')
             ->with('http://the-url.tld')
             ->willReturn('');
@@ -91,12 +89,11 @@ class TinyurlViewHelperTest extends ViewHelperBaseTestcase
         $this->callRenderStatic($arguments);
     }
 
-    public function testValidUntilIsPassedToTinyUrlApi()
+    public function testValidUntilIsPassedToTinyUrlApi(): void
     {
-        $this->tinyUrlApi->expects($this->once())
+        $this->tinyUrlApi->expects(self::once())
             ->method('setValidUntil')
-            ->with(3848909)
-            ->willReturn('');
+            ->with(3848909);
 
         $arguments = [
             'url' => 'http://the-url.tld',
@@ -118,21 +115,21 @@ class TinyurlViewHelperTest extends ViewHelperBaseTestcase
         return $arguments;
     }
 
-    private function callRenderStatic(array $arguments)
+    private function callRenderStatic(array $arguments): void
     {
-        $renderChildrenClosure = function () {
+        $renderChildrenClosure = function (): void {
             // Nothing to do here.
         };
 
         $this->callRenderStaticWithRenderChildrenClosure($arguments, $renderChildrenClosure);
     }
 
-    private function callRenderStaticWithRenderChildrenClosure(array $arguments, Closure $renderChildrenClosure)
+    private function callRenderStaticWithRenderChildrenClosure(array $arguments, \Closure $renderChildrenClosure): void
     {
         TinyurlViewHelper::renderStatic(
             $this->buildArguments($arguments),
             $renderChildrenClosure,
-            $this->renderingContext
+            $this->createMock(RenderingContextInterface::class)
         );
     }
 }

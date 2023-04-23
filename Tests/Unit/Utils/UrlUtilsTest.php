@@ -55,88 +55,89 @@ class UrlUtilsTest extends TestCase
     /**
      * @backupGlobals enabled
      */
-    public function testBuildTinyUrlCreatesEidUrlIfSpeakingUrlsAreDisabled()
+    public function testBuildTinyUrlCreatesEidUrlIfSpeakingUrlsAreDisabled(): void
     {
-        $this->generalUtilityMock->expects($this->once())
+        $this->generalUtilityMock->expects(self::once())
             ->method('getIndpEnv')
             ->with('TYPO3_SITE_URL')
             ->willReturn('http://the-site.url/');
 
-        $this->extensionConfigurationMock->expects($this->once())
+        $this->extensionConfigurationMock->expects(self::once())
             ->method('areSpeakingUrlsEnabled')
             ->willReturn(false);
 
-        $this->assertEquals(
+        self::assertSame(
             'http://the-site.url/?eID=tx_tinyurls&tx_tinyurls[key]=thekey',
             $this->urlUtils->buildTinyUrl('thekey')
         );
     }
 
-    public function testBuildTinyUrlCreatesSpeakingUrlIfEnabled()
+    public function testBuildTinyUrlCreatesSpeakingUrlIfEnabled(): void
     {
         $this->extensionConfigurationMock
             ->method('getSpeakingUrlTemplate')
             ->willReturn('http://base.url/###TINY_URL_KEY###');
 
-        $this->extensionConfigurationMock->expects($this->once())
+        $this->extensionConfigurationMock->expects(self::once())
             ->method('areSpeakingUrlsEnabled')
             ->willReturn(true);
 
-        $this->assertEquals('http://base.url/thekey', $this->urlUtils->buildTinyUrl('thekey'));
+        self::assertSame('http://base.url/thekey', $this->urlUtils->buildTinyUrl('thekey'));
     }
 
-    public function testCreateSpeakingTinyUrlReplacesIndependentEnvironmentMarker()
+    public function testCreateSpeakingTinyUrlReplacesIndependentEnvironmentMarker(): void
     {
-        $this->extensionConfigurationMock->expects($this->once())
+        $this->extensionConfigurationMock->expects(self::once())
             ->method('getSpeakingUrlTemplate')
             ->willReturn('###MY_ENV_MARKER###');
-        $this->generalUtilityMock->expects($this->once())
+        $this->generalUtilityMock->expects(self::once())
             ->method('getIndpEnv')
             ->willReturn('replacedvalue');
         $speakingUrl = $this->urlUtils->createSpeakingTinyUrl('testkey');
-        $this->assertEquals('replacedvalue', $speakingUrl);
+        self::assertSame('replacedvalue', $speakingUrl);
     }
 
-    public function testCreateSpeakingTinyUrlReplacesMultipleIndependentEnvironmentMarkers()
+    public function testCreateSpeakingTinyUrlReplacesMultipleIndependentEnvironmentMarkers(): void
     {
-        $this->extensionConfigurationMock->expects($this->once())
+        $this->extensionConfigurationMock->expects(self::once())
             ->method('getSpeakingUrlTemplate')
             ->willReturn('###MY_ENV_MARKER1###/###MY_ENV_MARKER2###');
-        $this->generalUtilityMock->expects($this->exactly(2))
+        $this->generalUtilityMock->expects(self::exactly(2))
             ->method('getIndpEnv')
-            ->will($this->onConsecutiveCalls('myenvvalue1', 'myenvvalue2'));
+            ->will(self::onConsecutiveCalls('myenvvalue1', 'myenvvalue2'));
         $speakingUrl = $this->urlUtils->createSpeakingTinyUrl('testkey');
-        $this->assertEquals('myenvvalue1/myenvvalue2', $speakingUrl);
+        self::assertSame('myenvvalue1/myenvvalue2', $speakingUrl);
     }
 
-    public function testCreateSpeakingTinyUrlReplacesTinyUrlMarker()
+    public function testCreateSpeakingTinyUrlReplacesTinyUrlMarker(): void
     {
-        $this->extensionConfigurationMock->expects($this->once())
+        $this->extensionConfigurationMock->expects(self::once())
             ->method('getSpeakingUrlTemplate')
             ->willReturn('###TINY_URL_KEY###');
         $speakingUrl = $this->urlUtils->createSpeakingTinyUrl('testkey');
-        $this->assertEquals('testkey', $speakingUrl);
+        self::assertSame('testkey', $speakingUrl);
     }
 
-    public function testGenerateTinyurlHashCreatesHash()
+    public function testGenerateTinyurlHashCreatesHash(): void
     {
         /** @noinspection PhpDeprecationInspection */
-        $this->assertEquals(
+        self::assertSame(
             'ee85c8ee5b024efa864c06a98ed613286d134aad',
             $this->urlUtils->generateTinyurlHash('http://the-url.tld')
         );
     }
 
-    public function testGenerateTinyurlKeyForUidGeneratesKey()
+    public function testGenerateTinyurlKeyForUidGeneratesKey(): void
     {
         $urlGeneratorMock = $this->createMock(UrlKeyGenerator::class);
-        $urlGeneratorMock->expects($this->once())
+        $urlGeneratorMock->expects(self::once())
             ->method('generateTinyurlKeyForUid')
             ->with(132)
             ->willReturn('thekey');
         ImplementationManager::getInstance()->setUrlKeyGenerator($urlGeneratorMock);
+
         /** @noinspection PhpDeprecationInspection */
-        $this->assertEquals('thekey', $this->urlUtils->generateTinyurlKeyForUid(132));
+        self::assertSame('thekey', $this->urlUtils->generateTinyurlKeyForUid(132));
         ImplementationManager::getInstance()->restoreDefaults();
     }
 }

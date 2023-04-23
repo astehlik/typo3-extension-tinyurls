@@ -20,23 +20,15 @@ use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
 class TypoScriptConfigurator
 {
     /**
-     * @var TinyUrlGenerator
+     * Contains the default values for the tinyurl configuration.
      */
-    protected $tinyUrlGenerator;
-
-    /**
-     * protected $contentObjectRenderer;
-     *
-     * /**
-     * Contains the default values for the tinyurl configuration
-     *
-     * @var array
-     */
-    protected $tinyurlConfigDefaults = [
+    protected array $tinyurlConfigDefaults = [
         'deleteOnUse' => 0,
         'validUntil' => 0,
         'urlKey' => false,
     ];
+
+    protected TinyUrlGenerator $tinyUrlGenerator;
 
     public function __construct(TinyUrlGenerator $tinyUrlGenerator)
     {
@@ -45,12 +37,9 @@ class TypoScriptConfigurator
 
     /**
      * Initializes the tinyurl configuration with default values and
-     * if the user set his own values they are parsed through stdWrap
-     *
-     * @param array $config
-     * @param ContentObjectRenderer $contentObjectRenderer
+     * if the user set his own values they are parsed through stdWrap.
      */
-    public function initializeConfigFromTyposcript(array $config, ContentObjectRenderer $contentObjectRenderer)
+    public function initializeConfigFromTyposcript(array $config, ContentObjectRenderer $contentObjectRenderer): void
     {
         if (!array_key_exists('tinyurl.', $config)) {
             return;
@@ -75,7 +64,7 @@ class TypoScriptConfigurator
             $configSetter = 'setOption' . ucfirst($configKey);
 
             if (method_exists($this->tinyUrlGenerator, $configSetter)) {
-                $this->tinyUrlGenerator->$configSetter($configValue);
+                $this->tinyUrlGenerator->{$configSetter}($configValue);
             }
         }
     }

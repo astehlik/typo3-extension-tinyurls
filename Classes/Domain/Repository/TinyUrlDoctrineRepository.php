@@ -31,10 +31,7 @@ class TinyUrlDoctrineRepository extends AbstractTinyUrlDatabaseRepository implem
 
     /**
      * See: http://lists.typo3.org/pipermail/typo3-dev/2007-December/026936.html
-     * Use of "set counter=counter+1" - avoiding race conditions
-     *
-     * @param TinyUrl $tinyUrl
-     * @return TinyUrl
+     * Use of "set counter=counter+1" - avoiding race conditions.
      */
     public function countTinyUrlHit(TinyUrl $tinyUrl): TinyUrl
     {
@@ -53,7 +50,7 @@ class TinyUrlDoctrineRepository extends AbstractTinyUrlDatabaseRepository implem
         return $this->findTinyUrlByKey($tinyUrl->getUrlkey());
     }
 
-    public function deleteTinyUrlByKey(string $tinyUrlKey)
+    public function deleteTinyUrlByKey(string $tinyUrlKey): void
     {
         $queryBuilder = $this->getQueryBuilder();
         $queryBuilder
@@ -123,9 +120,9 @@ class TinyUrlDoctrineRepository extends AbstractTinyUrlDatabaseRepository implem
     }
 
     /**
-     * Purges all invalid urls from the database
+     * Purges all invalid urls from the database.
      */
-    public function purgeInvalidUrls()
+    public function purgeInvalidUrls(): void
     {
         $queryBuilder = $this->getQueryBuilder();
         $queryBuilder
@@ -142,12 +139,12 @@ class TinyUrlDoctrineRepository extends AbstractTinyUrlDatabaseRepository implem
             ->execute();
     }
 
-    public function setDatabaseConnectionPool(ConnectionPool $databaseConnectionPool)
+    public function setDatabaseConnectionPool(ConnectionPool $databaseConnectionPool): void
     {
         $this->databaseConnectionPool = $databaseConnectionPool;
     }
 
-    public function updateTinyUrl(TinyUrl $tinyUrl)
+    public function updateTinyUrl(TinyUrl $tinyUrl): void
     {
         $this->prepareTinyUrlForUpdate($tinyUrl);
 
@@ -169,7 +166,6 @@ class TinyUrlDoctrineRepository extends AbstractTinyUrlDatabaseRepository implem
     }
 
     /**
-     * @return ConnectionPool
      * @codeCoverageIgnore
      */
     protected function getDatabaseConnectionPool(): ConnectionPool
@@ -204,7 +200,7 @@ class TinyUrlDoctrineRepository extends AbstractTinyUrlDatabaseRepository implem
         return (int)$this->getDatabaseConnection()->lastInsertId(static::TABLE_URLS, 'uid');
     }
 
-    protected function transactional(\Closure $transaction)
+    protected function transactional(\Closure $transaction): void
     {
         $this->getDatabaseConnection()->transactional($transaction);
     }

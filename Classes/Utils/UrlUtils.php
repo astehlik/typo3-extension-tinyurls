@@ -21,12 +21,12 @@ use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
- * Contains utilities for creating tiny url keys and url hashes
+ * Contains utilities for creating tiny url keys and url hashes.
  */
 class UrlUtils implements SingletonInterface
 {
     /**
-     * Contains the extension configration
+     * Contains the extension configration.
      *
      * @var ExtensionConfiguration
      */
@@ -36,16 +36,6 @@ class UrlUtils implements SingletonInterface
      * @var GeneralUtilityWrapper
      */
     protected $generalUtility;
-
-    public function injectExtensionConfiguration(ExtensionConfiguration $extensionConfiguration)
-    {
-        $this->extensionConfiguration = $extensionConfiguration;
-    }
-
-    public function injectGeneralUtility(GeneralUtilityWrapper $generalUtility)
-    {
-        $this->generalUtility = $generalUtility;
-    }
 
     public function buildTinyUrl(string $tinyUrlKey): string
     {
@@ -57,10 +47,7 @@ class UrlUtils implements SingletonInterface
     }
 
     /**
-     * Generates a speaking tinyurl based on the speaking url template
-     *
-     * @param string $tinyUrlKey
-     * @return string
+     * Generates a speaking tinyurl based on the speaking url template.
      */
     public function createSpeakingTinyUrl(string $tinyUrlKey): string
     {
@@ -87,11 +74,9 @@ class UrlUtils implements SingletonInterface
     }
 
     /**
-     * Generates a sha1 hash of the given URL
+     * Generates a sha1 hash of the given URL.
      *
-     * @param string $url
-     * @return string
-     * @deprecated Use TinyUrl model for hash generation instead.
+     * @deprecated use TinyUrl model for hash generation instead
      */
     public function generateTinyurlHash(string $url): string
     {
@@ -101,16 +86,24 @@ class UrlUtils implements SingletonInterface
     }
 
     /**
-     * Generates a unique tinyurl key for the record with the given UID
+     * Generates a unique tinyurl key for the record with the given UID.
      *
-     * @param int $uid
-     * @return string
-     * @deprecated Use the UrlKeyGenerator for generating the URL key.
+     * @deprecated use the UrlKeyGenerator for generating the URL key
      */
     public function generateTinyurlKeyForUid(int $uid): string
     {
         $urlKeyGenerator = ImplementationManager::getInstance()->getUrlKeyGenerator();
         return $urlKeyGenerator->generateTinyurlKeyForUid($uid);
+    }
+
+    public function injectExtensionConfiguration(ExtensionConfiguration $extensionConfiguration): void
+    {
+        $this->extensionConfiguration = $extensionConfiguration;
+    }
+
+    public function injectGeneralUtility(GeneralUtilityWrapper $generalUtility): void
+    {
+        $this->generalUtility = $generalUtility;
     }
 
     protected function createEidUrl(string $tinyUrlKey): string
@@ -120,7 +113,6 @@ class UrlUtils implements SingletonInterface
     }
 
     /**
-     * @return ExtensionConfiguration
      * @codeCoverageIgnore
      */
     protected function getExtensionConfiguration(): ExtensionConfiguration
@@ -132,7 +124,6 @@ class UrlUtils implements SingletonInterface
     }
 
     /**
-     * @return GeneralUtilityWrapper
      * @codeCoverageIgnore
      */
     protected function getGeneralUtility(): GeneralUtilityWrapper

@@ -40,10 +40,9 @@ class TypoLink
      * linktxt: reference to the link text
      * finalTag: reference to the final link tag
      * finalTagParts: reference to the array that contains the tag parts (aTagParams, url, TYPE, targetParams, TAG)
-     *
      * @param ContentObjectRenderer $contentObject The parent content object
      */
-    public function convertTypolinkToTinyUrl(array $parameters, ContentObjectRenderer $contentObject)
+    public function convertTypolinkToTinyUrl(array $parameters, ContentObjectRenderer $contentObject): void
     {
         $config = $parameters['conf'];
         $finalTagParts = $parameters['finalTagParts'];
@@ -71,16 +70,12 @@ class TypoLink
         $contentObject->lastTypoLinkUrl = $tinyUrl;
     }
 
-    /**
-     * @param Api $tinyUrlApi
-     */
-    public function setTinyUrlApi(Api $tinyUrlApi)
+    public function setTinyUrlApi(Api $tinyUrlApi): void
     {
         $this->tinyUrlApi = $tinyUrlApi;
     }
 
     /**
-     * @return Api
      * @codeCoverageIgnore
      */
     protected function getTinyUrlApi(): Api

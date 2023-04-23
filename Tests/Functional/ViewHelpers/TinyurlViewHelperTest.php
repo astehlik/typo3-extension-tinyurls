@@ -36,10 +36,7 @@ class TinyurlViewHelperTest extends AbstractFunctionalTestCase
         $this->importCSVDataSet(__DIR__ . '/../Fixtures/Database/pages.csv');
     }
 
-    /**
-     * @test
-     */
-    public function tinyurlViewHelperGeneratesUrl()
+    public function testTinyurlViewHelperGeneratesUrl(): void
     {
         $this->setUpFrontendRootPage(
             1,
@@ -47,8 +44,8 @@ class TinyurlViewHelperTest extends AbstractFunctionalTestCase
         );
         $this->setUpFrontendSite(1);
         $request = (new InternalRequest())->withPageId(1);
-        $response = $this->executeFrontendRequest($request);
-        $this->assertRegExp(
+        $response = $this->executeFrontendSubRequest($request);
+        self::assertMatchesRegularExpression(
             '/http:\/\/localhost\/\?eID=tx_tinyurls&amp;tx_tinyurls\[key\]=b-[a-zA-Z0-9]{7}/',
             (string)$response->getBody()
         );

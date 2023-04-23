@@ -22,23 +22,12 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  */
 class TinyUrlDisplay
 {
-    /**
-     * @var UrlUtils
-     */
-    protected $urlUtils;
-
-    public function injectUrlUtils(UrlUtils $urlUtils)
-    {
-        $this->urlUtils = $urlUtils;
-    }
+    protected ?UrlUtils $urlUtils = null;
 
     /**
      * Renders a full tiny URL based on the given form element data.
      *
      * This method is called as a valueFunc by the TYPO3 form engine.
-     *
-     * @param array $formElementData
-     * @return string
      */
     public function buildTinyUrlFormFormElementData(array $formElementData): string
     {
@@ -46,8 +35,12 @@ class TinyUrlDisplay
         return $urlUtils->buildTinyUrl($formElementData['databaseRow']['urlkey']);
     }
 
+    public function injectUrlUtils(UrlUtils $urlUtils): void
+    {
+        $this->urlUtils = $urlUtils;
+    }
+
     /**
-     * @return UrlUtils
      * @codeCoverageIgnore
      */
     protected function getUrlUtils(): UrlUtils

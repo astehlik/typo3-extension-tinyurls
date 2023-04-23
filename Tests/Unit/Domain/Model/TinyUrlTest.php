@@ -14,8 +14,6 @@ namespace Tx\Tinyurls\Tests\Unit\Domain\Model;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
-use DateTime;
-use InvalidArgumentException;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Tx\Tinyurls\Domain\Model\TinyUrl;
@@ -24,269 +22,275 @@ use Tx\Tinyurls\UrlKeyGenerator\UrlKeyGenerator;
 
 class TinyUrlTest extends TestCase
 {
-    public function testCreateFromDatabaseFillsComment()
+    public function testCreateFromDatabaseFillsComment(): void
     {
         $tinyUrl = TinyUrl::createFromDatabaseRow($this->getDummyDatabaseRow());
-        $this->assertEquals('The cool comment', $tinyUrl->getComment());
+        self::assertSame('The cool comment', $tinyUrl->getComment());
     }
 
-    public function testCreateFromDatabaseFillsCounter()
+    public function testCreateFromDatabaseFillsCounter(): void
     {
         $tinyUrl = TinyUrl::createFromDatabaseRow($this->getDummyDatabaseRow());
-        $this->assertEquals(4323237, $tinyUrl->getCounter());
+        self::assertSame(4323237, $tinyUrl->getCounter());
     }
 
-    public function testCreateFromDatabaseFillsDeleteOnUse()
+    public function testCreateFromDatabaseFillsDeleteOnUse(): void
     {
         $tinyUrl = TinyUrl::createFromDatabaseRow($this->getDummyDatabaseRow());
-        $this->assertEquals(false, $tinyUrl->getDeleteOnUse());
+        self::assertFalse($tinyUrl->getDeleteOnUse());
     }
 
-    public function testCreateFromDatabaseFillsPid()
+    public function testCreateFromDatabaseFillsPid(): void
     {
         $tinyUrl = TinyUrl::createFromDatabaseRow($this->getDummyDatabaseRow());
-        $this->assertEquals(48, $tinyUrl->getPid());
+        self::assertSame(48, $tinyUrl->getPid());
     }
 
-    public function testCreateFromDatabaseFillsTargetUrl()
+    public function testCreateFromDatabaseFillsTargetUrl(): void
     {
         $tinyUrl = TinyUrl::createFromDatabaseRow($this->getDummyDatabaseRow());
-        $this->assertEquals('http://the-target.url', $tinyUrl->getTargetUrl());
+        self::assertSame('http://the-target.url', $tinyUrl->getTargetUrl());
     }
 
-    public function testCreateFromDatabaseFillsTargetUrlHash()
+    public function testCreateFromDatabaseFillsTargetUrlHash(): void
     {
         $tinyUrl = TinyUrl::createFromDatabaseRow($this->getDummyDatabaseRow());
-        $this->assertEquals('59d24fcbfb6c586daeabf73ddd58cd01affb56d4', $tinyUrl->getTargetUrlHash());
+        self::assertSame('59d24fcbfb6c586daeabf73ddd58cd01affb56d4', $tinyUrl->getTargetUrlHash());
     }
 
-    public function testCreateFromDatabaseFillsTstamp()
+    public function testCreateFromDatabaseFillsTstamp(): void
     {
         $tinyUrl = TinyUrl::createFromDatabaseRow($this->getDummyDatabaseRow());
-        $this->assertEquals(new DateTime('2017-12-10 12:30:00.000000+0000'), $tinyUrl->getTstamp());
+        self::assertSame(
+            (new \DateTime('2017-12-10 12:30:00.000000+0000'))->getTimestamp(),
+            $tinyUrl->getTstamp()->getTimestamp()
+        );
     }
 
-    public function testCreateFromDatabaseFillsUid()
+    public function testCreateFromDatabaseFillsUid(): void
     {
         $tinyUrl = TinyUrl::createFromDatabaseRow($this->getDummyDatabaseRow());
-        $this->assertEquals(945, $tinyUrl->getUid());
+        self::assertSame(945, $tinyUrl->getUid());
     }
 
-    public function testCreateFromDatabaseFillsUrlkey()
+    public function testCreateFromDatabaseFillsUrlkey(): void
     {
         $tinyUrl = TinyUrl::createFromDatabaseRow($this->getDummyDatabaseRow());
-        $this->assertEquals('theurlkey', $tinyUrl->getUrlkey());
+        self::assertSame('theurlkey', $tinyUrl->getUrlkey());
     }
 
-    public function testCreateFromDatabaseFillsValidUntil()
+    public function testCreateFromDatabaseFillsValidUntil(): void
     {
         $tinyUrl = TinyUrl::createFromDatabaseRow($this->getDummyDatabaseRow());
-        $this->assertEquals(new DateTime('2017-10-10 12:30:00.000000+0000'), $tinyUrl->getValidUntil());
+        self::assertSame(
+            (new \DateTime('2017-10-10 12:30:00.000000+0000'))->getTimestamp(),
+            $tinyUrl->getValidUntil()->getTimestamp()
+        );
     }
 
-    public function testCreateFromDatabaseFillsValidUntilWithNullIfEmtpy()
+    public function testCreateFromDatabaseFillsValidUntilWithNullIfEmtpy(): void
     {
         $databaseRow = $this->getDummyDatabaseRow();
         $databaseRow['valid_until'] = 0;
         $tinyUrl = TinyUrl::createFromDatabaseRow($databaseRow);
-        $this->assertFalse($tinyUrl->hasValidUntil());
+        self::assertFalse($tinyUrl->hasValidUntil());
     }
 
-    public function testEnableDeleteOnUseSetsDeleteOnUseToTrue()
+    public function testEnableDeleteOnUseSetsDeleteOnUseToTrue(): void
     {
         $tinyUrl = TinyUrl::createNew();
-        $this->assertFalse($tinyUrl->getDeleteOnUse());
+        self::assertFalse($tinyUrl->getDeleteOnUse());
         $tinyUrl->enableDeleteOnUse();
-        $this->assertTrue($tinyUrl->getDeleteOnUse());
+        self::assertTrue($tinyUrl->getDeleteOnUse());
     }
 
-    public function testEqualsReturnsFalseIfBothTinyUrlsAreNewAndAreNotTheSameObject()
+    public function testEqualsReturnsFalseIfBothTinyUrlsAreNewAndAreNotTheSameObject(): void
     {
         $tinyUrl = TinyUrl::createNew();
         $tinyUrl2 = TinyUrl::createNew();
-        $this->assertFalse($tinyUrl->equals($tinyUrl2));
+        self::assertFalse($tinyUrl->equals($tinyUrl2));
     }
 
-    public function testEqualsReturnsFalseIfBothTinyUrlsExistAndHaveDifferentSameUids()
+    public function testEqualsReturnsFalseIfBothTinyUrlsExistAndHaveDifferentSameUids(): void
     {
         $tinyUrl = TinyUrl::createNew();
         $tinyUrl->persistPostProcessInsert(3);
         $tinyUrl2 = TinyUrl::createNew();
         $tinyUrl2->persistPostProcessInsert(4);
-        $this->assertFalse($tinyUrl->equals($tinyUrl2));
+        self::assertFalse($tinyUrl->equals($tinyUrl2));
     }
 
-    public function testEqualsReturnsFalseIfOnyTinyUrlIsNewAndTheOtherExists()
+    public function testEqualsReturnsFalseIfOnyTinyUrlIsNewAndTheOtherExists(): void
     {
         $tinyUrl = TinyUrl::createNew();
         $tinyUrl2 = TinyUrl::createNew();
         $tinyUrl2->persistPostProcessInsert(3);
-        $this->assertFalse($tinyUrl->equals($tinyUrl2));
+        self::assertFalse($tinyUrl->equals($tinyUrl2));
     }
 
-    public function testEqualsReturnsTrueIfBothTinyUrlsAreNewAndAreTheSameObject()
+    public function testEqualsReturnsTrueIfBothTinyUrlsAreNewAndAreTheSameObject(): void
     {
         $tinyUrl = TinyUrl::createNew();
-        $this->assertTrue($tinyUrl->equals($tinyUrl));
+        self::assertTrue($tinyUrl->equals($tinyUrl));
     }
 
-    public function testEqualsReturnsTrueIfBothTinyUrlsExistAndHaveTheSameUid()
+    public function testEqualsReturnsTrueIfBothTinyUrlsExistAndHaveTheSameUid(): void
     {
         $tinyUrl = TinyUrl::createNew();
         $tinyUrl->persistPostProcessInsert(3);
         $tinyUrl2 = TinyUrl::createNew();
         $tinyUrl2->persistPostProcessInsert(3);
-        $this->assertTrue($tinyUrl->equals($tinyUrl2));
+        self::assertTrue($tinyUrl->equals($tinyUrl2));
     }
 
-    public function testGetTargetUrlHasChangedReturnsFalseIfUrlWasNotChanged()
+    public function testGetTargetUrlHasChangedReturnsFalseIfUrlWasNotChanged(): void
     {
         $tinyUrl = TinyUrl::createFromDatabaseRow($this->getDummyDatabaseRow());
-        $this->assertFalse($tinyUrl->getTargetUrlHasChanged());
+        self::assertFalse($tinyUrl->getTargetUrlHasChanged());
     }
 
-    public function testGetTargetUrlHasChangedReturnsTrueIfUrlWasChanged()
+    public function testGetTargetUrlHasChangedReturnsTrueIfUrlWasChanged(): void
     {
         $tinyUrl = TinyUrl::createFromDatabaseRow($this->getDummyDatabaseRow());
         $tinyUrl->setTargetUrl('The new target URL');
-        $this->assertTrue($tinyUrl->getTargetUrlHasChanged());
+        self::assertTrue($tinyUrl->getTargetUrlHasChanged());
     }
 
-    public function testHasCustomUrlKeyReturnsFalseForNewRecord()
+    public function testHasCustomUrlKeyReturnsFalseForNewRecord(): void
     {
         $tinyUrl = TinyUrl::createNew();
-        $this->assertFalse($tinyUrl->hasCustomUrlKey());
+        self::assertFalse($tinyUrl->hasCustomUrlKey());
     }
 
-    public function testHasCustomUrlKeyReturnsTrueIfCustomUrlSet()
+    public function testHasCustomUrlKeyReturnsTrueIfCustomUrlSet(): void
     {
         $tinyUrl = TinyUrl::createNew();
         $tinyUrl->setCustomUrlKey('asdf');
-        $this->assertTrue($tinyUrl->hasCustomUrlKey());
+        self::assertTrue($tinyUrl->hasCustomUrlKey());
     }
 
-    public function testHasValidUntilReturnsFalseForNewRecord()
+    public function testHasValidUntilReturnsFalseForNewRecord(): void
     {
         $tinyUrl = TinyUrl::createNew();
-        $this->assertFalse($tinyUrl->hasValidUntil());
+        self::assertFalse($tinyUrl->hasValidUntil());
     }
 
-    public function testHasValidUntilReturnsTrueIfValidUntilSet()
+    public function testHasValidUntilReturnsTrueIfValidUntilSet(): void
     {
         $tinyUrl = TinyUrl::createNew();
-        $tinyUrl->setValidUntil(new DateTime());
-        $this->assertTrue($tinyUrl->hasValidUntil());
+        $tinyUrl->setValidUntil(new \DateTime());
+        self::assertTrue($tinyUrl->hasValidUntil());
     }
 
-    public function testIsNewReturnsTrueForNewTinyUrl()
+    public function testIsNewReturnsTrueForNewTinyUrl(): void
     {
         $tinyUrl = TinyUrl::createNew();
-        $this->assertTrue($tinyUrl->isNew());
+        self::assertTrue($tinyUrl->isNew());
     }
 
-    public function testIsNewReturnsTrueIfUidIsGreaterThanZero()
+    public function testIsNewReturnsTrueIfUidIsGreaterThanZero(): void
     {
         $tinyUrl = TinyUrl::createNew();
         $tinyUrl->persistPostProcessInsert(2);
-        $this->assertFalse($tinyUrl->isNew());
+        self::assertFalse($tinyUrl->isNew());
     }
 
-    public function testPersistPostProcessInsertResetsOriginalHash()
+    public function testPersistPostProcessInsertResetsOriginalHash(): void
     {
         $tinyUrl = TinyUrl::createNew();
         $tinyUrl->setTargetUrl('the url');
-        $this->assertTrue($tinyUrl->getTargetUrlHasChanged());
+        self::assertTrue($tinyUrl->getTargetUrlHasChanged());
 
         $tinyUrl->persistPostProcessInsert(2);
-        $this->assertFalse($tinyUrl->getTargetUrlHasChanged());
+        self::assertFalse($tinyUrl->getTargetUrlHasChanged());
     }
 
-    public function testPersistPostProcessInsertSetsUid()
+    public function testPersistPostProcessInsertSetsUid(): void
     {
         $tinyUrl = TinyUrl::createNew();
         $tinyUrl->persistPostProcessInsert(2);
-        $this->assertEquals(2, $tinyUrl->getUid());
+        self::assertSame(2, $tinyUrl->getUid());
     }
 
-    public function testPersistPostProcessRefusesZeroUid()
+    public function testPersistPostProcessRefusesZeroUid(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(\InvalidArgumentException::class);
         $tinyUrl = TinyUrl::createNew();
         $tinyUrl->persistPostProcessInsert(0);
     }
 
-    public function testPersistPostProcessResetsCustomUrlKey()
+    public function testPersistPostProcessResetsCustomUrlKey(): void
     {
         $tinyUrl = TinyUrl::createNew();
         $tinyUrl->setCustomUrlKey('custom key');
-        $this->assertTrue($tinyUrl->hasCustomUrlKey());
+        self::assertTrue($tinyUrl->hasCustomUrlKey());
         $tinyUrl->persistPostProcess();
-        $this->assertFalse($tinyUrl->hasCustomUrlKey());
+        self::assertFalse($tinyUrl->hasCustomUrlKey());
     }
 
-    public function testPersistPostProcessResetsOriginalHash()
+    public function testPersistPostProcessResetsOriginalHash(): void
     {
         $tinyUrl = TinyUrl::createNew();
         $tinyUrl->setTargetUrl('the url');
-        $this->assertTrue($tinyUrl->getTargetUrlHasChanged());
+        self::assertTrue($tinyUrl->getTargetUrlHasChanged());
 
         $tinyUrl->persistPostProcess();
-        $this->assertFalse($tinyUrl->getTargetUrlHasChanged());
+        self::assertFalse($tinyUrl->getTargetUrlHasChanged());
     }
 
-    public function testPersistPreProcessSetsCustomUrlKey()
+    public function testPersistPreProcessSetsCustomUrlKey(): void
     {
         $tinyUrl = TinyUrl::createNew();
         $tinyUrl->setCustomUrlKey('thekey');
         $tinyUrl->persistPreProcess();
-        $this->assertEquals('thekey', $tinyUrl->getUrlkey());
+        self::assertSame('thekey', $tinyUrl->getUrlkey());
     }
 
-    public function testPersistPreProcessSetsTstamp()
+    public function testPersistPreProcessSetsTstamp(): void
     {
         $tinyUrl = TinyUrl::createNew();
         $tinyUrl->persistPreProcess();
-        $this->assertInstanceOf(DateTime::class, $tinyUrl->getTstamp());
+        self::assertInstanceOf(\DateTime::class, $tinyUrl->getTstamp());
     }
 
-    public function testRegenerateUrlKeySetsUrlKeyProperty()
+    public function testRegenerateUrlKeySetsUrlKeyProperty(): void
     {
         $tinyUrl = TinyUrl::createNew();
         $tinyUrl->persistPostProcessInsert(2);
 
-        /** @var UrlKeyGenerator|MockObject $urlGeneratorMock */
+        /** @var MockObject|UrlKeyGenerator $urlGeneratorMock */
         $urlGeneratorMock = $this->createMock(UrlKeyGenerator::class);
-        $urlGeneratorMock->expects($this->once())
+        $urlGeneratorMock->expects(self::once())
             ->method('generateTinyurlKeyForTinyUrl')
             ->with($tinyUrl)
             ->willReturn('thekey');
         ImplementationManager::getInstance()->setUrlKeyGenerator($urlGeneratorMock);
 
         $tinyUrl->regenerateUrlKey();
-        $this->assertEquals('thekey', $tinyUrl->getUrlkey());
+        self::assertSame('thekey', $tinyUrl->getUrlkey());
 
         ImplementationManager::getInstance()->restoreDefaults();
     }
 
-    public function testSetCommentSetsComment()
+    public function testSetCommentSetsComment(): void
     {
         $tinyUrl = TinyUrl::createNew();
         $tinyUrl->setComment('the comment');
-        $this->assertEquals('the comment', $tinyUrl->getComment());
+        self::assertSame('the comment', $tinyUrl->getComment());
     }
 
-    public function testSetCustomUrlKeyThrowsExceptionIfKeyIsEmpty()
+    public function testSetCustomUrlKeyThrowsExceptionIfKeyIsEmpty(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(\InvalidArgumentException::class);
         $tinyUrl = TinyUrl::createNew();
         $tinyUrl->setCustomUrlKey('');
     }
 
-    public function testSetPidSetsPid()
+    public function testSetPidSetsPid(): void
     {
         $tinyUrl = TinyUrl::createNew();
         $tinyUrl->setPid(103);
-        $this->assertEquals(103, $tinyUrl->getPid());
+        self::assertSame(103, $tinyUrl->getPid());
     }
 
     protected function getDummyDatabaseRow(): array

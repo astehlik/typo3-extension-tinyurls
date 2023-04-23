@@ -14,7 +14,6 @@ namespace Tx\Tinyurls\Configuration;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
-use InvalidArgumentException;
 use Tx\Tinyurls\TinyUrl\TinyUrlGenerator;
 use TYPO3\CMS\Core\Configuration\ExtensionConfiguration as TYPO3ExtensionConfiguration;
 use TYPO3\CMS\Core\SingletonInterface;
@@ -22,23 +21,19 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
 
 /**
- * Contains utilities for getting configuration
+ * Contains utilities for getting configuration.
  */
 class ExtensionConfiguration implements SingletonInterface
 {
     /**
-     * The initialized extension configuration
-     *
-     * @var array
+     * The initialized extension configuration.
      */
-    protected $extensionConfiguration = null;
+    protected ?array $extensionConfiguration = null;
 
     /**
-     * Contains the default values for the extension configuration
-     *
-     * @var array
+     * Contains the default values for the extension configuration.
      */
-    protected $extensionConfigurationDefaults = [
+    protected array $extensionConfigurationDefaults = [
         'createSpeakingURLs' => false,
         'speakingUrlTemplate' => '###TYPO3_SITE_URL###tinyurl/###TINY_URL_KEY###',
         'base62Dictionary' => 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789',
@@ -47,42 +42,22 @@ class ExtensionConfiguration implements SingletonInterface
         'urlRecordStoragePID' => 0,
     ];
 
-    /**
-     * @var TypoScriptConfigurator
-     */
-    protected $typoScriptConfigurator;
+    protected ?TypoScriptConfigurator $typoScriptConfigurator = null;
 
     /**
-     * Initializes the tinyurl configuration with default values and
-     * if the user set his own values they are parsed through stdWrap
-     *
-     * @param array $config
-     * @param ContentObjectRenderer $contentObject
-     * @param TinyUrlGenerator $tinyUrlGenerator
-     * @deprecated Please use the TypoScriptConfigurator class instead.
-     */
-    public function initializeConfigFromTyposcript(
-        array $config,
-        ContentObjectRenderer $contentObject,
-        TinyUrlGenerator $tinyUrlGenerator
-    ) {
-        $typoScriptConfigurator = $this->getTypoScriptConfigurator($tinyUrlGenerator);
-        $typoScriptConfigurator->initializeConfigFromTyposcript($config, $contentObject);
-    }
-
-    /**
-     * Appends a PID query to the given where statement
+     * Appends a PID query to the given where statement.
      *
      * @param string $whereStatement The where statement where the PID query should be appended to
+     *
      * @return string The where statement with the appended PID query
      */
-    public function appendPidQuery($whereStatement)
+    public function appendPidQuery(string $whereStatement): string
     {
         if (!empty($whereStatement)) {
             $whereStatement .= ' AND ';
         }
 
-        $whereStatement .= 'pid=' . (int)$this->getUrlRecordStoragePid();
+        $whereStatement .= 'pid=' . $this->getUrlRecordStoragePid();
 
         return $whereStatement;
     }
@@ -98,10 +73,9 @@ class ExtensionConfiguration implements SingletonInterface
     }
 
     /**
-     * Returns the extension configuration
+     * Returns the extension configuration.
      *
-     * @return array
-     * @deprecated Please use the matching getter for retrieving a config value.
+     * @deprecated please use the matching getter for retrieving a config value
      */
     public function getExtensionConfiguration(): array
     {
@@ -110,12 +84,15 @@ class ExtensionConfiguration implements SingletonInterface
     }
 
     /**
-     * Returns an extension configuration value
+     * Returns an extension configuration value.
      *
      * @param string $key the configuration key
+     *
      * @return mixed the configuration value
-     * @throws InvalidArgumentException if the configuration key does not exist
-     * @deprecated Please use the matching getter for retrieving the config value.
+     *
+     * @throws \InvalidArgumentException if the configuration key does not exist
+     *
+     * @deprecated please use the matching getter for retrieving the config value
      */
     public function getExtensionConfigurationValue(string $key)
     {
@@ -142,7 +119,22 @@ class ExtensionConfiguration implements SingletonInterface
         return (int)$this->getExtensionConfigurationValueInternal('urlRecordStoragePID');
     }
 
-    public function setTypoScriptConfigurator(TypoScriptConfigurator $typoScriptConfigurator)
+    /**
+     * Initializes the tinyurl configuration with default values and
+     * if the user set his own values they are parsed through stdWrap.
+     *
+     * @deprecated please use the TypoScriptConfigurator class instead
+     */
+    public function initializeConfigFromTyposcript(
+        array $config,
+        ContentObjectRenderer $contentObject,
+        TinyUrlGenerator $tinyUrlGenerator
+    ): void {
+        $typoScriptConfigurator = $this->getTypoScriptConfigurator($tinyUrlGenerator);
+        $typoScriptConfigurator->initializeConfigFromTyposcript($config, $contentObject);
+    }
+
+    public function setTypoScriptConfigurator(TypoScriptConfigurator $typoScriptConfigurator): void
     {
         $this->typoScriptConfigurator = $typoScriptConfigurator;
     }
@@ -152,15 +144,13 @@ class ExtensionConfiguration implements SingletonInterface
         $this->initializeExtensionConfiguration();
 
         if (!array_key_exists($key, $this->extensionConfiguration)) {
-            throw new InvalidArgumentException('The key ' . $key . ' does not exists in the extension configuration');
+            throw new \InvalidArgumentException('The key ' . $key . ' does not exists in the extension configuration');
         }
 
         return $this->extensionConfiguration[$key];
     }
 
     /**
-     * @param TinyUrlGenerator $tinyUrlGenerator
-     * @return TypoScriptConfigurator
      * @codeCoverageIgnore
      */
     protected function getTypoScriptConfigurator(TinyUrlGenerator $tinyUrlGenerator): TypoScriptConfigurator
@@ -176,9 +166,9 @@ class ExtensionConfiguration implements SingletonInterface
 
     /**
      * Initializes the extension configuration array, merging the default config and the config
-     * defined by the user
+     * defined by the user.
      */
-    protected function initializeExtensionConfiguration()
+    protected function initializeExtensionConfiguration(): void
     {
         if ($this->extensionConfiguration !== null) {
             return;

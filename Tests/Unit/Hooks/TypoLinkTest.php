@@ -74,12 +74,12 @@ class TypoLinkTest extends TestCase
         $this->typoLinkHook->setTinyUrlApi($this->tinyUrlApiMock);
     }
 
-    public function testApiGetTinyUrlIsCalledWithOriginalUrl()
+    public function testApiGetTinyUrlIsCalledWithOriginalUrl(): void
     {
         $contentObjectRendererMock = $this->getContentObjectRendererMock();
         $typoLinkParameters = $this->getTypoLinkParameterArray();
 
-        $this->tinyUrlApiMock->expects($this->once())
+        $this->tinyUrlApiMock->expects(self::once())
             ->method('getTinyUrl')
             ->with($this->lastTypoLinkUrlOriginal)
             ->willReturn('the tiny url');
@@ -87,21 +87,21 @@ class TypoLinkTest extends TestCase
         $this->typoLinkHook->convertTypolinkToTinyUrl($typoLinkParameters, $contentObjectRendererMock);
     }
 
-    public function testApiIsInitializedWithLinkConfig()
+    public function testApiIsInitializedWithLinkConfig(): void
     {
         $contentObjectRendererMock = $this->getContentObjectRendererMock();
         $typoLinkParameters = $this->getTypoLinkParameterArray();
 
         $this->tinyUrlApiMock->method('getTinyUrl')->willReturn('the url');
 
-        $this->tinyUrlApiMock->expects($this->once())
+        $this->tinyUrlApiMock->expects(self::once())
             ->method('initializeConfigFromTyposcript')
             ->with($this->typoLinkConfigOriginal, $contentObjectRendererMock);
 
         $this->typoLinkHook->convertTypolinkToTinyUrl($typoLinkParameters, $contentObjectRendererMock);
     }
 
-    public function testContentObjectRendererLastTypoLinkUrlIsSetToTinyUrl()
+    public function testContentObjectRendererLastTypoLinkUrlIsSetToTinyUrl(): void
     {
         $contentObjectRendererMock = $this->getContentObjectRendererMock();
         $typoLinkParameters = $this->getTypoLinkParameterArray();
@@ -110,10 +110,10 @@ class TypoLinkTest extends TestCase
 
         $this->typoLinkHook->convertTypolinkToTinyUrl($typoLinkParameters, $contentObjectRendererMock);
 
-        $this->assertEquals('http://the-tiny-url', $contentObjectRendererMock->lastTypoLinkUrl);
+        self::assertSame('http://the-tiny-url', $contentObjectRendererMock->lastTypoLinkUrl);
     }
 
-    public function testFinalTagPartsUrlIsReplacedWithTinyUrl()
+    public function testFinalTagPartsUrlIsReplacedWithTinyUrl(): void
     {
         $contentObjectRendererMock = $this->getContentObjectRendererMock();
         $typoLinkParameters = $this->getTypoLinkParameterArray();
@@ -122,10 +122,10 @@ class TypoLinkTest extends TestCase
 
         $this->typoLinkHook->convertTypolinkToTinyUrl($typoLinkParameters, $contentObjectRendererMock);
 
-        $this->assertEquals('http://the-tiny-url', $this->finalTagParts['url']);
+        self::assertSame('http://the-tiny-url', $this->finalTagParts['url']);
     }
 
-    public function testFinalTagUrlIsReplacedWithTinyUrl()
+    public function testFinalTagUrlIsReplacedWithTinyUrl(): void
     {
         $contentObjectRendererMock = $this->getContentObjectRendererMock();
         $typoLinkParameters = $this->getTypoLinkParameterArray();
@@ -134,10 +134,10 @@ class TypoLinkTest extends TestCase
 
         $this->typoLinkHook->convertTypolinkToTinyUrl($typoLinkParameters, $contentObjectRendererMock);
 
-        $this->assertEquals('<a href="http://the-tiny-url">http://the-tiny-url</a>', $this->finalTag);
+        self::assertSame('<a href="http://the-tiny-url">http://the-tiny-url</a>', $this->finalTag);
     }
 
-    public function testSkipsProcessingForMailtoUrl()
+    public function testSkipsProcessingForMailtoUrl(): void
     {
         $contentObjectRendererMock = $this->getContentObjectRendererMock();
         $typoLinkParameterArray = $this->getTypoLinkParameterArray('mailto');
@@ -145,7 +145,7 @@ class TypoLinkTest extends TestCase
         $this->assertLinkUnchanged($contentObjectRendererMock);
     }
 
-    public function testSkipsProcessingIfDisabled()
+    public function testSkipsProcessingIfDisabled(): void
     {
         $contentObjectRendererMock = $this->getContentObjectRendererMock();
         $typoLinkParameterArray = $this->getTypoLinkParameterArray('page', false);
@@ -153,12 +153,12 @@ class TypoLinkTest extends TestCase
         $this->assertLinkUnchanged($contentObjectRendererMock);
     }
 
-    protected function assertLinkUnchanged(ContentObjectRenderer $contentObjectRendererMock)
+    protected function assertLinkUnchanged(ContentObjectRenderer $contentObjectRendererMock): void
     {
-        $this->assertEquals($this->lastTypoLinkUrlOriginal, $contentObjectRendererMock->lastTypoLinkUrl);
-        $this->assertEquals($this->finalTagOriginal, $this->finalTag);
-        $this->assertEquals($this->finalTagPartsOriginal, $this->finalTagParts);
-        $this->assertEquals($this->typoLinkConfigOriginal, $this->typoLinkConfig);
+        self::assertSame($this->lastTypoLinkUrlOriginal, $contentObjectRendererMock->lastTypoLinkUrl);
+        self::assertSame($this->finalTagOriginal, $this->finalTag);
+        self::assertSame($this->finalTagPartsOriginal, $this->finalTagParts);
+        self::assertSame($this->typoLinkConfigOriginal, $this->typoLinkConfig);
     }
 
     /**
@@ -167,6 +167,7 @@ class TypoLinkTest extends TestCase
     protected function getContentObjectRendererMock()
     {
         $this->lastTypoLinkUrlOriginal = 'http://the-original.tld';
+
         /** @var ContentObjectRenderer|MockObject $contentObjectRendererMock */
         $contentObjectRendererMock = $this->createMock(ContentObjectRenderer::class);
         $contentObjectRendererMock->lastTypoLinkUrl = $this->lastTypoLinkUrlOriginal;

@@ -28,7 +28,7 @@ class TypoScriptConfiguratorTest extends TestCase
     protected $contentObjectRendererMock;
 
     /**
-     * @var TinyUrlGenerator|MockObject
+     * @var MockObject|TinyUrlGenerator
      */
     protected $tinyUrlGeneratorMock;
 
@@ -44,22 +44,22 @@ class TypoScriptConfiguratorTest extends TestCase
         $this->typoScriptConfigurator = new TypoScriptConfigurator($this->tinyUrlGeneratorMock);
     }
 
-    public function testDoesNotSetOptionsIfConfigIsEmpty()
+    public function testDoesNotSetOptionsIfConfigIsEmpty(): void
     {
         $this->typoScriptConfigurator->initializeConfigFromTyposcript([], $this->contentObjectRendererMock);
-        $this->tinyUrlGeneratorMock->expects($this->never())->method('setOptionDeleteOnUse');
-        $this->tinyUrlGeneratorMock->expects($this->never())->method('setOptionUrlKey');
-        $this->tinyUrlGeneratorMock->expects($this->never())->method('setOptionValidUntil');
+        $this->tinyUrlGeneratorMock->expects(self::never())->method('setOptionDeleteOnUse');
+        $this->tinyUrlGeneratorMock->expects(self::never())->method('setOptionUrlKey');
+        $this->tinyUrlGeneratorMock->expects(self::never())->method('setOptionValidUntil');
     }
 
-    public function testOptionValueIsProcessedByStdwrapIfConfigured()
+    public function testOptionValueIsProcessedByStdwrapIfConfigured(): void
     {
-        $this->contentObjectRendererMock->expects($this->once())
+        $this->contentObjectRendererMock->expects(self::once())
             ->method('stdWrap')
             ->with('asdf', ['case' => 'upper'])
             ->willReturn('ASDF');
 
-        $this->tinyUrlGeneratorMock->expects($this->once())
+        $this->tinyUrlGeneratorMock->expects(self::once())
             ->method('setOptionUrlKey')
             ->with('ASDF');
 
@@ -74,9 +74,9 @@ class TypoScriptConfiguratorTest extends TestCase
         );
     }
 
-    public function testSetsOptionDeleteOnUseDefaultVlaue()
+    public function testSetsOptionDeleteOnUseDefaultVlaue(): void
     {
-        $this->tinyUrlGeneratorMock->expects($this->once())
+        $this->tinyUrlGeneratorMock->expects(self::once())
             ->method('setOptionDeleteOnUse')
             ->with(false);
 
@@ -86,9 +86,9 @@ class TypoScriptConfiguratorTest extends TestCase
         );
     }
 
-    public function testSetsOptionDeleteOnUseValueFromConfig()
+    public function testSetsOptionDeleteOnUseValueFromConfig(): void
     {
-        $this->tinyUrlGeneratorMock->expects($this->once())
+        $this->tinyUrlGeneratorMock->expects(self::once())
             ->method('setOptionDeleteOnUse')
             ->with(true);
 
@@ -98,9 +98,9 @@ class TypoScriptConfiguratorTest extends TestCase
         );
     }
 
-    public function testSetsOptionUrlKeyDefaultValue()
+    public function testSetsOptionUrlKeyDefaultValue(): void
     {
-        $this->tinyUrlGeneratorMock->expects($this->once())
+        $this->tinyUrlGeneratorMock->expects(self::once())
             ->method('setOptionUrlKey')
             ->with(false);
 
@@ -110,9 +110,9 @@ class TypoScriptConfiguratorTest extends TestCase
         );
     }
 
-    public function testSetsOptionUrlKeyWithValueFromConfig()
+    public function testSetsOptionUrlKeyWithValueFromConfig(): void
     {
-        $this->tinyUrlGeneratorMock->expects($this->once())
+        $this->tinyUrlGeneratorMock->expects(self::once())
             ->method('setOptionUrlKey')
             ->with('the-new-url-key');
 
@@ -122,9 +122,9 @@ class TypoScriptConfiguratorTest extends TestCase
         );
     }
 
-    public function testSetsOptionValidUntilDefaultValue()
+    public function testSetsOptionValidUntilDefaultValue(): void
     {
-        $this->tinyUrlGeneratorMock->expects($this->once())
+        $this->tinyUrlGeneratorMock->expects(self::once())
             ->method('setOptionValidUntil')
             ->with(0);
 
@@ -134,9 +134,9 @@ class TypoScriptConfiguratorTest extends TestCase
         );
     }
 
-    public function testSetsOptionValidUntilWithValueFromConfig()
+    public function testSetsOptionValidUntilWithValueFromConfig(): void
     {
-        $this->tinyUrlGeneratorMock->expects($this->once())
+        $this->tinyUrlGeneratorMock->expects(self::once())
             ->method('setOptionValidUntil')
             ->with(2389);
 
