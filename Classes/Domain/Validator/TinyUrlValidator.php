@@ -24,13 +24,8 @@ class TinyUrlValidator implements ValidatorInterface
      */
     protected $tinyUrlRepository;
 
-    public function injectTinyUrlRepository(TinyUrlRepository $tinyUrlRepository)
-    {
-        $this->tinyUrlRepository = $tinyUrlRepository;
-    }
-
     /**
-     * Returns the options of this validator which can be specified in the constructor
+     * Returns the options of this validator which can be specified in the constructor.
      *
      * @return array
      */
@@ -39,11 +34,17 @@ class TinyUrlValidator implements ValidatorInterface
         return [];
     }
 
+    public function injectTinyUrlRepository(TinyUrlRepository $tinyUrlRepository): void
+    {
+        $this->tinyUrlRepository = $tinyUrlRepository;
+    }
+
     /**
      * Checks if the given value is valid according to the validator, and returns
      * the Error Messages object which occurred.
      *
      * @param TinyUrl $value The value that should be validated
+     *
      * @return Result
      */
     public function validate($value)
@@ -57,7 +58,6 @@ class TinyUrlValidator implements ValidatorInterface
     }
 
     /**
-     * @return TinyUrlRepository
      * @codeCoverageIgnore
      */
     protected function getTinyUrlRepository(): TinyUrlRepository
@@ -68,7 +68,7 @@ class TinyUrlValidator implements ValidatorInterface
         return $this->tinyUrlRepository;
     }
 
-    protected function validateCustomUrlKey(TinyUrl $tinyUrl)
+    protected function validateCustomUrlKey(TinyUrl $tinyUrl): void
     {
         if (!$tinyUrl->hasCustomUrlKey()) {
             return;
@@ -92,7 +92,7 @@ class TinyUrlValidator implements ValidatorInterface
         $this->result->forProperty('customUrlKey')->addError($error);
     }
 
-    protected function validateValidUntil(TinyUrl $tinyUrl)
+    protected function validateValidUntil(TinyUrl $tinyUrl): void
     {
         $now = new \DateTime();
         if ($tinyUrl->hasValidUntil() && $now->diff($tinyUrl->getValidUntil())->invert) {

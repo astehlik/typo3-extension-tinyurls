@@ -23,7 +23,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * This class is responsible for generating tiny Urls based on configuration
- * options and extension configuration
+ * options and extension configuration.
  */
 class TinyUrlGenerator
 {
@@ -34,16 +34,16 @@ class TinyUrlGenerator
 
     /**
      * If this option is 1 the URL will be deleted from the database
-     * on the first hit
+     * on the first hit.
      *
      * @var bool
      */
     protected $optionDeleteOnUse = false;
 
     /**
-     * With this option the user can specify a custom URL key
+     * With this option the user can specify a custom URL key.
      *
-     * @var string|bool
+     * @var bool|string
      */
     protected $optionUrlKey = false;
 
@@ -65,22 +65,10 @@ class TinyUrlGenerator
      */
     protected $urlUtils;
 
-    public function injectTinyUrlRepository(TinyUrlRepository $tinyUrlRepository)
-    {
-        $this->tinyUrlRepository = $tinyUrlRepository;
-    }
-
-    public function injectUrlUtils(UrlUtils $urlUtils)
-    {
-        $this->urlUtils = $urlUtils;
-    }
-
     /**
      * Builds a complete tiny URL based on the given URL key and the createSpeakingURLs setting.
      *
-     * @param string $tinyUrlKey
-     * @return string
-     * @deprecated Use UrlTils::buildTinyUrl() instead.
+     * @deprecated use UrlTils::buildTinyUrl() instead
      */
     public function buildTinyUrl(string $tinyUrlKey): string
     {
@@ -89,9 +77,10 @@ class TinyUrlGenerator
 
     /**
      * This method generates a tiny URL, stores it in the database
-     * and returns the full URL
+     * and returns the full URL.
      *
      * @param string $targetUrl The URL that should be minified
+     *
      * @return string The generated tinyurl
      */
     public function getTinyUrl(string $targetUrl): string
@@ -106,9 +95,17 @@ class TinyUrlGenerator
             $tinyUrl = $this->generateNewTinyurl($targetUrl);
         }
 
-        $tinyUrl = $this->getUrlUtils()->buildTinyUrl($tinyUrl->getUrlkey());
+        return $this->getUrlUtils()->buildTinyUrl($tinyUrl->getUrlkey());
+    }
 
-        return $tinyUrl;
+    public function injectTinyUrlRepository(TinyUrlRepository $tinyUrlRepository): void
+    {
+        $this->tinyUrlRepository = $tinyUrlRepository;
+    }
+
+    public function injectUrlUtils(UrlUtils $urlUtils): void
+    {
+        $this->urlUtils = $urlUtils;
     }
 
     /**
@@ -116,28 +113,28 @@ class TinyUrlGenerator
      *
      * @param string $comment
      */
-    public function setComment($comment)
+    public function setComment($comment): void
     {
         $this->comment = (string)$comment;
     }
 
     /**
      * Sets the deleteOnUse option, if 1 the URL will be deleted from
-     * the database on the first hit
+     * the database on the first hit.
      *
      * @param bool $deleteOnUse
      */
-    public function setOptionDeleteOnUse($deleteOnUse)
+    public function setOptionDeleteOnUse($deleteOnUse): void
     {
         $this->optionDeleteOnUse = (bool)$deleteOnUse;
     }
 
     /**
-     * Sets a custom URL key, must be unique
+     * Sets a custom URL key, must be unique.
      *
      * @param string $urlKey
      */
-    public function setOptionUrlKey($urlKey)
+    public function setOptionUrlKey($urlKey): void
     {
         if (!empty($urlKey)) {
             $this->optionUrlKey = $urlKey;
@@ -147,23 +144,20 @@ class TinyUrlGenerator
     }
 
     /**
-     * Sets the timestamp until the generated URL is valid
+     * Sets the timestamp until the generated URL is valid.
      *
      * @param int $validUntil
      */
-    public function setOptionValidUntil($validUntil)
+    public function setOptionValidUntil($validUntil): void
     {
-        $this->optionValidUntil = intval($validUntil);
+        $this->optionValidUntil = (int)$validUntil;
     }
 
     /**
-     * Inserts a new record in the database
+     * Inserts a new record in the database.
      *
      * Does not check, if the url hash already exists! This is done in
      * getTinyUrl().
-     *
-     * @param string $targetUrl
-     * @return TinyUrl
      */
     protected function generateNewTinyurl(string $targetUrl): TinyUrl
     {
@@ -189,7 +183,6 @@ class TinyUrlGenerator
     }
 
     /**
-     * @return TinyUrlRepository
      * @codeCoverageIgnore
      */
     protected function getTinyUrlRepository(): TinyUrlRepository
@@ -201,7 +194,6 @@ class TinyUrlGenerator
     }
 
     /**
-     * @return UrlUtils
      * @codeCoverageIgnore
      */
     protected function getUrlUtils(): UrlUtils

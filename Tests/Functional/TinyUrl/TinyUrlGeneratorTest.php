@@ -42,13 +42,10 @@ class TinyUrlGeneratorTest extends AbstractFunctionalTestCase
         $this->tinyUrlGenerator = GeneralUtility::makeInstance(TinyUrlGenerator::class);
     }
 
-    /**
-     * @test
-     */
-    public function getTinyUrlSetsTstampOfNewTinyUrl()
+    public function testGetTinyUrlSetsTstampOfNewTinyUrl(): void
     {
         $this->tinyUrlGenerator->getTinyUrl('http://mydomain.tld');
         $tinyUrlRow = $this->getTinyUrlRow();
-        $this->assertGreaterThanOrEqual($GLOBALS['EXEC_TIME'], $tinyUrlRow['tstamp']);
+        self::assertGreaterThanOrEqual($GLOBALS['EXEC_TIME'], $tinyUrlRow['tstamp']);
     }
 }

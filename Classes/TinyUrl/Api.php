@@ -19,7 +19,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
 
 /**
- * Use this class for generating tiny URLs in your own extension
+ * Use this class for generating tiny URLs in your own extension.
  *
  * @api
  */
@@ -36,27 +36,12 @@ class Api
     protected $typoScriptConfigurator;
 
     /**
-     * Initializes the configuration of the tiny URL generator based on the given
-     * TypoScript configuration. The content object is used to parse values with
-     * stdWrap
-     *
-     * @param array $config the TypoScript configuration of a typolink, the config options must be set within
-     * the tinyurl. namespace
-     * @param ContentObjectRenderer $contentObject The parent content object (used for running stdWrap)
-     * @api
-     */
-    public function initializeConfigFromTyposcript(array $config, ContentObjectRenderer $contentObject)
-    {
-        $this->getTypoScriptConfigurator()->initializeConfigFromTyposcript($config, $contentObject);
-    }
-
-    /**
      * Returns the final tiny URL for the given target URL using the
      * configuration options that have been provided by the setters or
-     * by TypoScript
+     * by TypoScript.
      *
-     * @param string $targetUrl
      * @return string the tiny URL
+     *
      * @api
      */
     public function getTinyUrl(string $targetUrl): string
@@ -65,58 +50,65 @@ class Api
     }
 
     /**
-     * Sets the comment for the created tiny URL.
+     * Initializes the configuration of the tiny URL generator based on the given
+     * TypoScript configuration. The content object is used to parse values with
+     * stdWrap.
      *
-     * @param string $comment
+     * @param array $config the TypoScript configuration of a typolink, the config options must be set within
+     *                      the tinyurl. namespace
+     * @param ContentObjectRenderer $contentObject The parent content object (used for running stdWrap)
+     *
+     * @api
      */
-    public function setComment(string $comment)
+    public function initializeConfigFromTyposcript(array $config, ContentObjectRenderer $contentObject): void
+    {
+        $this->getTypoScriptConfigurator()->initializeConfigFromTyposcript($config, $contentObject);
+    }
+
+    /**
+     * Sets the comment for the created tiny URL.
+     */
+    public function setComment(string $comment): void
     {
         $this->getTinyUrlGenerator()->setComment($comment);
     }
 
     /**
      * Sets the deleteOnUse option, if TRUE the URL will be deleted from
-     * the database on the first hit
-     *
-     * @param bool $deleteOnUse
+     * the database on the first hit.
      */
-    public function setDeleteOnUse(bool $deleteOnUse)
+    public function setDeleteOnUse(bool $deleteOnUse): void
     {
         $this->getTinyUrlGenerator()->setOptionDeleteOnUse($deleteOnUse);
     }
 
-    public function setTinyUrlGenerator(TinyUrlGenerator $tinyUrlGenerator)
+    public function setTinyUrlGenerator(TinyUrlGenerator $tinyUrlGenerator): void
     {
         $this->tinyUrlGenerator = $tinyUrlGenerator;
     }
 
-    public function setTypoScriptConfigurator(TypoScriptConfigurator $typoScriptConfigurator)
+    public function setTypoScriptConfigurator(TypoScriptConfigurator $typoScriptConfigurator): void
     {
         $this->typoScriptConfigurator = $typoScriptConfigurator;
     }
 
     /**
-     * Sets a custom URL key, must be unique
-     *
-     * @param string $urlKey
+     * Sets a custom URL key, must be unique.
      */
-    public function setUrlKey(string $urlKey)
+    public function setUrlKey(string $urlKey): void
     {
         $this->getTinyUrlGenerator()->setOptionUrlKey($urlKey);
     }
 
     /**
-     * Sets the timestamp until the generated URL is valid
-     *
-     * @param int $validUntil
+     * Sets the timestamp until the generated URL is valid.
      */
-    public function setValidUntil(int $validUntil)
+    public function setValidUntil(int $validUntil): void
     {
         $this->getTinyUrlGenerator()->setOptionValidUntil($validUntil);
     }
 
     /**
-     * @return TinyUrlGenerator
      * @codeCoverageIgnore
      */
     protected function getTinyUrlGenerator(): TinyUrlGenerator
@@ -128,7 +120,6 @@ class Api
     }
 
     /**
-     * @return TypoScriptConfigurator
      * @codeCoverageIgnore
      */
     protected function getTypoScriptConfigurator(): TypoScriptConfigurator

@@ -20,11 +20,11 @@ use TYPO3\CMS\Extbase\Error\Result;
 
 class TinyUrlValidationExceptionTest extends TestCase
 {
-    public function testSetResultSetsResult()
+    public function testSetResultSetsResult(): void
     {
         $result = new Result();
         $validationException = new TinyUrlValidationException();
         $validationException->setValidationResult($result);
-        $this->assertEquals($result, $validationException->getResult());
+        self::assertSame($result, $validationException->getResult());
     }
 }

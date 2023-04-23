@@ -43,54 +43,39 @@ class ApiTest extends AbstractFunctionalTestCase
         $this->tinyUrlsApi = GeneralUtility::makeInstance(Api::class);
     }
 
-    /**
-     * @test
-     */
-    public function apiDoesNotSetDeleteOnUseByDefault()
+    public function testApiDoesNotSetDeleteOnUseByDefault(): void
     {
         $this->tinyUrlsApi->getTinyUrl('http://mydomain.tld');
         $tinyUrlRow = $this->getTinyUrlRow();
-        $this->assertEmpty($tinyUrlRow['delete_on_use']);
+        self::assertEmpty($tinyUrlRow['delete_on_use']);
     }
 
-    /**
-     * @test
-     */
-    public function apiDoesNotSetValidationDateByDefault()
+    public function testApiDoesNotSetValidationDateByDefault(): void
     {
         $this->tinyUrlsApi->getTinyUrl('http://mydomain.tld');
         $tinyUrlRow = $this->getTinyUrlRow();
-        $this->assertEmpty($tinyUrlRow['valid_until']);
+        self::assertEmpty($tinyUrlRow['valid_until']);
     }
 
-    /**
-     * @test
-     */
-    public function apiRespectsCustomUrlKey()
+    public function testApiRespectsCustomUrlKey(): void
     {
         $this->tinyUrlsApi->setUrlKey('mydomain');
         $tinyUrl = $this->tinyUrlsApi->getTinyUrl('http://mydomain.tld');
-        $this->assertMatchesRegularExpression(
+        self::assertMatchesRegularExpression(
             '/http:\/\/.+\/\?eID=tx_tinyurls&tx_tinyurls\[key\]=mydomain/',
             $tinyUrl
         );
     }
 
-    /**
-     * @test
-     */
-    public function apiSetsComment()
+    public function testApiSetsComment(): void
     {
         $this->tinyUrlsApi->setComment('My test comment');
         $this->tinyUrlsApi->getTinyUrl('http://mydomain.tld');
         $tinyUrlRow = $this->getTinyUrlRow();
-        $this->assertEquals('My test comment', $tinyUrlRow['comment']);
+        self::assertSame('My test comment', $tinyUrlRow['comment']);
     }
 
-    /**
-     * @test
-     */
-    public function apiSetsDeleteOnUseIfConfiguredInTypoScript()
+    public function testApiSetsDeleteOnUseIfConfiguredInTypoScript(): void
     {
         $typoScript = [
             'tinyurl.' => ['deleteOnUse' => 1],
@@ -99,24 +84,27 @@ class ApiTest extends AbstractFunctionalTestCase
         $this->tinyUrlsApi->initializeConfigFromTyposcript($typoScript, $contentObject);
         $this->tinyUrlsApi->getTinyUrl('http://mydomain.tld');
         $tinyUrlRow = $this->getTinyUrlRow();
-        $this->assertNotEmpty($tinyUrlRow['delete_on_use']);
+        self::assertNotEmpty($tinyUrlRow['delete_on_use']);
     }
 
-    /**
-     * @test
-     */
-    public function apiSetsDeleteOnUseIfRequested()
+    public function testApiSetsDeleteOnUseIfRequested(): void
     {
         $this->tinyUrlsApi->setDeleteOnUse(true);
         $this->tinyUrlsApi->getTinyUrl('http://mydomain.tld');
         $tinyUrlRow = $this->getTinyUrlRow();
-        $this->assertNotEmpty($tinyUrlRow['delete_on_use']);
+        self::assertNotEmpty($tinyUrlRow['delete_on_use']);
     }
 
-    /**
-     * @test
-     */
-    public function apiSetsValidUntilIfConfiguredInTypoScript()
+    public function testApiSetsValidationDateIfRequested(): void
+    {
+        $validUntilTimestamp = time() + 2000;
+        $this->tinyUrlsApi->setValidUntil($validUntilTimestamp);
+        $this->tinyUrlsApi->getTinyUrl('http://mydomain.tld');
+        $tinyUrlRow = $this->getTinyUrlRow();
+        self::assertSame($validUntilTimestamp, (int)$tinyUrlRow['valid_until']);
+    }
+
+    public function testApiSetsValidUntilIfConfiguredInTypoScript(): void
     {
         $validUntilTimestamp = time() + 1000;
         $typoScript = [
@@ -126,18 +114,6 @@ class ApiTest extends AbstractFunctionalTestCase
         $this->tinyUrlsApi->initializeConfigFromTyposcript($typoScript, $contentObject);
         $this->tinyUrlsApi->getTinyUrl('http://mydomain.tld');
         $tinyUrlRow = $this->getTinyUrlRow();
-        $this->assertEquals($validUntilTimestamp, $tinyUrlRow['valid_until']);
-    }
-
-    /**
-     * @test
-     */
-    public function apiSetsValidationDateIfRequested()
-    {
-        $validUntilTimestamp = time() + 2000;
-        $this->tinyUrlsApi->setValidUntil($validUntilTimestamp);
-        $this->tinyUrlsApi->getTinyUrl('http://mydomain.tld');
-        $tinyUrlRow = $this->getTinyUrlRow();
-        $this->assertEquals($validUntilTimestamp, $tinyUrlRow['valid_until']);
+        self::assertSame($validUntilTimestamp, (int)$tinyUrlRow['valid_until']);
     }
 }

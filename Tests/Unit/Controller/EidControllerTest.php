@@ -24,7 +24,6 @@ use Tx\Tinyurls\Domain\Repository\TinyUrlRepository;
 use Tx\Tinyurls\Exception\NoTinyUrlKeySubmittedException;
 use Tx\Tinyurls\Exception\TinyUrlNotFoundException;
 use TYPO3\CMS\Core\Error\Http\BadRequestException;
-use TYPO3\CMS\Core\Error\Http\PageNotFoundException;
 use TYPO3\CMS\Core\Http\ServerRequest;
 use TYPO3\CMS\Frontend\Controller\ErrorController;
 
@@ -44,7 +43,7 @@ class EidControllerTest extends TestCase
     protected $errorControllerMock;
 
     /**
-     * @var TinyUrlRepository|MockObject
+     * @var MockObject|TinyUrlRepository
      */
     protected $tinyUrlRepositoryMock;
 
@@ -60,97 +59,97 @@ class EidControllerTest extends TestCase
         $GLOBALS['EXEC_TIME'] = time();
     }
 
-    public function testBadRequestExceptionIfNoUrlKeyIsProvided()
+    public function testBadRequestExceptionIfNoUrlKeyIsProvided(): void
     {
         $this->expectException(BadRequestException::class);
 
         $this->processRequest();
     }
 
-    public function testDeleteOnUseUrlIsDeleted()
+    public function testDeleteOnUseUrlIsDeleted(): void
     {
         $_GET['tx_tinyurls']['key'] = 'thekey';
         $tinyUrlMock = $this->createMock(TinyUrl::class);
         $tinyUrlMock->method('getDeleteOnUse')->willReturn(true);
         $tinyUrlMock->method('getUrlkey')->willReturn('thekey');
 
-        $this->tinyUrlRepositoryMock->expects($this->once())
+        $this->tinyUrlRepositoryMock->expects(self::once())
             ->method('findTinyUrlByKey')
             ->willReturn($tinyUrlMock);
 
-        $this->tinyUrlRepositoryMock->expects($this->once())
+        $this->tinyUrlRepositoryMock->expects(self::once())
             ->method('deleteTinyUrlByKey')
             ->with('thekey');
 
         $this->processRequest();
     }
 
-    public function testHitIsCountedIfUrlIsNotDeletedOnUse()
+    public function testHitIsCountedIfUrlIsNotDeletedOnUse(): void
     {
         $_GET['tx_tinyurls']['key'] = 'thekey';
         $tinyUrlMock = $this->createMock(TinyUrl::class);
         $tinyUrlMock->method('getUid')->willReturn(999);
         $tinyUrlMock->method('getDeleteOnUse')->willReturn(false);
 
-        $this->tinyUrlRepositoryMock->expects($this->once())
+        $this->tinyUrlRepositoryMock->expects(self::once())
             ->method('findTinyUrlByKey')
             ->willReturn($tinyUrlMock);
 
-        $this->tinyUrlRepositoryMock->expects($this->once())
+        $this->tinyUrlRepositoryMock->expects(self::once())
             ->method('countTinyUrlHit')
             ->with($tinyUrlMock);
 
         $this->processRequest();
     }
 
-    public function testHitIsNotCountedIfUrlIsDeletedOnUse()
+    public function testHitIsNotCountedIfUrlIsDeletedOnUse(): void
     {
         $_GET['tx_tinyurls']['key'] = 'thekey';
         $tinyUrlMock = $this->createMock(TinyUrl::class);
         $tinyUrlMock->method('getDeleteOnUse')->willReturn(true);
 
-        $this->tinyUrlRepositoryMock->expects($this->once())
+        $this->tinyUrlRepositoryMock->expects(self::once())
             ->method('findTinyUrlByKey')
             ->willReturn($tinyUrlMock);
 
-        $this->tinyUrlRepositoryMock->expects($this->never())
+        $this->tinyUrlRepositoryMock->expects(self::never())
             ->method('countTinyUrlHit');
 
         $this->processRequest();
     }
 
-    public function testInvalidUrlsArePurgedBeforeRedirect()
+    public function testInvalidUrlsArePurgedBeforeRedirect(): void
     {
         $this->expectException(NoTinyUrlKeySubmittedException::class);
 
-        $this->tinyUrlRepositoryMock->expects($this->once())
+        $this->tinyUrlRepositoryMock->expects(self::once())
             ->method('purgeInvalidUrls');
 
         $this->processRequest();
     }
 
-    public function testPageNotFoundErrorIfUrlKeyIsNotFoundInDatabase()
+    public function testPageNotFoundErrorIfUrlKeyIsNotFoundInDatabase(): void
     {
         $_GET['tx_tinyurls']['key'] = 'thekey';
 
-        $this->tinyUrlRepositoryMock->expects($this->once())
+        $this->tinyUrlRepositoryMock->expects(self::once())
             ->method('findTinyUrlByKey')
             ->with('thekey')
             ->willThrowException(new TinyUrlNotFoundException('thekey'));
 
         $errorResponse = $this->getMockBuilder(ResponseInterface::class)->getMock();
-        $this->errorControllerMock->expects($this->once())
+        $this->errorControllerMock->expects(self::once())
             ->method('pageNotFoundAction')
             ->with(
-                $this->isInstanceOf(ServerRequestInterface::class),
+                self::isInstanceOf(ServerRequestInterface::class),
                 'The tinyurl with the key thekey was not found.'
             )
             ->willReturn($errorResponse);
 
-        $this->assertEquals($errorResponse, $this->processRequest());
+        self::assertSame($errorResponse, $this->processRequest());
     }
 
-    public function testRedirectsToTargetUrl()
+    public function testRedirectsToTargetUrl(): void
     {
         $_GET['tx_tinyurls']['key'] = 'thekey';
         $tinyUrlMock = $this->createMock(TinyUrl::class);
@@ -158,29 +157,26 @@ class EidControllerTest extends TestCase
         $tinyUrlMock->method('getTargetUrl')->willReturn('http://the-target.url');
         $tinyUrlMock->method('getDeleteOnUse')->willReturn(false);
 
-        $this->tinyUrlRepositoryMock->expects($this->once())
+        $this->tinyUrlRepositoryMock->expects(self::once())
             ->method('findTinyUrlByKey')
             ->willReturn($tinyUrlMock);
 
         $response = $this->processRequest();
-        $this->assertEquals(301, $response->getStatusCode());
-        $this->assertEquals('Moved Permanently', $response->getReasonPhrase());
-        $this->assertEquals('http://the-target.url', $response->getHeaderLine('Location'));
+        self::assertSame(301, $response->getStatusCode());
+        self::assertSame('Moved Permanently', $response->getReasonPhrase());
+        self::assertSame('http://the-target.url', $response->getHeaderLine('Location'));
     }
 
     /**
-     * @param string $headerName
-     * @param string $expectedValue
      * @dataProvider tinyUrlRedirectSendsNoCacheHeadersDataProvider
-     * @test
      */
-    public function tinyUrlRedirectSendsNoCacheHeaders(string $headerName, string $expectedValue)
+    public function testTinyUrlRedirectSendsNoCacheHeaders(string $headerName, string $expectedValue): void
     {
         $_GET['tx_tinyurls']['key'] = 'thekey';
         $tinyUrlMock = $this->createMock(TinyUrl::class);
         $tinyUrlMock->method('getDeleteOnUse')->willReturn(true);
 
-        $this->tinyUrlRepositoryMock->expects($this->once())
+        $this->tinyUrlRepositoryMock->expects(self::once())
             ->method('findTinyUrlByKey')
             ->willReturn($tinyUrlMock);
 
@@ -190,7 +186,7 @@ class EidControllerTest extends TestCase
             $expectedValue = gmdate('D, d M Y H:i:s', $GLOBALS['EXEC_TIME']) . ' GMT';
         }
 
-        $this->assertEquals($expectedValue, $response->getHeaderLine($headerName));
+        self::assertSame($expectedValue, $response->getHeaderLine($headerName));
     }
 
     public function tinyUrlRedirectSendsNoCacheHeadersDataProvider(): array

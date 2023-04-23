@@ -24,19 +24,19 @@ use Tx\Tinyurls\Utils\UrlUtils;
  */
 class TinyUrlDisplayTest extends TestCase
 {
-    public function testBuildTinyUrlFormFormElementDataBuildTinyUrlUsingUrlKey()
+    public function testBuildTinyUrlFormFormElementDataBuildTinyUrlUsingUrlKey(): void
     {
         $tinyUrlDisplay = new TinyUrlDisplay();
 
-        /** @var UrlUtils|MockObject $tinyUrlGenerator */
+        /** @var MockObject|UrlUtils $tinyUrlGenerator */
         $tinyUrlGenerator = $this->createMock(UrlUtils::class);
-        $tinyUrlGenerator->expects($this->once())
+        $tinyUrlGenerator->expects(self::once())
             ->method('buildTinyUrl')
             ->with('the tiny urlkey')
             ->willReturn('the generated url');
         $tinyUrlDisplay->injectUrlUtils($tinyUrlGenerator);
 
         $formElementData['databaseRow']['urlkey'] = 'the tiny urlkey';
-        $this->assertEquals('the generated url', $tinyUrlDisplay->buildTinyUrlFormFormElementData($formElementData));
+        self::assertSame('the generated url', $tinyUrlDisplay->buildTinyUrlFormFormElementData($formElementData));
     }
 }

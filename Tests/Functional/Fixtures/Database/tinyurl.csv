@@ -1,0 +1,6 @@
+"pages",,,
+,"uid","pid","title"
+,1,0,"Page containing tiny URL"
+"tx_tinyurls_urls",,,,,,,,,,,
+,"uid","pid","tstamp","counter","comment","urlkey","urldisplay","target_url","target_url_hash","delete_on_use","valid_until"
+,1,0,1529594422,0,"Test URL","9499fjf",1,"http://typo3.org","http://typo3.org",0,0

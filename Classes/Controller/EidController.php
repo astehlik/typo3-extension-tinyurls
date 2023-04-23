@@ -26,27 +26,18 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Frontend\Controller\ErrorController;
 
 /**
- * Handles tiny URLs with the TYPO3 eID mechanism
+ * Handles tiny URLs with the TYPO3 eID mechanism.
  *
  * @author Alexander Stehlik <alexander.stehlik.deleteme@gmail.com>
  * @author Sebastian Lemke <s.lemke.deleteme@infoworxx.de>
  */
 class EidController
 {
-    /**
-     * @var TinyUrlRepository
-     */
-    protected $tinyUrlRepository;
+    protected ?TinyUrlRepository $tinyUrlRepository = null;
 
-    /**
-     * @var ErrorController
-     */
-    private $errorController;
+    private ?ErrorController $errorController = null;
 
-    /**
-     * @param TinyUrlRepository $tinyUrlRepository
-     */
-    public function injectTinyUrlRepository(TinyUrlRepository $tinyUrlRepository)
+    public function injectTinyUrlRepository(TinyUrlRepository $tinyUrlRepository): void
     {
         $this->tinyUrlRepository = $tinyUrlRepository;
     }
@@ -83,14 +74,11 @@ class EidController
             gmdate('D, d M Y H:i:s', $GLOBALS['EXEC_TIME']) . ' GMT'
         );
         $noCacheResponse = $noCacheResponse->withAddedHeader('Cache-Control', 'no-cache, must-revalidate');
-        $noCacheResponse = $noCacheResponse->withAddedHeader('Pragma', 'no-cache');
-        return $noCacheResponse;
+        return $noCacheResponse->withAddedHeader('Pragma', 'no-cache');
     }
 
     /**
      * Increases the hit counter for the given tiny URL record.
-     *
-     * @param TinyUrl $tinyUrl
      */
     protected function countUrlHit(TinyUrl $tinyUrl): void
     {
@@ -114,8 +102,6 @@ class EidController
     /**
      * Returns the data of the tiny URL record that was found by the submitted tinyurl key.
      *
-     * @param ServerRequestInterface $request
-     * @return TinyUrl
      * @throws TinyUrlNotFoundException
      */
     protected function getTinyUrl(ServerRequestInterface $request): TinyUrl
@@ -131,7 +117,6 @@ class EidController
     }
 
     /**
-     * @return TinyUrlRepository
      * @codeCoverageIgnore
      */
     protected function getTinyUrlRepository(): TinyUrlRepository

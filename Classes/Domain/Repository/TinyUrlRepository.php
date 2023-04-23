@@ -24,26 +24,20 @@ interface TinyUrlRepository extends SingletonInterface
 
     /**
      * See: http://lists.typo3.org/pipermail/typo3-dev/2007-December/026936.html
-     * Use of "set counter=counter+1" - avoiding race conditions
+     * Use of "set counter=counter+1" - avoiding race conditions.
      *
-     * @param TinyUrl $tinyUrl
-     * @return TinyUrl A new tiny URL instance with an updated counter.
+     * @return TinyUrl a new tiny URL instance with an updated counter
      */
     public function countTinyUrlHit(TinyUrl $tinyUrl): TinyUrl;
 
     /**
      * Deletes the URL with the given URL key.
-     *
-     * @param string $tinyUrlKey
-     * @return void
      */
-    public function deleteTinyUrlByKey(string $tinyUrlKey);
+    public function deleteTinyUrlByKey(string $tinyUrlKey): void;
 
     /**
      * Finds the URL by the given URL key.
      *
-     * @param string $tinyUrlKey
-     * @return TinyUrl
      * @throws TinyUrlNotFoundException
      */
     public function findTinyUrlByKey(string $tinyUrlKey): TinyUrl;
@@ -51,8 +45,6 @@ interface TinyUrlRepository extends SingletonInterface
     /**
      * Finds the URL by the given target URL.
      *
-     * @param string $targetUrl
-     * @return TinyUrl
      * @throws TinyUrlNotFoundException
      */
     public function findTinyUrlByTargetUrl(string $targetUrl): TinyUrl;
@@ -60,30 +52,22 @@ interface TinyUrlRepository extends SingletonInterface
     /**
      * Finds the URL by the given UID.
      *
-     * @param int $uid
-     * @return TinyUrl
      * @throws TinyUrlNotFoundException
      */
     public function findTinyUrlByUid(int $uid): TinyUrl;
 
     /**
      * Inserts the given URL in the database.
-     *
-     * @param TinyUrl $tinyUrl
-     * @return void
      */
-    public function insertNewTinyUrl(TinyUrl $tinyUrl);
+    public function insertNewTinyUrl(TinyUrl $tinyUrl): void;
 
     /**
-     * Purges all invalid urls from the database
+     * Purges all invalid urls from the database.
      */
     public function purgeInvalidUrls();
 
     /**
      * Updates an existing TinyURL in the storage.
-     *
-     * @param TinyUrl $tinyUrl
-     * @return void
      */
-    public function updateTinyUrl(TinyUrl $tinyUrl);
+    public function updateTinyUrl(TinyUrl $tinyUrl): void;
 }

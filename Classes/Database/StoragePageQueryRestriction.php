@@ -21,10 +21,7 @@ use TYPO3\CMS\Core\Database\Query\Restriction\QueryRestrictionInterface;
 
 class StoragePageQueryRestriction implements QueryRestrictionInterface
 {
-    /**
-     * @var int
-     */
-    protected $storagePageUid;
+    protected int $storagePageUid;
 
     public function __construct(int $storagePageUid)
     {
@@ -32,10 +29,11 @@ class StoragePageQueryRestriction implements QueryRestrictionInterface
     }
 
     /**
-     * Main method to build expressions for given tables
+     * Main method to build expressions for given tables.
      *
      * @param array $queriedTables Array of tables, where array key is table name and value potentially an alias
      * @param ExpressionBuilder $expressionBuilder Expression builder instance to add restrictions with
+     *
      * @return CompositeExpression The result of query builder expression(s)
      */
     public function buildExpression(array $queriedTables, ExpressionBuilder $expressionBuilder): CompositeExpression
@@ -46,7 +44,7 @@ class StoragePageQueryRestriction implements QueryRestrictionInterface
                 continue;
             }
 
-            $fieldName = ($tableAlias ?: $tableName) . '.' . 'pid';
+            $fieldName = ($tableAlias ?: $tableName) . '.pid';
             $constraints[] = $expressionBuilder->eq($fieldName, $this->storagePageUid);
         }
 

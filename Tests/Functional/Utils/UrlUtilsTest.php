@@ -28,14 +28,11 @@ class UrlUtilsTest extends AbstractFunctionalTestCase
      */
     protected $testExtensionsToLoad = ['typo3conf/ext/tinyurls'];
 
-    /**
-     * @test
-     */
-    public function createSpeakingTinyUrlReplacesGeneralUtilityMarkers()
+    public function testCreateSpeakingTinyUrlReplacesGeneralUtilityMarkers(): void
     {
         $_SERVER['REMOTE_ADDR'] = '127.0.0.1';
         $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['tinyurls']['speakingUrlTemplate'] = '###REMOTE_ADDR###';
         $urlUtils = GeneralUtility::makeInstance(UrlUtils::class);
-        $this->assertEquals('127.0.0.1', $urlUtils->createSpeakingTinyUrl('test'));
+        self::assertSame('127.0.0.1', $urlUtils->createSpeakingTinyUrl('test'));
     }
 }

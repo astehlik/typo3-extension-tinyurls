@@ -51,7 +51,7 @@ class Base62UrlKeyGeneratorTest extends TestCase
         $this->base62UrlKeyGenerator->injectGeneralUtility($this->generalUtilityMock);
     }
 
-    public function testGenerateTinyurlKeyForUidEncodesIntegerIfNoMinimalLengthIsConfigured()
+    public function testGenerateTinyurlKeyForUidEncodesIntegerIfNoMinimalLengthIsConfigured(): void
     {
         $this->extensionConfigurationMock->method('getBase62Dictionary')
             ->willReturn('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
@@ -59,10 +59,10 @@ class Base62UrlKeyGeneratorTest extends TestCase
         $tinyUrl = TinyUrl::createNew();
         $tinyUrl->persistPostProcessInsert(1243);
         $key = $this->base62UrlKeyGenerator->generateTinyurlKeyForTinyUrl($tinyUrl);
-        $this->assertEquals('ud', $key);
+        self::assertSame('ud', $key);
     }
 
-    public function testGenerateTinyurlKeyForUidFillsUpKeyUpToConfiguredMinimalLength()
+    public function testGenerateTinyurlKeyForUidFillsUpKeyUpToConfiguredMinimalLength(): void
     {
         $this->extensionConfigurationMock->method('getBase62Dictionary')
             ->willReturn('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
@@ -77,10 +77,10 @@ class Base62UrlKeyGeneratorTest extends TestCase
         $tinyUrl = TinyUrl::createNew();
         $tinyUrl->persistPostProcessInsert(1243);
         $key = $this->base62UrlKeyGenerator->generateTinyurlKeyForTinyUrl($tinyUrl);
-        $this->assertEquals('ud-ag', $key);
+        self::assertSame('ud-ag', $key);
     }
 
-    public function testGenerateTinyurlKeyForUidFillsUpKeyWithConfiguredMinimalRandomPart()
+    public function testGenerateTinyurlKeyForUidFillsUpKeyWithConfiguredMinimalRandomPart(): void
     {
         $this->extensionConfigurationMock->method('getBase62Dictionary')
             ->willReturn('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
@@ -98,6 +98,6 @@ class Base62UrlKeyGeneratorTest extends TestCase
         $tinyUrl = TinyUrl::createNew();
         $tinyUrl->persistPostProcessInsert(1243);
         $key = $this->base62UrlKeyGenerator->generateTinyurlKeyForTinyUrl($tinyUrl);
-        $this->assertEquals('ud-ag', $key);
+        self::assertSame('ud-ag', $key);
     }
 }

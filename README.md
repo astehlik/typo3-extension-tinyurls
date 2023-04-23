@@ -1,7 +1,7 @@
 
 # tinyurls TYPO3 Extension
 
-[![Build Status](https://travis-ci.com/astehlik/typo3-extension-tinyurls.svg?branch=develop)](https://travis-ci.com/astehlik/typo3-extension-tinyurls)
+[![.github/workflows/test.yml](https://github.com/astehlik/typo3-extension-tinyurls/actions/workflows/test.yml/badge.svg)](https://github.com/astehlik/typo3-extension-tinyurls/actions/workflows/test.yml)
 [![Maintainability](https://api.codeclimate.com/v1/badges/4c31d95d98c82ad468e7/maintainability)](https://codeclimate.com/github/astehlik/typo3-extension-tinyurls/maintainability)
 [![Test Coverage](https://api.codeclimate.com/v1/badges/4c31d95d98c82ad468e7/test_coverage)](https://codeclimate.com/github/astehlik/typo3-extension-tinyurls/test_coverage)
 

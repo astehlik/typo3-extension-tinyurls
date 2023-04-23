@@ -24,8 +24,6 @@ use TYPO3\CMS\Core\Imaging\Icon;
 use TYPO3\CMS\Core\Imaging\IconFactory;
 use TYPO3\CMS\Fluid\View\StandaloneView;
 
-/**
- */
 class CopyableFieldElementTest extends TestCase
 {
     use ArraySubsetAsserts;
@@ -36,7 +34,7 @@ class CopyableFieldElementTest extends TestCase
     private $copyableFieldElement;
 
     /**
-     * @var StandaloneView|MockObject
+     * @var MockObject|StandaloneView
      */
     private $formFieldViewMock;
 
@@ -56,7 +54,7 @@ class CopyableFieldElementTest extends TestCase
         $this->createCopyableFieldElement($data);
     }
 
-    public function testGetFieldValueCallsConfiguredUserFunc()
+    public function testGetFieldValueCallsConfiguredUserFunc(): void
     {
         $data = [
             'parameterArray' => [
@@ -67,16 +65,16 @@ class CopyableFieldElementTest extends TestCase
 
         $this->createCopyableFieldElement($data);
 
-        $this->generalUtilityWrapperMock->expects($this->once())
+        $this->generalUtilityWrapperMock->expects(self::once())
             ->method('callUserFunction')
             ->with('thefunc', $data, $this->copyableFieldElement);
 
         $this->copyableFieldElement->render();
     }
 
-    public function testRenderAssignsClipboardIconToTemplate()
+    public function testRenderAssignsClipboardIconToTemplate(): void
     {
-        $this->formFieldViewMock->expects($this->atLeast(1))
+        $this->formFieldViewMock->expects(self::atLeast(1))
             ->method('assign')
             ->withConsecutive(
                 [],
@@ -89,9 +87,9 @@ class CopyableFieldElementTest extends TestCase
         $this->copyableFieldElement->render();
     }
 
-    public function testRenderAssignsFieldValueToTemplate()
+    public function testRenderAssignsFieldValueToTemplate(): void
     {
-        $this->formFieldViewMock->expects($this->atLeast(1))
+        $this->formFieldViewMock->expects(self::atLeast(1))
             ->method('assign')
             ->withConsecutive(
                 [
@@ -103,40 +101,40 @@ class CopyableFieldElementTest extends TestCase
         $this->copyableFieldElement->render();
     }
 
-    public function testRenderCreatesSmallClipboardIcon()
+    public function testRenderCreatesSmallClipboardIcon(): void
     {
-        $this->iconFactoryMock->expects($this->once())
+        $this->iconFactoryMock->expects(self::once())
             ->method('getIcon')
             ->with('actions-edit-copy', Icon::SIZE_SMALL);
 
         $this->copyableFieldElement->render();
     }
 
-    public function testRenderInitializesResultArray()
+    public function testRenderInitializesResultArray(): void
     {
         // Test for some common array keys. This way we do not need to mock the test subject.
-        $this->assertArrayHasKey('additionalJavaScriptPost', $this->copyableFieldElement->render());
-        $this->assertArrayHasKey('additionalHiddenFields', $this->copyableFieldElement->render());
-        $this->assertArrayHasKey('inlineData', $this->copyableFieldElement->render());
+        self::assertArrayHasKey('additionalJavaScriptPost', $this->copyableFieldElement->render());
+        self::assertArrayHasKey('additionalHiddenFields', $this->copyableFieldElement->render());
+        self::assertArrayHasKey('inlineData', $this->copyableFieldElement->render());
     }
 
-    public function testRenderInitializesTemplatePathInFormFieldView()
+    public function testRenderInitializesTemplatePathInFormFieldView(): void
     {
-        $this->generalUtilityWrapperMock->expects($this->once())
+        $this->generalUtilityWrapperMock->expects(self::once())
             ->method('getFileAbsFileName')
             ->with(CopyableFieldElement::TEMPLATE_PATH)
             ->willReturn('the template path');
 
-        $this->formFieldViewMock->expects($this->once())
+        $this->formFieldViewMock->expects(self::once())
             ->method('setTemplatePathAndFilename')
             ->with('the template path');
 
         $this->copyableFieldElement->render();
     }
 
-    public function testRenderLoadsAdditionalLanguageLabels()
+    public function testRenderLoadsAdditionalLanguageLabels(): void
     {
-        $this->assertArraySubset(
+        self::assertArraySubset(
             [
                 'additionalInlineLanguageLabelFiles' => ['EXT:tinyurls/Resources/Private/Language/locallang_db_js.xlf'],
             ],
@@ -144,25 +142,25 @@ class CopyableFieldElementTest extends TestCase
         );
     }
 
-    public function testRenderLoadsCopyToClipboardJsModule()
+    public function testRenderLoadsCopyToClipboardJsModule(): void
     {
-        $this->assertArraySubset(
+        self::assertArraySubset(
             ['requireJsModules' => ['TYPO3/CMS/Tinyurls/CopyToClipboard']],
             $this->copyableFieldElement->render()
         );
     }
 
-    public function testRenderReturnsRenderedFieldTemplate()
+    public function testRenderReturnsRenderedFieldTemplate(): void
     {
-        $this->formFieldViewMock->expects($this->once())
+        $this->formFieldViewMock->expects(self::once())
             ->method('render')
             ->willReturn('The final html');
 
         $result = $this->copyableFieldElement->render();
-        $this->assertEquals('The final html', $result['html']);
+        self::assertSame('The final html', $result['html']);
     }
 
-    protected function createCopyableFieldElement(array $data)
+    protected function createCopyableFieldElement(array $data): void
     {
         $nodeFactory = $this->getNodeFactoryMock();
         $this->copyableFieldElement = new CopyableFieldElement($nodeFactory, $data);
@@ -173,7 +171,7 @@ class CopyableFieldElementTest extends TestCase
     }
 
     /**
-     * @return StandaloneView|MockObject
+     * @return MockObject|StandaloneView
      */
     private function createFormFieldViewMock(): StandaloneView
     {
@@ -204,7 +202,7 @@ class CopyableFieldElementTest extends TestCase
     }
 
     /**
-     * @return NodeFactory|MockObject
+     * @return MockObject|NodeFactory
      */
     private function getNodeFactoryMock(): NodeFactory
     {

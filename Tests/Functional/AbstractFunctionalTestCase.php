@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Tx\Tinyurls\Tests\Functional;
 
-use Doctrine\DBAL\FetchMode;
-use PDO;
 use Symfony\Component\Yaml\Yaml;
 use TYPO3\CMS\Core\Cache\CacheManager;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -18,18 +16,15 @@ abstract class AbstractFunctionalTestCase extends FunctionalTestCase
         $builder = $this->getConnectionPool()->getQueryBuilderForTable('tx_tinyurls_urls');
         $builder->select('*')
             ->from('tx_tinyurls_urls')
-            ->where($builder->expr()->eq('uid', $builder->createNamedParameter(1, PDO::PARAM_INT)));
-        return $builder->execute()->fetch(FetchMode::ASSOCIATIVE);
+            ->where($builder->expr()->eq('uid', $builder->createNamedParameter(1, \PDO::PARAM_INT)));
+        return $builder->execute()->fetchAssociative();
     }
 
     /**
      * Create a simple site config for the tests that
      * call a frontend page.
-     *
-     * @param int $pageId
-     * @param array $additionalLanguages
      */
-    protected function setUpFrontendSite(int $pageId, array $additionalLanguages = [])
+    protected function setUpFrontendSite(int $pageId, array $additionalLanguages = []): void
     {
         $languages = [
             [

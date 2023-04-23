@@ -20,7 +20,7 @@ use Tx\Tinyurls\Utils\GeneralUtilityWrapper;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
- * Contains utilities for creating tiny url keys and url hashes
+ * Contains utilities for creating tiny url keys and url hashes.
  */
 class Base62UrlKeyGenerator implements UrlKeyGenerator
 {
@@ -34,21 +34,8 @@ class Base62UrlKeyGenerator implements UrlKeyGenerator
      */
     protected $generalUtility;
 
-    public function injectExtensionConfiguration(ExtensionConfiguration $extensionConfiguration)
-    {
-        $this->extensionConfiguration = $extensionConfiguration;
-    }
-
-    public function injectGeneralUtility(GeneralUtilityWrapper $generalUtility)
-    {
-        $this->generalUtility = $generalUtility;
-    }
-
     /**
-     * Generates a unique tinyurl key for the record with the given UID
-     *
-     * @param TinyUrl $tinyUrl
-     * @return string
+     * Generates a unique tinyurl key for the record with the given UID.
      */
     public function generateTinyurlKeyForTinyUrl(TinyUrl $tinyUrl): string
     {
@@ -57,9 +44,6 @@ class Base62UrlKeyGenerator implements UrlKeyGenerator
 
     /**
      * Generates a unique tinyurl key for the given UID.
-     *
-     * @param int $uid
-     * @return string
      */
     public function generateTinyurlKeyForUid(int $uid): string
     {
@@ -85,13 +69,24 @@ class Base62UrlKeyGenerator implements UrlKeyGenerator
         return $tinyUrlKey;
     }
 
+    public function injectExtensionConfiguration(ExtensionConfiguration $extensionConfiguration): void
+    {
+        $this->extensionConfiguration = $extensionConfiguration;
+    }
+
+    public function injectGeneralUtility(GeneralUtilityWrapper $generalUtility): void
+    {
+        $this->generalUtility = $generalUtility;
+    }
+
     /**
-     * This mehtod converts the given base 10 integer to a base62
+     * This mehtod converts the given base 10 integer to a base62.
      *
      * Thanks to http://jeremygibbs.com/2012/01/16/how-to-make-a-url-shortener
      *
      * @param int $base10Integer The integer that will converted
      * @param string $base62Dictionary the dictionary for generating the base62 integer
+     *
      * @return string A base62 encoded integer using a custom dictionary
      */
     protected function convertIntToBase62(int $base10Integer, string $base62Dictionary): string
@@ -100,7 +95,7 @@ class Base62UrlKeyGenerator implements UrlKeyGenerator
         $base = 62;
 
         do {
-            $base62Integer = $base62Dictionary[($base10Integer % $base)] . $base62Integer;
+            $base62Integer = $base62Dictionary[$base10Integer % $base] . $base62Integer;
             $base10Integer = floor($base10Integer / $base);
         } while ($base10Integer > 0);
 
@@ -108,7 +103,6 @@ class Base62UrlKeyGenerator implements UrlKeyGenerator
     }
 
     /**
-     * @return ExtensionConfiguration
      * @codeCoverageIgnore
      */
     protected function getExtensionConfiguration(): ExtensionConfiguration
@@ -120,7 +114,6 @@ class Base62UrlKeyGenerator implements UrlKeyGenerator
     }
 
     /**
-     * @return GeneralUtilityWrapper
      * @codeCoverageIgnore
      */
     protected function getGeneralUtility(): GeneralUtilityWrapper

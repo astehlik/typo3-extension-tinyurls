@@ -80,24 +80,24 @@ class TinyUrl
      */
     protected $validUntil;
 
-    public static function createFromDatabaseRow(array $databaseRow): TinyUrl
+    public static function createFromDatabaseRow(array $databaseRow): self
     {
         $tinyUrl = new static();
         $tinyUrl->fillFromDatabaseRow($databaseRow);
         return $tinyUrl;
     }
 
-    public static function createNew(): TinyUrl
+    public static function createNew(): self
     {
         return new static();
     }
 
-    public function enableDeleteOnUse()
+    public function enableDeleteOnUse(): void
     {
         $this->deleteOnUse = true;
     }
 
-    public function equals(TinyUrl $existingTinyUrl): bool
+    public function equals(self $existingTinyUrl): bool
     {
         if ($this->isNew() && $existingTinyUrl->isNew()) {
             return $this === $existingTinyUrl;
@@ -184,7 +184,7 @@ class TinyUrl
         return (int)$this->uid === 0;
     }
 
-    public function persistPostProcess()
+    public function persistPostProcess(): void
     {
         $this->customUrlKey = null;
         $this->targetUrlHashOriginal = $this->targetUrlHash;
@@ -195,10 +195,8 @@ class TinyUrl
      *
      * IMPORTANT! The Repository needs to update the record in the persistence once more
      * if no custom URL key is used because we can not generate the URL key without a UID.
-     *
-     * @param int $newUid
      */
-    public function persistPostProcessInsert(int $newUid)
+    public function persistPostProcessInsert(int $newUid): void
     {
         if ($newUid === 0) {
             throw new \InvalidArgumentException('The inserted UID must not be zero.');
@@ -207,7 +205,7 @@ class TinyUrl
         $this->persistPostProcess();
     }
 
-    public function persistPreProcess()
+    public function persistPreProcess(): void
     {
         if ($this->hasCustomUrlKey()) {
             $this->urlkey = $this->getCustomUrlKey();
@@ -215,18 +213,18 @@ class TinyUrl
         $this->tstamp = new \DateTime();
     }
 
-    public function regenerateUrlKey()
+    public function regenerateUrlKey(): void
     {
         $tinyUrlKeyGenerator = ImplementationManager::getInstance()->getUrlKeyGenerator();
         $this->urlkey = $tinyUrlKeyGenerator->generateTinyurlKeyForTinyUrl($this);
     }
 
-    public function setComment(string $comment)
+    public function setComment(string $comment): void
     {
         $this->comment = $comment;
     }
 
-    public function setCustomUrlKey(string $customUrlKey)
+    public function setCustomUrlKey(string $customUrlKey): void
     {
         $customUrlKey = trim($customUrlKey);
 
@@ -237,22 +235,22 @@ class TinyUrl
         $this->customUrlKey = $customUrlKey;
     }
 
-    public function setPid(int $pid)
+    public function setPid(int $pid): void
     {
         $this->pid = $pid;
     }
 
-    public function setTargetUrl(string $targetUrl)
+    public function setTargetUrl(string $targetUrl): void
     {
         $this->targetUrl = $targetUrl;
     }
 
-    public function setValidUntil(\DateTime $validUntil)
+    public function setValidUntil(\DateTime $validUntil): void
     {
         $this->validUntil = $validUntil;
     }
 
-    protected function fillFromDatabaseRow(array $databaseRow)
+    protected function fillFromDatabaseRow(array $databaseRow): void
     {
         $this->uid = (int)$databaseRow['uid'];
         $this->pid = (int)$databaseRow['pid'];
@@ -269,7 +267,7 @@ class TinyUrl
             : null;
     }
 
-    protected function regenerateTargetUrlHash()
+    protected function regenerateTargetUrlHash(): void
     {
         $this->targetUrlHash = sha1($this->getTargetUrl());
     }

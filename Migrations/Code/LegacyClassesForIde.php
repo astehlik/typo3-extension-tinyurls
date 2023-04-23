@@ -1,6 +1,8 @@
 <?php
-namespace {
 
+declare(strict_types=1);
+
+namespace {
     use Tx\Tinyurls\Hooks\EidProcessor;
     use Tx\Tinyurls\Hooks\TceDataMap;
     use Tx\Tinyurls\Hooks\TypoLink;
@@ -9,7 +11,7 @@ namespace {
     use Tx\Tinyurls\Utils\ConfigUtils;
     use Tx\Tinyurls\Utils\UrlUtils;
 
-    die('Access denied');
+    exit('Access denied');
 
     /**
      * @deprecated since 1.0.0 will be removed in 3.0.0
@@ -62,7 +64,6 @@ namespace {
 }
 
 namespace Tx\Tinyurls\Hooks {
-
     use Tx\Tinyurls\Controller\EidController;
 
     /**
@@ -74,7 +75,6 @@ namespace Tx\Tinyurls\Hooks {
 }
 
 namespace Tx\Tinyurls\Utils {
-
     use Tx\Tinyurls\Configuration\ExtensionConfiguration;
 
     /**

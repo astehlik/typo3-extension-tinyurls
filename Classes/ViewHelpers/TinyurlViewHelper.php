@@ -14,7 +14,6 @@ namespace Tx\Tinyurls\ViewHelpers;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
-use Closure;
 use Tx\Tinyurls\TinyUrl\Api as TinyUrlApi;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3Fluid\Fluid\Core\Rendering\RenderingContextInterface;
@@ -41,29 +40,12 @@ class TinyurlViewHelper extends AbstractViewHelper
      */
     private static $tinyUrlApi;
 
-    public function initializeArguments()
-    {
-        $this->registerArgument('url', 'string', 'The Url to be shortened', false, null);
-        $this->registerArgument(
-            'onlyOneTimeValid',
-            'boolean',
-            'If this is is true, the tiny URL is deleted from the database on the first hit.',
-            false,
-            false
-        );
-        $this->registerArgument('validUntil', 'int', 'Timestamp until generated link is valid', false, 0);
-        $this->registerArgument('urlKey', 'string', 'Custom url key', false, '');
-    }
-
     /**
-     * @param array $arguments
-     * @param Closure $renderChildrenClosure
-     * @param RenderingContextInterface $renderingContext
      * @return string Rendered link
      */
     public static function renderStatic(
         array $arguments,
-        Closure $renderChildrenClosure,
+        \Closure $renderChildrenClosure,
         RenderingContextInterface $renderingContext
     ) {
         $url = $arguments['url'];
@@ -89,22 +71,18 @@ class TinyurlViewHelper extends AbstractViewHelper
             $tinyUrlApi->setUrlKey($urlKey);
         }
 
-        $tinyUrl = $tinyUrlApi->getTinyUrl($url);
-
-        return $tinyUrl;
+        return $tinyUrlApi->getTinyUrl($url);
     }
 
     /**
-     * @param TinyUrlApi $tinyUrlApi
-     * @internal No public API! Currently used for unit testing.
+     * @internal no public API! Currently used for unit testing
      */
-    public static function setTinyUrlApi(TinyUrlApi $tinyUrlApi)
+    public static function setTinyUrlApi(TinyUrlApi $tinyUrlApi): void
     {
         static::$tinyUrlApi = $tinyUrlApi;
     }
 
     /**
-     * @return TinyUrlApi
      * @codeCoverageIgnore
      */
     protected static function getTinyUrlApi(): TinyUrlApi
@@ -114,5 +92,19 @@ class TinyurlViewHelper extends AbstractViewHelper
         }
 
         return GeneralUtility::makeInstance(TinyUrlApi::class);
+    }
+
+    public function initializeArguments(): void
+    {
+        $this->registerArgument('url', 'string', 'The Url to be shortened', false, null);
+        $this->registerArgument(
+            'onlyOneTimeValid',
+            'boolean',
+            'If this is is true, the tiny URL is deleted from the database on the first hit.',
+            false,
+            false
+        );
+        $this->registerArgument('validUntil', 'int', 'Timestamp until generated link is valid', false, 0);
+        $this->registerArgument('urlKey', 'string', 'Custom url key', false, '');
     }
 }

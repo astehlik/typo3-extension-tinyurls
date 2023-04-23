@@ -15,10 +15,7 @@ class TinyUrlRepositoryTest extends AbstractFunctionalTestCase
      */
     protected $testExtensionsToLoad = ['typo3conf/ext/tinyurls'];
 
-    /**
-     * @var TinyUrlRepository
-     */
-    private $tinyUrlRepository;
+    private TinyUrlRepository $tinyUrlRepository;
 
     protected function setUp(): void
     {
@@ -26,19 +23,16 @@ class TinyUrlRepositoryTest extends AbstractFunctionalTestCase
         $this->tinyUrlRepository = ImplementationManager::getInstance()->getTinyUrlRepository();
     }
 
-    /**
-     * @test
-     */
-    public function countTinyUrlHitRaisesCounter()
+    public function testCountTinyUrlHitRaisesCounter(): void
     {
-        $this->importDataSet(__DIR__ . '/../../Fixtures/Database/tinyurl.xml');
+        $this->importCSVDataSet(__DIR__ . '/../../Fixtures/Database/tinyurl.csv');
 
         $tinyUrl = $this->tinyUrlRepository->findTinyUrlByKey('9499fjf');
-        $this->assertEquals(0, $tinyUrl->getCounter());
+        self::assertSame(0, $tinyUrl->getCounter());
 
         $tinyUrl = $this->tinyUrlRepository->countTinyUrlHit($tinyUrl);
         $tinyUrl = $this->tinyUrlRepository->countTinyUrlHit($tinyUrl);
 
-        $this->assertEquals(2, $tinyUrl->getCounter());
+        self::assertSame(2, $tinyUrl->getCounter());
     }
 }

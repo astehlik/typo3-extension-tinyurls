@@ -29,7 +29,7 @@ class ApiTest extends TestCase
     protected $tinyUrlApi;
 
     /**
-     * @var TinyUrlGenerator|MockObject
+     * @var MockObject|TinyUrlGenerator
      */
     protected $tinyUrlGeneratorMock;
 
@@ -41,62 +41,63 @@ class ApiTest extends TestCase
         $this->tinyUrlApi->setTinyUrlGenerator($this->tinyUrlGeneratorMock);
     }
 
-    public function testGetTinyUrlUsesTinyUrlGeneratorForCreatingUrl()
+    public function testGetTinyUrlUsesTinyUrlGeneratorForCreatingUrl(): void
     {
-        $this->tinyUrlGeneratorMock->expects($this->once())
+        $this->tinyUrlGeneratorMock->expects(self::once())
             ->method('getTinyUrl')
             ->with('http://the-url.tld')
             ->willReturn('http://the-tiny.url');
 
-        $this->assertEquals('http://the-tiny.url', $this->tinyUrlApi->getTinyUrl('http://the-url.tld'));
+        self::assertSame('http://the-tiny.url', $this->tinyUrlApi->getTinyUrl('http://the-url.tld'));
     }
 
-    public function testInitializeConfigFromTypoScriptUsesTypoScriptConfiguratorForSettingConfig()
+    public function testInitializeConfigFromTypoScriptUsesTypoScriptConfiguratorForSettingConfig(): void
     {
         $config = ['the' => 'config'];
+
         /** @var ContentObjectRenderer $contentObjectRendererMock */
         $contentObjectRendererMock = $this->createMock(ContentObjectRenderer::class);
 
-        /** @var TypoScriptConfigurator|MockObject $typoScriptConfiguratorMock */
+        /** @var MockObject|TypoScriptConfigurator $typoScriptConfiguratorMock */
         $typoScriptConfiguratorMock = $this->createMock(TypoScriptConfigurator::class);
         $this->tinyUrlApi->setTypoScriptConfigurator($typoScriptConfiguratorMock);
 
-        $typoScriptConfiguratorMock->expects($this->once())
+        $typoScriptConfiguratorMock->expects(self::once())
             ->method('initializeConfigFromTyposcript')
             ->with($config, $contentObjectRendererMock);
         $this->tinyUrlApi->initializeConfigFromTyposcript($config, $contentObjectRendererMock);
     }
 
-    public function testSetCommentSetsCommentInUrlGenerator()
+    public function testSetCommentSetsCommentInUrlGenerator(): void
     {
-        $this->tinyUrlGeneratorMock->expects($this->once())
+        $this->tinyUrlGeneratorMock->expects(self::once())
             ->method('setComment')
             ->with('the comment');
 
         $this->tinyUrlApi->setComment('the comment');
     }
 
-    public function testSetDeleteOnUseSetsDeleteOnUseOptionInUrlGenerator()
+    public function testSetDeleteOnUseSetsDeleteOnUseOptionInUrlGenerator(): void
     {
-        $this->tinyUrlGeneratorMock->expects($this->once())
+        $this->tinyUrlGeneratorMock->expects(self::once())
             ->method('setOptionDeleteOnUse')
             ->with(true);
 
         $this->tinyUrlApi->setDeleteOnUse(true);
     }
 
-    public function testSetUrlKeySetsUrlKeyOptionInUrlGenerator()
+    public function testSetUrlKeySetsUrlKeyOptionInUrlGenerator(): void
     {
-        $this->tinyUrlGeneratorMock->expects($this->once())
+        $this->tinyUrlGeneratorMock->expects(self::once())
             ->method('setOptionUrlKey')
             ->with('the url key');
 
         $this->tinyUrlApi->setUrlKey('the url key');
     }
 
-    public function testSetValidUntilSetsValidUntilOptionInUrlGenerator()
+    public function testSetValidUntilSetsValidUntilOptionInUrlGenerator(): void
     {
-        $this->tinyUrlGeneratorMock->expects($this->once())
+        $this->tinyUrlGeneratorMock->expects(self::once())
             ->method('setOptionValidUntil')
             ->with(12434);
 

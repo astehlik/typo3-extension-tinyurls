@@ -48,13 +48,12 @@ class ImplementationManager implements SingletonInterface
         $this->restoreDefaults();
     }
 
-    public static function getInstance(): ImplementationManager
+    public static function getInstance(): self
     {
-        return GeneralUtility::makeInstance(ImplementationManager::class);
+        return GeneralUtility::makeInstance(self::class);
     }
 
     /**
-     * @return TinyUrlRepository
      * @codeCoverageIgnore
      */
     public function getTinyUrlRepository(): TinyUrlRepository
@@ -71,7 +70,6 @@ class ImplementationManager implements SingletonInterface
     }
 
     /**
-     * @return UrlKeyGenerator
      * @codeCoverageIgnore
      */
     public function getUrlKeyGenerator(): UrlKeyGenerator
@@ -87,7 +85,7 @@ class ImplementationManager implements SingletonInterface
         return $this->urlKeyGeneratorClass;
     }
 
-    public function restoreDefaults()
+    public function restoreDefaults(): void
     {
         $this->urlKeyGenerator = null;
         $this->tinyUrlRepository = null;
@@ -96,23 +94,23 @@ class ImplementationManager implements SingletonInterface
         $this->urlKeyGeneratorClass = Base62UrlKeyGenerator::class;
     }
 
-    public function setTinyUrlRepository(TinyUrlRepository $tinyUrlRepository)
+    public function setTinyUrlRepository(TinyUrlRepository $tinyUrlRepository): void
     {
         $this->tinyUrlRepository = $tinyUrlRepository;
     }
 
-    public function setTinyUrlRepositoryClass(string $tinyUrlRepositoryClass)
+    public function setTinyUrlRepositoryClass(string $tinyUrlRepositoryClass): void
     {
         $this->tinyUrlRepository = null;
         $this->tinyUrlRepositoryClass = $tinyUrlRepositoryClass;
     }
 
-    public function setUrlKeyGenerator(UrlKeyGenerator $urlKeyGenerator)
+    public function setUrlKeyGenerator(UrlKeyGenerator $urlKeyGenerator): void
     {
         $this->urlKeyGenerator = $urlKeyGenerator;
     }
 
-    public function setUrlKeyGeneratorClass(string $urlKeyGeneratorClass)
+    public function setUrlKeyGeneratorClass(string $urlKeyGeneratorClass): void
     {
         $this->urlKeyGenerator = null;
         $this->urlKeyGeneratorClass = $urlKeyGeneratorClass;

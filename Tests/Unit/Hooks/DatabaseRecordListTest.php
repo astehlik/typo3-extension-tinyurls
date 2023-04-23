@@ -51,7 +51,7 @@ class DatabaseRecordListTest extends TestCase
         $this->databaseRecordListHooks = new DatabaseRecordListHooks($this->urlUtilsMock);
     }
 
-    public function testQueryDoesNotChangeForNonDefaultFields()
+    public function testQueryDoesNotChangeForNonDefaultFields(): void
     {
         $queryBuilder = $this->createQueryBuilderMock();
         $this->assertQueryDoesNotChange($queryBuilder);
@@ -59,14 +59,14 @@ class DatabaseRecordListTest extends TestCase
         $this->callModifyQuery($queryBuilder, TinyUrlRepository::TABLE_URLS, ['otherdisplay']);
     }
 
-    public function testQueryDoesNotChangeForOtherTable()
+    public function testQueryDoesNotChangeForOtherTable(): void
     {
         $queryBuilder = $this->createQueryBuilderMock();
         $this->assertQueryDoesNotChange($queryBuilder);
         $this->callModifyQuery($queryBuilder, 'someother_table');
     }
 
-    public function testQueryDoesNotChangeIfTinyUrlIsEmpty()
+    public function testQueryDoesNotChangeIfTinyUrlIsEmpty(): void
     {
         $this->expectBuildTinyUrlCall('');
 
@@ -75,7 +75,7 @@ class DatabaseRecordListTest extends TestCase
         $this->callModifyQuery($queryBuilder);
     }
 
-    public function testQueryDoesNotChangeIfTinyUrlOnlyContainsUrlKey()
+    public function testQueryDoesNotChangeIfTinyUrlOnlyContainsUrlKey(): void
     {
         $this->expectBuildTinyUrlCall('###urlkey###');
 
@@ -84,36 +84,24 @@ class DatabaseRecordListTest extends TestCase
         $this->callModifyQuery($queryBuilder);
     }
 
-    public function testUrlDisplaySelectIsAdded()
+    public function testUrlDisplaySelectIsAdded(): void
     {
         $this->expectBuildTinyUrlCall();
 
         $queryBuilder = $this->createQueryBuilderMock();
-        $queryBuilder->expects($this->once())
+        $queryBuilder->expects(self::once())
             ->method('addSelectLiteral')
             ->with("CONCAT('https://myurl.tld/goto/', `urlkey`) as urldisplay");
 
         $this->callModifyQuery($queryBuilder);
     }
 
-    public function testUrlDisplaySelectIsAddedWithSuffix()
-    {
-        $this->expectBuildTinyUrlCall('https://myurl.tld/goto/###urlkey###/suffix');
-
-        $queryBuilder = $this->createQueryBuilderMock();
-        $queryBuilder->expects($this->once())
-            ->method('addSelectLiteral')
-            ->with("CONCAT('https://myurl.tld/goto/', `urlkey`, '/suffix') as urldisplay");
-
-        $this->callModifyQuery($queryBuilder);
-    }
-
-    public function testUrlDisplaySelectIsAddedFromCache()
+    public function testUrlDisplaySelectIsAddedFromCache(): void
     {
         $this->expectBuildTinyUrlCall();
 
         $queryBuilder = $this->createQueryBuilderMock();
-        $queryBuilder->expects($this->exactly(2))
+        $queryBuilder->expects(self::exactly(2))
             ->method('addSelectLiteral')
             ->with("CONCAT('https://myurl.tld/goto/', `urlkey`) as urldisplay");
 
@@ -123,12 +111,24 @@ class DatabaseRecordListTest extends TestCase
         $this->callModifyQuery($queryBuilder);
     }
 
-    /**
-     * @param Typo3QueryBuilder|MockObject $queryBuilder
-     */
-    private function assertQueryDoesNotChange(Typo3QueryBuilder $queryBuilder)
+    public function testUrlDisplaySelectIsAddedWithSuffix(): void
     {
-        $queryBuilder->expects($this->never())->method('addSelectLiteral');
+        $this->expectBuildTinyUrlCall('https://myurl.tld/goto/###urlkey###/suffix');
+
+        $queryBuilder = $this->createQueryBuilderMock();
+        $queryBuilder->expects(self::once())
+            ->method('addSelectLiteral')
+            ->with("CONCAT('https://myurl.tld/goto/', `urlkey`, '/suffix') as urldisplay");
+
+        $this->callModifyQuery($queryBuilder);
+    }
+
+    /**
+     * @param MockObject|Typo3QueryBuilder $queryBuilder
+     */
+    private function assertQueryDoesNotChange(Typo3QueryBuilder $queryBuilder): void
+    {
+        $queryBuilder->expects(self::never())->method('addSelectLiteral');
     }
 
     private function callModifyQuery(
@@ -164,7 +164,7 @@ class DatabaseRecordListTest extends TestCase
 
     private function expectBuildTinyUrlCall(string $returnValue = 'https://myurl.tld/goto/###urlkey###'): void
     {
-        $this->urlUtilsMock->expects($this->once())
+        $this->urlUtilsMock->expects(self::once())
             ->method('buildTinyUrl')
             ->with('###urlkey###')
             ->willReturn($returnValue);

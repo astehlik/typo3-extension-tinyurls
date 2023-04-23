@@ -30,33 +30,18 @@ class CopyableFieldElement extends AbstractNode implements NodeInterface
 {
     public const TEMPLATE_PATH = 'EXT:tinyurls/Resources/Private/Templates/FormEngine/CopyableField.html';
 
-    /**
-     * @var StandaloneView
-     */
-    protected $formFieldView;
+    protected ?StandaloneView $formFieldView = null;
 
-    /**
-     * @var GeneralUtilityWrapper
-     */
-    protected $generalUtility;
+    protected ?GeneralUtilityWrapper $generalUtility = null;
 
-    /**
-     * @var IconFactory
-     */
-    protected $iconFactory;
+    protected ?IconFactory $iconFactory = null;
 
-    /**
-     * @param GeneralUtilityWrapper $generalUtility
-     */
-    public function injectGeneralUtilityWrapper(GeneralUtilityWrapper $generalUtility)
+    public function injectGeneralUtilityWrapper(GeneralUtilityWrapper $generalUtility): void
     {
         $this->generalUtility = $generalUtility;
     }
 
-    /**
-     * @param IconFactory $iconFactory
-     */
-    public function injectIconFactory(IconFactory $iconFactory)
+    public function injectIconFactory(IconFactory $iconFactory): void
     {
         $this->iconFactory = $iconFactory;
     }
@@ -66,7 +51,7 @@ class CopyableFieldElement extends AbstractNode implements NodeInterface
      *
      * @return array As defined in initializeResultArray() of AbstractNode
      */
-    public function render()
+    public function render(): array
     {
         $result = $this->initializeResultArray();
 
@@ -83,18 +68,13 @@ class CopyableFieldElement extends AbstractNode implements NodeInterface
         return $result;
     }
 
-    /**
-     * @param StandaloneView $formFieldView
-     */
-    public function setFormFieldView(StandaloneView $formFieldView)
+    public function setFormFieldView(StandaloneView $formFieldView): void
     {
         $this->formFieldView = $formFieldView;
     }
 
     /**
      * Uses the icon factory to build a clipboard icon.
-     *
-     * @return string
      */
     protected function getClipboardIcon(): string
     {
@@ -107,8 +87,6 @@ class CopyableFieldElement extends AbstractNode implements NodeInterface
      *
      * If configured, a custom user function is called to retrieve the value.
      * Otherwise the current field value is used.
-     *
-     * @return string
      */
     protected function getFieldValue(): string
     {
@@ -124,7 +102,6 @@ class CopyableFieldElement extends AbstractNode implements NodeInterface
     }
 
     /**
-     * @return StandaloneView
      * @codeCoverageIgnore
      */
     protected function getFormFieldView(): StandaloneView
@@ -136,7 +113,6 @@ class CopyableFieldElement extends AbstractNode implements NodeInterface
     }
 
     /**
-     * @return GeneralUtilityWrapper
      * @codeCoverageIgnore
      */
     protected function getGeneralUtility(): GeneralUtilityWrapper
@@ -148,7 +124,6 @@ class CopyableFieldElement extends AbstractNode implements NodeInterface
     }
 
     /**
-     * @return IconFactory
      * @codeCoverageIgnore
      */
     protected function getIconFactory(): IconFactory
@@ -159,7 +134,7 @@ class CopyableFieldElement extends AbstractNode implements NodeInterface
         return $this->iconFactory;
     }
 
-    protected function initializeFormFieldViewTemplatePath(StandaloneView $template)
+    protected function initializeFormFieldViewTemplatePath(StandaloneView $template): void
     {
         $template->setTemplatePathAndFilename(
             $this->getGeneralUtility()->getFileAbsFileName(static::TEMPLATE_PATH)

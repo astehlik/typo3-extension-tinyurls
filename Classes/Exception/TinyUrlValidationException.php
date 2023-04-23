@@ -34,7 +34,7 @@ class TinyUrlValidationException extends \InvalidArgumentException
         return $this->result;
     }
 
-    public function setValidationResult(Result $result)
+    public function setValidationResult(Result $result): void
     {
         $this->result = $result;
 
