@@ -92,7 +92,10 @@ class Base62UrlKeyGenerator implements UrlKeyGenerator
     protected function convertIntToBase62(int $base10Integer, string $base62Dictionary): string
     {
         $base62Integer = '';
-        $base = 62;
+
+        // Since $base62Dictionary is a configuration value, $base should be the strlen of
+        // $base62Dictionary and not a hardcoded value of 62
+        $base = strlen($base62Dictionary);
 
         do {
             $base62Integer = $base62Dictionary[$base10Integer % $base] . $base62Integer;
