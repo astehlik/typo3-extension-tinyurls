@@ -102,6 +102,8 @@ class TinyUrlTest extends TestCase
         self::assertFalse($tinyUrl->getDeleteOnUse());
         $tinyUrl->enableDeleteOnUse();
         self::assertTrue($tinyUrl->getDeleteOnUse());
+        $tinyUrl->disableDeleteOnUse();
+        self::assertFalse($tinyUrl->getDeleteOnUse());
     }
 
     public function testEqualsReturnsFalseIfBothTinyUrlsAreNewAndAreNotTheSameObject(): void
@@ -226,6 +228,14 @@ class TinyUrlTest extends TestCase
         self::assertTrue($tinyUrl->hasCustomUrlKey());
         $tinyUrl->persistPostProcess();
         self::assertFalse($tinyUrl->hasCustomUrlKey());
+    }
+
+    public function testResetCustomUrlKeySetsCustomUrlKeyToNull()
+    {
+        $tinyUrl = TinyUrl::createNew();
+        $tinyUrl->setCustomUrlKey('custom key');
+        $tinyUrl->resetCustomUrlKey();
+        self::assertNull($tinyUrl->getCustomUrlKey());
     }
 
     public function testPersistPostProcessResetsOriginalHash(): void

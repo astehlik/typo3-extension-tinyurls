@@ -54,6 +54,11 @@ class TinyUrl
         return new static();
     }
 
+    public function disableDeleteOnUse(): void
+    {
+        $this->deleteOnUse = false;
+    }
+
     public function enableDeleteOnUse(): void
     {
         $this->deleteOnUse = true;
@@ -80,7 +85,7 @@ class TinyUrl
         return $this->counter;
     }
 
-    public function getCustomUrlKey(): string
+    public function getCustomUrlKey(): ?string
     {
         return $this->customUrlKey;
     }
@@ -148,7 +153,7 @@ class TinyUrl
 
     public function persistPostProcess(): void
     {
-        $this->customUrlKey = null;
+        $this->resetCustomUrlKey();
         $this->targetUrlHashOriginal = $this->targetUrlHash;
     }
 
@@ -179,6 +184,11 @@ class TinyUrl
     {
         $tinyUrlKeyGenerator = ImplementationManager::getInstance()->getUrlKeyGenerator();
         $this->urlkey = $tinyUrlKeyGenerator->generateTinyurlKeyForTinyUrl($this);
+    }
+
+    public function resetCustomUrlKey(): void
+    {
+        $this->customUrlKey = null;
     }
 
     public function setComment(string $comment): void
