@@ -32,20 +32,19 @@ use TYPO3\CMS\Frontend\Controller\ErrorController;
  */
 class EidControllerTest extends TestCase
 {
-    protected EidController $eidController;
+    private EidController $eidController;
 
-    protected MockObject|ErrorController $errorControllerMock;
+    private MockObject|ErrorController $errorControllerMock;
 
-    protected TinyUrlRepository|MockObject $tinyUrlRepositoryMock;
+    private TinyUrlRepository|MockObject $tinyUrlRepositoryMock;
 
     protected function setUp(): void
     {
         $this->errorControllerMock = $this->createMock(ErrorController::class);
         $this->tinyUrlRepositoryMock = $this->createMock(TinyUrlRepository::class);
 
-        $this->eidController = new EidController();
+        $this->eidController = new EidController($this->tinyUrlRepositoryMock);
         $this->eidController->setErrorController($this->errorControllerMock);
-        $this->eidController->injectTinyUrlRepository($this->tinyUrlRepositoryMock);
 
         $GLOBALS['EXEC_TIME'] = time();
     }

@@ -20,7 +20,6 @@ use Tx\Tinyurls\Domain\Model\TinyUrl;
 use Tx\Tinyurls\Domain\Repository\TinyUrlRepository;
 use Tx\Tinyurls\Exception\NoTinyUrlKeySubmittedException;
 use Tx\Tinyurls\Exception\TinyUrlNotFoundException;
-use Tx\Tinyurls\Object\ImplementationManager;
 use TYPO3\CMS\Core\Http\Response;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Frontend\Controller\ErrorController;
@@ -33,14 +32,12 @@ use TYPO3\CMS\Frontend\Controller\ErrorController;
  */
 class EidController
 {
-    protected ?TinyUrlRepository $tinyUrlRepository = null;
+    public function __construct(protected readonly TinyUrlRepository $tinyUrlRepository)
+    {
+    }
 
     private ?ErrorController $errorController = null;
 
-    public function injectTinyUrlRepository(TinyUrlRepository $tinyUrlRepository): void
-    {
-        $this->tinyUrlRepository = $tinyUrlRepository;
-    }
 
     public function setErrorController(ErrorController $errorController): void
     {
@@ -49,7 +46,7 @@ class EidController
 
     public function tinyUrlRedirect(ServerRequestInterface $request): ResponseInterface
     {
-        $this->getTinyUrlRepository()->purgeInvalidUrls();
+        $this->tinyUrlRepository->purgeInvalidUrls();
 
         try {
             $tinyUrl = $this->getTinyUrl($request);
@@ -87,7 +84,7 @@ class EidController
             return;
         }
 
-        $this->getTinyUrlRepository()->countTinyUrlHit($tinyUrl);
+        $this->tinyUrlRepository->countTinyUrlHit($tinyUrl);
     }
 
     protected function getErrorController(): ErrorController
@@ -113,18 +110,7 @@ class EidController
 
         $tinyUrlKey = (string)$queryParams['tx_tinyurls']['key'];
 
-        return $this->getTinyUrlRepository()->findTinyUrlByKey($tinyUrlKey);
-    }
-
-    /**
-     * @codeCoverageIgnore
-     */
-    protected function getTinyUrlRepository(): TinyUrlRepository
-    {
-        if ($this->tinyUrlRepository === null) {
-            $this->tinyUrlRepository = ImplementationManager::getInstance()->getTinyUrlRepository();
-        }
-        return $this->tinyUrlRepository;
+        return $this->tinyUrlRepository->findTinyUrlByKey($tinyUrlKey);
     }
 
     protected function handleTinyUrlNotFoundError(
@@ -138,7 +124,7 @@ class EidController
     protected function processUrlHit(TinyUrl $tinyUrl): void
     {
         if ($tinyUrl->getDeleteOnUse()) {
-            $this->getTinyUrlRepository()->deleteTinyUrlByKey($tinyUrl->getUrlkey());
+            $this->tinyUrlRepository->deleteTinyUrlByKey($tinyUrl->getUrlkey());
             return;
         }
 
