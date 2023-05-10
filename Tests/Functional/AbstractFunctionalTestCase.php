@@ -11,6 +11,8 @@ use TYPO3\TestingFramework\Core\Functional\FunctionalTestCase;
 
 abstract class AbstractFunctionalTestCase extends FunctionalTestCase
 {
+    protected array $testExtensionsToLoad = ['typo3conf/ext/tinyurls'];
+
     protected function getTinyUrlRow(): array
     {
         $builder = $this->getConnectionPool()->getQueryBuilderForTable('tx_tinyurls_urls');

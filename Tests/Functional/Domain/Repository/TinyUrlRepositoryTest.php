@@ -10,11 +10,6 @@ use Tx\Tinyurls\Tests\Functional\AbstractFunctionalTestCase;
 
 class TinyUrlRepositoryTest extends AbstractFunctionalTestCase
 {
-    /**
-     * @var array
-     */
-    protected $testExtensionsToLoad = ['typo3conf/ext/tinyurls'];
-
     private TinyUrlRepository $tinyUrlRepository;
 
     protected function setUp(): void

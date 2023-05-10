@@ -25,11 +25,6 @@ use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
 class ApiTest extends AbstractFunctionalTestCase
 {
     /**
-     * @var array
-     */
-    protected $testExtensionsToLoad = ['typo3conf/ext/tinyurls'];
-
-    /**
      * @var Api
      */
     protected $tinyUrlsApi;

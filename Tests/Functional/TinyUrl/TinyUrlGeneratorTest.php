@@ -24,11 +24,6 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 class TinyUrlGeneratorTest extends AbstractFunctionalTestCase
 {
     /**
-     * @var array
-     */
-    protected $testExtensionsToLoad = ['typo3conf/ext/tinyurls'];
-
-    /**
      * @var TinyUrlGenerator
      */
     protected $tinyUrlGenerator;

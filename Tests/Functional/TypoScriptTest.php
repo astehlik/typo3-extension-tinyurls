@@ -22,11 +22,6 @@ use TYPO3\TestingFramework\Core\Functional\Framework\Frontend\InternalRequest;
 class TypoScriptTest extends AbstractFunctionalTestCase
 {
     /**
-     * @var array
-     */
-    protected $testExtensionsToLoad = ['typo3conf/ext/tinyurls'];
-
-    /**
      * Imports the pages database fixture.
      */
     protected function setUp(): void
