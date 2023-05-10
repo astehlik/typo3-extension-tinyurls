@@ -7,7 +7,6 @@ namespace Tx\Tinyurls\Domain\Validator;
 use Tx\Tinyurls\Domain\Model\TinyUrl;
 use Tx\Tinyurls\Domain\Repository\TinyUrlRepository;
 use Tx\Tinyurls\Exception\TinyUrlNotFoundException;
-use Tx\Tinyurls\Object\ImplementationManager;
 use TYPO3\CMS\Extbase\Error\Result;
 use TYPO3\CMS\Extbase\Validation\Error;
 use TYPO3\CMS\Extbase\Validation\Validator\ValidatorInterface;
@@ -16,7 +15,9 @@ class TinyUrlValidator implements ValidatorInterface
 {
     protected Result $result;
 
-    protected ?TinyUrlRepository $tinyUrlRepository = null;
+    public function __construct(protected readonly TinyUrlRepository $tinyUrlRepository)
+    {
+    }
 
     /**
      * Returns the options of this validator which can be specified in the constructor.
@@ -28,9 +29,8 @@ class TinyUrlValidator implements ValidatorInterface
         return [];
     }
 
-    public function injectTinyUrlRepository(TinyUrlRepository $tinyUrlRepository): void
+    public function setOptions(array $options): void
     {
-        $this->tinyUrlRepository = $tinyUrlRepository;
     }
 
     /**
@@ -51,28 +51,15 @@ class TinyUrlValidator implements ValidatorInterface
         return $this->result;
     }
 
-    /**
-     * @codeCoverageIgnore
-     */
-    protected function getTinyUrlRepository(): TinyUrlRepository
-    {
-        if ($this->tinyUrlRepository === null) {
-            $this->tinyUrlRepository = ImplementationManager::getInstance()->getTinyUrlRepository();
-        }
-        return $this->tinyUrlRepository;
-    }
-
     protected function validateCustomUrlKey(TinyUrl $tinyUrl): void
     {
         if (!$tinyUrl->hasCustomUrlKey()) {
             return;
         }
 
-        $tinyUrlRepository = $this->getTinyUrlRepository();
-
         try {
-            $existingTinyUrl = $tinyUrlRepository->findTinyUrlByKey($tinyUrl->getCustomUrlKey());
-        } catch (TinyUrlNotFoundException $e) {
+            $existingTinyUrl = $this->tinyUrlRepository->findTinyUrlByKey($tinyUrl->getCustomUrlKey());
+        } catch (TinyUrlNotFoundException) {
             // No matching URL found, the custom key can be used.
             return;
         }
@@ -93,9 +80,5 @@ class TinyUrlValidator implements ValidatorInterface
             $error = new Error('The validUntil DateTime must not be in the past.', 1488307858);
             $this->result->forProperty('validUntil')->addError($error);
         }
-    }
-
-    public function setOptions(array $options): void
-    {
     }
 }
