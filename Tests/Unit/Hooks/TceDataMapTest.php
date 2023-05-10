@@ -20,20 +20,23 @@ use Tx\Tinyurls\Domain\Model\TinyUrl;
 use Tx\Tinyurls\Domain\Repository\TinyUrlRepository;
 use Tx\Tinyurls\Exception\TinyUrlNotFoundException;
 use Tx\Tinyurls\Hooks\TceDataMap;
+use Tx\Tinyurls\Utils\UrlUtils;
 use TYPO3\CMS\Core\DataHandling\DataHandler;
 
 class TceDataMapTest extends TestCase
 {
-    protected TceDataMap $tceDataMapHook;
+    private TceDataMap $tceDataMapHook;
 
-    protected TinyUrlRepository|MockObject $tinyUrlRepositoryMock;
+    private TinyUrlRepository|MockObject $tinyUrlRepositoryMock;
+
+    private UrlUtils|MockObject $urlUtilsMock;
 
     protected function setUp(): void
     {
         $this->tinyUrlRepositoryMock = $this->createMock(TinyUrlRepository::class);
+        $this->urlUtilsMock = $this->createMock(UrlUtils::class);
 
-        $this->tceDataMapHook = new TceDataMap();
-        $this->tceDataMapHook->injectTinyUrlRepository($this->tinyUrlRepositoryMock);
+        $this->tceDataMapHook = new TceDataMap($this->tinyUrlRepositoryMock, $this->urlUtilsMock);
     }
 
     public function testDoesNotRegenerateKeyForExistingUnchangedRecord(): void
@@ -94,8 +97,9 @@ class TceDataMapTest extends TestCase
         $tinyUrlMock->method('getTargetUrlHasChanged')->willReturn(true);
         $tinyUrlMock->method('getUrlKey')->willReturn('the new key');
 
-        $tinyUrlMock->expects(self::once())
-            ->method('regenerateUrlKey');
+        $this->urlUtilsMock->expects(self::once())
+            ->method('regenerateUrlKey')
+            ->with($tinyUrlMock);
 
         $this->tinyUrlRepositoryMock->expects(self::once())
             ->method('findTinyUrlByUid')
@@ -125,7 +129,7 @@ class TceDataMapTest extends TestCase
         $tinyUrlMock->method('getTargetUrlHasChanged')->willReturn(true);
         $tinyUrlMock->method('getUrlKey')->willReturn('the key');
 
-        $tinyUrlMock->expects(self::once())
+        $this->urlUtilsMock->expects(self::once())
             ->method('regenerateUrlKey');
 
         $this->tinyUrlRepositoryMock->expects(self::once())

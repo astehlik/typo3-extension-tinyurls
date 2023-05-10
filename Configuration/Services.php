@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Tx\Tinyurls\Configuration\ExtensionConfiguration;
+use Tx\Tinyurls\Domain\Repository\TinyUrlDoctrineRepository;
+use Tx\Tinyurls\Domain\Repository\TinyUrlRepository;
 use Tx\Tinyurls\Hooks\DatabaseRecordList;
 use Tx\Tinyurls\Hooks\TypoLink;
 use Tx\Tinyurls\UrlKeyGenerator\Base62UrlKeyGenerator;
@@ -20,6 +22,7 @@ return function (ContainerConfigurator $configurator): void {
 
         // Configure implementations of interfaces.
         ->set(UrlKeyGenerator::class, Base62UrlKeyGenerator::class)
+        ->set(TinyUrlRepository::class, TinyUrlDoctrineRepository::class)
 
         // Configure services.
         ->set(ExtensionConfiguration::class, ExtensionConfiguration::class)
