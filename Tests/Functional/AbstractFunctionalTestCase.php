@@ -17,7 +17,7 @@ abstract class AbstractFunctionalTestCase extends FunctionalTestCase
         $builder->select('*')
             ->from('tx_tinyurls_urls')
             ->where($builder->expr()->eq('uid', $builder->createNamedParameter(1, \PDO::PARAM_INT)));
-        return $builder->execute()->fetchAssociative();
+        return $builder->executeQuery()->fetchAssociative();
     }
 
     /**

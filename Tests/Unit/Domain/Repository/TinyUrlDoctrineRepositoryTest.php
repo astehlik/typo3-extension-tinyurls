@@ -14,8 +14,6 @@ namespace Tx\Tinyurls\Tests\Unit\Domain\Repository;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
-use DMS\PHPUnitExtensions\ArraySubset\Constraint\ArraySubset;
-use Doctrine\DBAL\Driver\Statement;
 use PHPUnit\Framework\Constraint\Callback;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -38,35 +36,17 @@ use TYPO3\CMS\Extbase\Error\Result;
  */
 class TinyUrlDoctrineRepositoryTest extends TestCase
 {
-    /**
-     * @var Connection|MockObject
-     */
-    protected $databaseConnectionMock;
+    protected Connection|MockObject $databaseConnectionMock;
 
-    /**
-     * @var ConnectionPool|MockObject
-     */
-    protected $databaseConnectionPoolMock;
+    protected MockObject|ConnectionPool $databaseConnectionPoolMock;
 
-    /**
-     * @var MockObject|QueryBuilder
-     */
-    protected $databaseQueryBuilderMock;
+    protected QueryBuilder|MockObject $databaseQueryBuilderMock;
 
-    /**
-     * @var MockObject|QueryRestrictionContainerInterface
-     */
-    protected $databaseQueryRestrictionsContainerMock;
+    protected QueryRestrictionContainerInterface|MockObject $databaseQueryRestrictionsContainerMock;
 
-    /**
-     * @var TinyUrlDoctrineRepository
-     */
-    protected $doctrineRepository;
+    protected TinyUrlDoctrineRepository $doctrineRepository;
 
-    /**
-     * @var ExtensionConfiguration|MockObject
-     */
-    protected $extensionConfiugrationMock;
+    protected ExtensionConfiguration|MockObject $extensionConfiugrationMock;
 
     protected function setUp(): void
     {
@@ -113,21 +93,21 @@ class TinyUrlDoctrineRepositoryTest extends TestCase
 
     public function testCountTinyUrlHitIncreasesCountByOne(): void
     {
-        $resultMock = $this->createMock(Statement::class);
+        $resultMock = $this->createMock(\Doctrine\DBAL\Result::class);
         $resultMock->expects(self::once())
-            ->method('fetch')
+            ->method('fetchAssociative')
             ->willReturn($this->getDummyDatabaseRow());
 
         $this->databaseQueryBuilderMock->expects(self::once())
             ->method('set')
             ->with('counter', '1');
 
-        $this->databaseQueryBuilderMock->expects(self::exactly(2))
-            ->method('execute')
-            ->willReturnOnConsecutiveCalls(
-                null,
-                $resultMock
-            );
+        $this->databaseQueryBuilderMock->expects(self::once())
+            ->method('executeQuery')
+            ->willReturn($resultMock);
+
+        $this->databaseQueryBuilderMock->expects(self::once())
+            ->method('executeStatement');
 
         $tinyUrl = TinyUrl::createNew();
         $tinyUrl->persistPostProcessInsert(3342);
@@ -136,12 +116,12 @@ class TinyUrlDoctrineRepositoryTest extends TestCase
 
     public function testFindTinyUrlByKeyReturnsTinyUrlWithFoundData(): void
     {
-        $resultMock = $this->createMock(Statement::class);
+        $resultMock = $this->createMock(\Doctrine\DBAL\Result::class);
         $resultMock->expects(self::once())
-            ->method('fetch')
+            ->method('fetchAssociative')
             ->willReturn($this->getDummyDatabaseRow());
         $this->databaseQueryBuilderMock->expects(self::once())
-            ->method('execute')
+            ->method('executeQuery')
             ->willReturn($resultMock);
         $tinyUrl = $this->doctrineRepository->findTinyUrlByKey('the key to find');
         self::assertSame(945, $tinyUrl->getUid());
@@ -149,12 +129,12 @@ class TinyUrlDoctrineRepositoryTest extends TestCase
 
     public function testFindTinyUrlByKeyThrowsNotFoundExceptionForEmptyResult(): void
     {
-        $resultMock = $this->createMock(Statement::class);
+        $resultMock = $this->createMock(\Doctrine\DBAL\Result::class);
         $resultMock->expects(self::once())
-            ->method('fetch')
+            ->method('fetchAssociative')
             ->willReturn(false);
         $this->databaseQueryBuilderMock->expects(self::once())
-            ->method('execute')
+            ->method('executeQuery')
             ->willReturn($resultMock);
         $this->expectException(TinyUrlNotFoundException::class);
         $this->doctrineRepository->findTinyUrlByKey('the key to find');
@@ -162,12 +142,12 @@ class TinyUrlDoctrineRepositoryTest extends TestCase
 
     public function testFindTinyUrlByTargetUrlReturnsTinyUrlWithFoundData(): void
     {
-        $resultMock = $this->createMock(Statement::class);
+        $resultMock = $this->createMock(\Doctrine\DBAL\Result::class);
         $resultMock->expects(self::once())
-            ->method('fetch')
+            ->method('fetchAssociative')
             ->willReturn($this->getDummyDatabaseRow());
         $this->databaseQueryBuilderMock->expects(self::once())
-            ->method('execute')
+            ->method('executeQuery')
             ->willReturn($resultMock);
         $tinyUrl = $this->doctrineRepository->findTinyUrlByTargetUrl('http://the-url-to-find.tld');
         self::assertSame(945, $tinyUrl->getUid());
@@ -175,12 +155,12 @@ class TinyUrlDoctrineRepositoryTest extends TestCase
 
     public function testFindTinyUrlByTargetUrlThrowsNotFoundExceptionForEmptyResult(): void
     {
-        $resultMock = $this->createMock(Statement::class);
+        $resultMock = $this->createMock(\Doctrine\DBAL\Result::class);
         $resultMock->expects(self::once())
-            ->method('fetch')
+            ->method('fetchAssociative')
             ->willReturn(false);
         $this->databaseQueryBuilderMock->expects(self::once())
-            ->method('execute')
+            ->method('executeQuery')
             ->willReturn($resultMock);
         $this->expectException(TinyUrlNotFoundException::class);
         $this->doctrineRepository->findTinyUrlByTargetUrl('http://the-url-to-find.tld');
@@ -188,12 +168,12 @@ class TinyUrlDoctrineRepositoryTest extends TestCase
 
     public function testFindTinyUrlByUidReturnsTinyUrlWithFoundData(): void
     {
-        $resultMock = $this->createMock(Statement::class);
+        $resultMock = $this->createMock(\Doctrine\DBAL\Result::class);
         $resultMock->expects(self::once())
-            ->method('fetch')
+            ->method('fetchAssociative')
             ->willReturn($this->getDummyDatabaseRow());
         $this->databaseQueryBuilderMock->expects(self::once())
-            ->method('execute')
+            ->method('executeQuery')
             ->willReturn($resultMock);
         $tinyUrl = $this->doctrineRepository->findTinyUrlByUid(945);
         self::assertSame(945, $tinyUrl->getUid());
@@ -201,12 +181,12 @@ class TinyUrlDoctrineRepositoryTest extends TestCase
 
     public function testFindTinyUrlByUidThrowsNotFoundExceptionForEmptyResult(): void
     {
-        $resultMock = $this->createMock(Statement::class);
+        $resultMock = $this->createMock(\Doctrine\DBAL\Result::class);
         $resultMock->expects(self::once())
-            ->method('fetch')
+            ->method('fetchAssociative')
             ->willReturn(false);
         $this->databaseQueryBuilderMock->expects(self::once())
-            ->method('execute')
+            ->method('executeQuery')
             ->willReturn($resultMock);
         $this->expectException(TinyUrlNotFoundException::class);
         $this->doctrineRepository->findTinyUrlByUid(293);
@@ -347,7 +327,7 @@ class TinyUrlDoctrineRepositoryTest extends TestCase
         $this->databaseQueryBuilderMock->expects(self::once())
             ->method('delete');
         $this->databaseQueryBuilderMock->expects(self::once())
-            ->method('execute');
+            ->method('executeStatement');
         $this->doctrineRepository->purgeInvalidUrls();
     }
 
@@ -370,7 +350,7 @@ class TinyUrlDoctrineRepositoryTest extends TestCase
             ->method('update')
             ->with(
                 TinyUrlRepository::TABLE_URLS,
-                new ArraySubset($tinyUrlData),
+                self::callback(fn(array $databaseRow) => array_diff_assoc($tinyUrlData, $databaseRow) === []),
                 ['uid' => 945]
             );
 

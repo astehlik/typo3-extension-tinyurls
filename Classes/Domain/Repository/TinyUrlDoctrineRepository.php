@@ -24,10 +24,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class TinyUrlDoctrineRepository extends AbstractTinyUrlDatabaseRepository implements TinyUrlRepository
 {
-    /**
-     * @var ConnectionPool
-     */
-    protected $databaseConnectionPool;
+    protected ?ConnectionPool $databaseConnectionPool = null;
 
     /**
      * See: http://lists.typo3.org/pipermail/typo3-dev/2007-December/026936.html
@@ -45,7 +42,7 @@ class TinyUrlDoctrineRepository extends AbstractTinyUrlDatabaseRepository implem
                     $queryBuilder->createNamedParameter($tinyUrl->getUid(), \PDO::PARAM_INT)
                 )
             )
-            ->execute();
+            ->executeStatement();
 
         return $this->findTinyUrlByKey($tinyUrl->getUrlkey());
     }
@@ -56,7 +53,7 @@ class TinyUrlDoctrineRepository extends AbstractTinyUrlDatabaseRepository implem
         $queryBuilder
             ->delete(static::TABLE_URLS)
             ->where($queryBuilder->expr()->eq('urlkey', $queryBuilder->createNamedParameter($tinyUrlKey)))
-            ->execute();
+            ->executeStatement();
     }
 
     public function findTinyUrlByKey(string $tinyUrlKey): TinyUrl
@@ -66,8 +63,8 @@ class TinyUrlDoctrineRepository extends AbstractTinyUrlDatabaseRepository implem
             ->select('*')
             ->from(static::TABLE_URLS)
             ->where($queryBuilder->expr()->eq('urlkey', $queryBuilder->createNamedParameter($tinyUrlKey)))
-            ->execute()
-            ->fetch();
+            ->executeQuery()
+            ->fetchAssociative();
 
         if (empty($result)) {
             throw new TinyUrlNotFoundException($tinyUrlKey);
@@ -88,8 +85,8 @@ class TinyUrlDoctrineRepository extends AbstractTinyUrlDatabaseRepository implem
                     $queryBuilder->createNamedParameter($this->getTargetUrlHash($targetUrl))
                 )
             )
-            ->execute()
-            ->fetch();
+            ->executeQuery()
+            ->fetchAssociative();
 
         if (empty($result)) {
             throw new TinyUrlNotFoundException(
@@ -107,8 +104,8 @@ class TinyUrlDoctrineRepository extends AbstractTinyUrlDatabaseRepository implem
             ->select('*')
             ->from(static::TABLE_URLS)
             ->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter($uid, \PDO::PARAM_INT)))
-            ->execute()
-            ->fetch();
+            ->executeQuery()
+            ->fetchAssociative();
 
         if (empty($result)) {
             throw new TinyUrlNotFoundException(
@@ -128,7 +125,7 @@ class TinyUrlDoctrineRepository extends AbstractTinyUrlDatabaseRepository implem
         $queryBuilder
             ->delete(static::TABLE_URLS)
             ->where(
-                $queryBuilder->expr()->andX(
+                $queryBuilder->expr()->and(
                     $queryBuilder->expr()->gt('valid_until', 0),
                     $queryBuilder->expr()->lt(
                         'valid_until',
@@ -136,7 +133,7 @@ class TinyUrlDoctrineRepository extends AbstractTinyUrlDatabaseRepository implem
                     )
                 )
             )
-            ->execute();
+            ->executeStatement();
     }
 
     public function setDatabaseConnectionPool(ConnectionPool $databaseConnectionPool): void
@@ -153,7 +150,7 @@ class TinyUrlDoctrineRepository extends AbstractTinyUrlDatabaseRepository implem
         $this->getDatabaseConnection()->update(
             static::TABLE_URLS,
             $newTinyUrlData,
-            ['uid' => (int)$tinyUrl->getUid()]
+            ['uid' => $tinyUrl->getUid()]
         );
 
         $tinyUrl->persistPostProcess();
@@ -197,11 +194,11 @@ class TinyUrlDoctrineRepository extends AbstractTinyUrlDatabaseRepository implem
             $this->getTinyUrlDatabaseData($tinyUrl)
         );
 
-        return (int)$this->getDatabaseConnection()->lastInsertId(static::TABLE_URLS, 'uid');
+        return (int)$this->getDatabaseConnection()->lastInsertId(static::TABLE_URLS);
     }
 
-    protected function transactional(\Closure $transaction): void
+    protected function transactional(\Closure $callback): void
     {
-        $this->getDatabaseConnection()->transactional($transaction);
+        $this->getDatabaseConnection()->transactional($callback);
     }
 }
