@@ -21,33 +21,27 @@ use Tx\Tinyurls\UrlKeyGenerator\UrlKeyGenerator;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
+/**
+ * @deprecated Use Service configuration instead.
+ */
 class ImplementationManager implements SingletonInterface
 {
-    /**
-     * @var TinyUrlRepository
-     */
-    protected $tinyUrlRepository;
+    protected ?TinyUrlRepository $tinyUrlRepository;
 
-    /**
-     * @var string
-     */
-    protected $tinyUrlRepositoryClass;
+    protected string $tinyUrlRepositoryClass;
 
-    /**
-     * @var UrlKeyGenerator
-     */
-    protected $urlKeyGenerator;
+    protected ?UrlKeyGenerator $urlKeyGenerator;
 
-    /**
-     * @var string
-     */
-    protected $urlKeyGeneratorClass;
+    protected string $urlKeyGeneratorClass;
 
     public function __construct()
     {
         $this->restoreDefaults();
     }
 
+    /**
+     * @deprecated Will be removed in next major version, use Dependency Injection instead.
+     */
     public static function getInstance(): self
     {
         return GeneralUtility::makeInstance(self::class);
@@ -55,6 +49,7 @@ class ImplementationManager implements SingletonInterface
 
     /**
      * @codeCoverageIgnore
+     * @deprecated Will be removed in next major version, use Dependency Injection instead.
      */
     public function getTinyUrlRepository(): TinyUrlRepository
     {
@@ -64,6 +59,9 @@ class ImplementationManager implements SingletonInterface
         return $this->tinyUrlRepository;
     }
 
+    /**
+     * @deprecated Will be removed in next major version, use Dependency Injection instead.
+     */
     public function getTinyUrlRepositoryClass(): string
     {
         return $this->tinyUrlRepositoryClass;
@@ -71,6 +69,7 @@ class ImplementationManager implements SingletonInterface
 
     /**
      * @codeCoverageIgnore
+     * @deprecated Will be removed in next major version, use Dependency Injection instead.
      */
     public function getUrlKeyGenerator(): UrlKeyGenerator
     {
@@ -80,11 +79,17 @@ class ImplementationManager implements SingletonInterface
         return $this->urlKeyGenerator;
     }
 
+    /**
+     * @deprecated Will be removed in next major version, use Dependency Injection instead.
+     */
     public function getUrlKeyGeneratorClass(): string
     {
         return $this->urlKeyGeneratorClass;
     }
 
+    /**
+     * @deprecated Will be removed in next major version, use Dependency Injection instead.
+     */
     public function restoreDefaults(): void
     {
         $this->urlKeyGenerator = null;
@@ -94,22 +99,34 @@ class ImplementationManager implements SingletonInterface
         $this->urlKeyGeneratorClass = Base62UrlKeyGenerator::class;
     }
 
+    /**
+     * @deprecated Will be removed in next major version, use Dependency Injection instead.
+     */
     public function setTinyUrlRepository(TinyUrlRepository $tinyUrlRepository): void
     {
         $this->tinyUrlRepository = $tinyUrlRepository;
     }
 
+    /**
+     * @deprecated Will be removed in next major version, use Dependency Injection instead.
+     */
     public function setTinyUrlRepositoryClass(string $tinyUrlRepositoryClass): void
     {
         $this->tinyUrlRepository = null;
         $this->tinyUrlRepositoryClass = $tinyUrlRepositoryClass;
     }
 
+    /**
+     * @deprecated Will be removed in next major version, use Dependency Injection instead.
+     */
     public function setUrlKeyGenerator(UrlKeyGenerator $urlKeyGenerator): void
     {
         $this->urlKeyGenerator = $urlKeyGenerator;
     }
 
+    /**
+     * @deprecated Will be removed in next major version, use Dependency Injection instead.
+     */
     public function setUrlKeyGeneratorClass(string $urlKeyGeneratorClass): void
     {
         $this->urlKeyGenerator = null;
