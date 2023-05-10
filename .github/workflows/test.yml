@@ -31,7 +31,7 @@ jobs:
           bash .Build/bin/t3_run_tests.sh -s composerNormalize -n -p ${{ env.MAIN_PHP_VERSION }}
 
   "check-codestyle-codesniffer":
-    name: "PHP code style check"
+    name: "PHP_CodeSniffer check"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -45,7 +45,7 @@ jobs:
           bash .Build/bin/t3_check_codestyle.sh PSRTinyurls
 
   "check-codestyle-php-cs-fixer":
-    name: "PHP code style check"
+    name: "PHP CS Fixer check"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -53,7 +53,7 @@ jobs:
         with:
           php_version: "8.1"
       - run: |
-          bash .Build/bin/t3_run_tests.sh -s cgl -n -p 8.1
+          bash .Build/bin/t3_run_tests.sh -s cgl -n -p ${{ env.MAIN_PHP_VERSION }}
 
   "php-unit-tests":
     name: "PHP Unit tests"
