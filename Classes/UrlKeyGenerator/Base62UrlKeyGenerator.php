@@ -24,15 +24,11 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  */
 class Base62UrlKeyGenerator implements UrlKeyGenerator
 {
-    /**
-     * @var ExtensionConfiguration
-     */
-    protected $extensionConfiguration;
-
-    /**
-     * @var GeneralUtilityWrapper
-     */
-    protected $generalUtility;
+    public function __construct(
+        protected readonly ExtensionConfiguration $extensionConfiguration,
+        protected readonly GeneralUtilityWrapper $generalUtility
+    ) {
+    }
 
     /**
      * Generates a unique tinyurl key for the record with the given UID.
@@ -49,13 +45,13 @@ class Base62UrlKeyGenerator implements UrlKeyGenerator
     {
         $tinyUrlKey = $this->convertIntToBase62(
             $uid,
-            $this->getExtensionConfiguration()->getBase62Dictionary()
+            $this->extensionConfiguration->getBase62Dictionary()
         );
 
         $numberOfFillupChars =
-            $this->getExtensionConfiguration()->getMinimalTinyurlKeyLength() - strlen($tinyUrlKey);
+            $this->extensionConfiguration->getMinimalTinyurlKeyLength() - strlen($tinyUrlKey);
 
-        $minimalRandomKeyLength = $this->getExtensionConfiguration()->getMinimalRandomKeyLength();
+        $minimalRandomKeyLength = $this->extensionConfiguration->getMinimalRandomKeyLength();
         if ($numberOfFillupChars < $minimalRandomKeyLength) {
             $numberOfFillupChars = $minimalRandomKeyLength;
         }
@@ -64,19 +60,9 @@ class Base62UrlKeyGenerator implements UrlKeyGenerator
             return $tinyUrlKey;
         }
 
-        $tinyUrlKey .= '-' . $this->getGeneralUtility()->getRandomHexString($numberOfFillupChars);
+        $tinyUrlKey .= '-' . $this->generalUtility->getRandomHexString($numberOfFillupChars);
 
         return $tinyUrlKey;
-    }
-
-    public function injectExtensionConfiguration(ExtensionConfiguration $extensionConfiguration): void
-    {
-        $this->extensionConfiguration = $extensionConfiguration;
-    }
-
-    public function injectGeneralUtility(GeneralUtilityWrapper $generalUtility): void
-    {
-        $this->generalUtility = $generalUtility;
     }
 
     /**
@@ -100,27 +86,5 @@ class Base62UrlKeyGenerator implements UrlKeyGenerator
         } while ($base10Integer > 0);
 
         return $base62Integer;
-    }
-
-    /**
-     * @codeCoverageIgnore
-     */
-    protected function getExtensionConfiguration(): ExtensionConfiguration
-    {
-        if ($this->extensionConfiguration === null) {
-            $this->extensionConfiguration = GeneralUtility::makeInstance(ExtensionConfiguration::class);
-        }
-        return $this->extensionConfiguration;
-    }
-
-    /**
-     * @codeCoverageIgnore
-     */
-    protected function getGeneralUtility(): GeneralUtilityWrapper
-    {
-        if ($this->generalUtility === null) {
-            $this->generalUtility = GeneralUtility::makeInstance(GeneralUtilityWrapper::class);
-        }
-        return $this->generalUtility;
     }
 }

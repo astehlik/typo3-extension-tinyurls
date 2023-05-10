@@ -46,9 +46,10 @@ class Base62UrlKeyGeneratorTest extends TestCase
         $this->extensionConfigurationMock = $this->createMock(ExtensionConfiguration::class);
         $this->generalUtilityMock = $this->createMock(GeneralUtilityWrapper::class);
 
-        $this->base62UrlKeyGenerator = new Base62UrlKeyGenerator();
-        $this->base62UrlKeyGenerator->injectExtensionConfiguration($this->extensionConfigurationMock);
-        $this->base62UrlKeyGenerator->injectGeneralUtility($this->generalUtilityMock);
+        $this->base62UrlKeyGenerator = new Base62UrlKeyGenerator(
+            $this->extensionConfigurationMock,
+            $this->generalUtilityMock
+        );
     }
 
     public function testGenerateTinyurlKeyForUidEncodesIntegerIfNoMinimalLengthIsConfigured(): void
