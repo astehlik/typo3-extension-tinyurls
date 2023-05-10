@@ -18,67 +18,29 @@ use Tx\Tinyurls\Object\ImplementationManager;
 
 class TinyUrl
 {
-    /**
-     * @var string
-     */
-    protected $comment = '';
+    protected string $comment = '';
 
-    /**
-     * @var int
-     */
-    protected $counter = 0;
+    protected int $counter = 0;
 
-    /**
-     * @var string
-     */
-    protected $customUrlKey;
+    protected ?string $customUrlKey = null;
 
-    /**
-     * @var bool
-     */
-    protected $deleteOnUse = false;
+    protected bool $deleteOnUse = false;
 
-    /**
-     * @var int
-     */
-    protected $pid;
+    protected int $pid;
 
-    /**
-     * @var string
-     */
-    protected $targetUrl = '';
+    protected string $targetUrl = '';
 
-    /**
-     * @var string
-     */
-    protected $targetUrlHash = '';
+    protected string $targetUrlHash = '';
 
-    /**
-     * The hash hat was originally stored in the database.
-     *
-     * @var string
-     */
-    protected $targetUrlHashOriginal = '';
+    protected string $targetUrlHashOriginal = '';
 
-    /**
-     * @var \DateTime
-     */
-    protected $tstamp;
+    protected \DateTime $tstamp;
 
-    /**
-     * @var int
-     */
-    protected $uid;
+    protected int $uid = 0;
 
-    /**
-     * @var string
-     */
-    protected $urlkey = '';
+    protected string $urlkey = '';
 
-    /**
-     * @var \DateTime
-     */
-    protected $validUntil;
+    protected ?\DateTime $validUntil = null;
 
     public static function createFromDatabaseRow(array $databaseRow): self
     {
@@ -169,7 +131,7 @@ class TinyUrl
         return $this->validUntil;
     }
 
-    public function hasCustomUrlKey()
+    public function hasCustomUrlKey(): bool
     {
         return $this->customUrlKey !== null;
     }
@@ -181,7 +143,7 @@ class TinyUrl
 
     public function isNew(): bool
     {
-        return (int)$this->uid === 0;
+        return $this->uid === 0;
     }
 
     public function persistPostProcess(): void
