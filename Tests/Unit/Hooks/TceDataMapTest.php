@@ -71,7 +71,7 @@ class TceDataMapTest extends TestCase
 
     public function testGeneratesHashForChangedUrl(): void
     {
-        $fieldArray = $fieldArrayOriginal = ['the field' => 'the value'];
+        $fieldArray = ['the field' => 'the value'];
         $tinyUrlMock = $this->createMock(TinyUrl::class);
         $tinyUrlMock->method('getTargetUrlHasChanged')->willReturn(true);
         $tinyUrlMock->method('getTargetUrlHash')->willReturn('the new hash');
@@ -92,7 +92,7 @@ class TceDataMapTest extends TestCase
             $this->getDataHandlerMock()
         );
 
-        self::assertArraySubset(['target_url_hash' => 'the new hash'], $fieldArray);
+        self::assertSame('the new hash', $fieldArray['target_url_hash']);
     }
 
     public function testGeneratesKeyForChangedUrl(): void
@@ -122,7 +122,7 @@ class TceDataMapTest extends TestCase
             $this->getDataHandlerMock()
         );
 
-        self::assertArraySubset(['urlkey' => 'the new key'], $fieldArray);
+        self::assertSame('the new key', $fieldArray['urlkey']);
     }
 
     public function testGeneratesKeyForNewRecord(): void
@@ -156,7 +156,8 @@ class TceDataMapTest extends TestCase
             $dataHandlerMock
         );
 
-        self::assertArraySubset(['target_url_hash' => 'the hash', 'urlkey' => 'the key'], $fieldArray);
+        self::assertSame('the hash', $fieldArray['target_url_hash']);
+        self::assertSame('the key', $fieldArray['urlkey']);
     }
 
     public function testSkippsProcessingForNonTinyUrlTable(): void
