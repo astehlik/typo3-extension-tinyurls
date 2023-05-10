@@ -24,41 +24,21 @@ use Tx\Tinyurls\Utils\UrlUtils;
 
 class TinyUrlGeneratorTest extends TestCase
 {
-    /**
-     * @var TinyUrlGenerator
-     */
-    protected $tinyUrlGenerator;
+    private TinyUrlGenerator $tinyUrlGenerator;
 
-    /**
-     * @var MockObject|TinyUrlRepository
-     */
-    protected $tinyUrlRepositoryMock;
+    private TinyUrlRepository|MockObject $tinyUrlRepositoryMock;
 
-    /**
-     * @var MockObject|UrlUtils
-     */
-    protected $urlUtilsMock;
+    private UrlUtils|MockObject $urlUtilsMock;
 
     protected function setUp(): void
     {
         $this->tinyUrlRepositoryMock = $this->createMock(TinyUrlRepository::class);
         $this->urlUtilsMock = $this->createMock(UrlUtils::class);
-        $this->tinyUrlGenerator = new TinyUrlGenerator();
-        $this->tinyUrlGenerator->injectTinyUrlRepository($this->tinyUrlRepositoryMock);
-        $this->tinyUrlGenerator->injectUrlUtils($this->urlUtilsMock);
-    }
 
-    public function testBuildTinyUrlUsesUrlUtilToBuildUrl(): void
-    {
-        $urlKey = 'thekey';
-        $this->urlUtilsMock->expects(self::once())
-            ->method('buildTinyUrl')
-            ->with($urlKey)
-            ->willReturn('http://the-url.tld/goto/' . $urlKey);
-
-        /** @noinspection PhpDeprecationInspection */
-        $tinyUrl = $this->tinyUrlGenerator->buildTinyUrl($urlKey);
-        self::assertSame('http://the-url.tld/goto/' . $urlKey, $tinyUrl);
+        $this->tinyUrlGenerator = new TinyUrlGenerator(
+            $this->tinyUrlRepositoryMock,
+            $this->urlUtilsMock
+        );
     }
 
     public function testGetTinyUrlBuildsUrlForExistingUrl(): void

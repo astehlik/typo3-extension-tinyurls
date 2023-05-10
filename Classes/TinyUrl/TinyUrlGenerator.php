@@ -17,9 +17,7 @@ namespace Tx\Tinyurls\TinyUrl;
 use Tx\Tinyurls\Domain\Model\TinyUrl;
 use Tx\Tinyurls\Domain\Repository\TinyUrlRepository;
 use Tx\Tinyurls\Exception\TinyUrlNotFoundException;
-use Tx\Tinyurls\Object\ImplementationManager;
 use Tx\Tinyurls\Utils\UrlUtils;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * This class is responsible for generating tiny Urls based on configuration
@@ -27,52 +25,28 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  */
 class TinyUrlGenerator
 {
-    /**
-     * @var string
-     */
-    protected $comment = '';
+    private readonly TinyUrl $tinyurl;
 
-    /**
-     * If this option is 1 the URL will be deleted from the database
-     * on the first hit.
-     *
-     * @var bool
-     */
-    protected $optionDeleteOnUse = false;
+    public function __construct(
+        private readonly TinyUrlRepository $tinyUrlRepository,
+        private readonly UrlUtils $urlUtils
+    ) {
+        $this->tinyurl = TinyUrl::createNew();
+    }
 
-    /**
-     * With this option the user can specify a custom URL key.
-     *
-     * @var bool|string
-     */
-    protected $optionUrlKey = false;
-
-    /**
-     * If this value is set to a timestamp the URL will be invalid
-     * after this timestamp has passed.
-     *
-     * @var int
-     */
-    protected $optionValidUntil = 0;
-
-    /**
-     * @var TinyUrlRepository
-     */
-    protected $tinyUrlRepository;
-
-    /**
-     * @var UrlUtils
-     */
-    protected $urlUtils;
-
-    /**
-     * Builds a complete tiny URL based on the given URL key and the createSpeakingURLs setting.
-     *
-     * @deprecated use UrlTils::buildTinyUrl() instead
-     */
-    public function buildTinyUrl(string $tinyUrlKey): string
+    public function generateTinyUrl(TinyUrl $tinyUrl): string
     {
-        return $this->getUrlUtils()->buildTinyUrl($tinyUrlKey);
+        if ($tinyUrl->getTargetUrl() === '') {
+            return '';
+        }
+
+        try {
+            $tinyUrl = $this->tinyUrlRepository->findTinyUrlByTargetUrl($tinyUrl->getTargetUrl());
+        } catch (TinyUrlNotFoundException) {
+            $this->tinyUrlRepository->insertNewTinyUrl($tinyUrl);
+        }
+
+        return $this->urlUtils->buildTinyUrl($tinyUrl->getUrlkey());
     }
 
     /**
@@ -82,6 +56,8 @@ class TinyUrlGenerator
      * @param string $targetUrl The URL that should be minified
      *
      * @return string The generated tinyurl
+     * @deprecated Will be removed with the next major version! Use generateTinyUrl() instead.
+     *
      */
     public function getTinyUrl(string $targetUrl): string
     {
@@ -90,117 +66,64 @@ class TinyUrlGenerator
         }
 
         try {
-            $tinyUrl = $this->getTinyUrlRepository()->findTinyUrlByTargetUrl($targetUrl);
-        } catch (TinyUrlNotFoundException $e) {
-            $tinyUrl = $this->generateNewTinyurl($targetUrl);
+            $tinyUrl = $this->tinyUrlRepository->findTinyUrlByTargetUrl($targetUrl);
+        } catch (TinyUrlNotFoundException) {
+            $tinyUrl = clone $this->tinyurl;
+            $tinyUrl->setTargetUrl($targetUrl);
+            $this->tinyUrlRepository->insertNewTinyUrl($tinyUrl);
         }
 
-        return $this->getUrlUtils()->buildTinyUrl($tinyUrl->getUrlkey());
-    }
-
-    public function injectTinyUrlRepository(TinyUrlRepository $tinyUrlRepository): void
-    {
-        $this->tinyUrlRepository = $tinyUrlRepository;
-    }
-
-    public function injectUrlUtils(UrlUtils $urlUtils): void
-    {
-        $this->urlUtils = $urlUtils;
+        return $this->urlUtils->buildTinyUrl($tinyUrl->getUrlkey());
     }
 
     /**
      * Sets the comment for the next tinyurl that is generated.
      *
-     * @param string $comment
+     * @deprecated Will be removed in next major version. Use TinyUrl model instead.
      */
-    public function setComment($comment): void
+    public function setComment(string $comment): void
     {
-        $this->comment = (string)$comment;
+        $this->tinyurl->setComment($comment);
     }
 
     /**
      * Sets the deleteOnUse option, if 1 the URL will be deleted from
      * the database on the first hit.
      *
-     * @param bool $deleteOnUse
+     * @deprecated Will be removed in next major version. Use TinyUrl model instead.
      */
-    public function setOptionDeleteOnUse($deleteOnUse): void
+    public function setOptionDeleteOnUse(bool $deleteOnUse): void
     {
-        $this->optionDeleteOnUse = (bool)$deleteOnUse;
+        if (!$deleteOnUse) {
+            $this->tinyurl->disableDeleteOnUse();
+            return;
+        }
+
+        $this->tinyurl->enableDeleteOnUse();
     }
 
     /**
      * Sets a custom URL key, must be unique.
      *
-     * @param string $urlKey
+     * @deprecated Will be removed in next major version. Use TinyUrl model instead.
      */
-    public function setOptionUrlKey($urlKey): void
+    public function setOptionUrlKey(string $urlKey): void
     {
-        if (!empty($urlKey)) {
-            $this->optionUrlKey = $urlKey;
-        } else {
-            $this->optionUrlKey = false;
+        if ($urlKey === '') {
+            $this->tinyurl->resetCustomUrlKey();
+            return;
         }
+
+        $this->tinyurl->setCustomUrlKey($urlKey);
     }
 
     /**
      * Sets the timestamp until the generated URL is valid.
      *
-     * @param int $validUntil
+     * @deprecated Will be removed in next major version. Use TinyUrl model instead.
      */
-    public function setOptionValidUntil($validUntil): void
+    public function setOptionValidUntil(int $validUntil): void
     {
-        $this->optionValidUntil = (int)$validUntil;
-    }
-
-    /**
-     * Inserts a new record in the database.
-     *
-     * Does not check, if the url hash already exists! This is done in
-     * getTinyUrl().
-     */
-    protected function generateNewTinyurl(string $targetUrl): TinyUrl
-    {
-        $tinyUrl = TinyUrl::createNew();
-        $tinyUrl->setTargetUrl($targetUrl);
-        $tinyUrl->setComment($this->comment);
-
-        if ($this->optionDeleteOnUse) {
-            $tinyUrl->enableDeleteOnUse();
-        }
-
-        if ($this->optionValidUntil > 0) {
-            $tinyUrl->setValidUntil(new \DateTime('@' . $this->optionValidUntil));
-        }
-
-        if ($this->optionUrlKey !== false) {
-            $tinyUrl->setCustomUrlKey($this->optionUrlKey);
-        }
-
-        $this->getTinyUrlRepository()->insertNewTinyUrl($tinyUrl);
-
-        return $tinyUrl;
-    }
-
-    /**
-     * @codeCoverageIgnore
-     */
-    protected function getTinyUrlRepository(): TinyUrlRepository
-    {
-        if ($this->tinyUrlRepository === null) {
-            $this->tinyUrlRepository = ImplementationManager::getInstance()->getTinyUrlRepository();
-        }
-        return $this->tinyUrlRepository;
-    }
-
-    /**
-     * @codeCoverageIgnore
-     */
-    protected function getUrlUtils(): UrlUtils
-    {
-        if ($this->urlUtils === null) {
-            $this->urlUtils = GeneralUtility::makeInstance(UrlUtils::class);
-        }
-        return $this->urlUtils;
+        $this->tinyurl->setValidUntil(new \DateTime('@' . $validUntil));
     }
 }
