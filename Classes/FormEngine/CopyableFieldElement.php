@@ -78,6 +78,7 @@ class CopyableFieldElement extends AbstractNode implements NodeInterface
      */
     protected function getClipboardIcon(): string
     {
+        // @extensionScannerIgnoreLine
         $iconFactory = $this->getIconFactory();
         return $iconFactory->getIcon('actions-edit-copy', Icon::SIZE_SMALL)->render();
     }
