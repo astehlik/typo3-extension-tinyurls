@@ -6,6 +6,8 @@ use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigura
 use Tx\Tinyurls\Configuration\ExtensionConfiguration;
 use Tx\Tinyurls\Hooks\DatabaseRecordList;
 use Tx\Tinyurls\Hooks\TypoLink;
+use Tx\Tinyurls\UrlKeyGenerator\Base62UrlKeyGenerator;
+use Tx\Tinyurls\UrlKeyGenerator\UrlKeyGenerator;
 use Tx\Tinyurls\Utils\GeneralUtilityWrapper;
 use Tx\Tinyurls\Utils\UrlUtils;
 use Tx\Tinyurls\ViewHelpers\TinyurlViewHelper;
@@ -15,10 +17,17 @@ use TYPO3\CMS\Frontend\Event\AfterLinkIsGeneratedEvent;
 return function (ContainerConfigurator $configurator): void {
     $configurator->services()
         ->defaults()->autowire()->autoconfigure()
+
+        // Configure implementations of interfaces.
+        ->set(UrlKeyGenerator::class, Base62UrlKeyGenerator::class)
+
+        // Configure services.
         ->set(ExtensionConfiguration::class, ExtensionConfiguration::class)
         ->set(GeneralUtilityWrapper::class, GeneralUtilityWrapper::class)
         ->set(UrlUtils::class, UrlUtils::class)
         ->set(TinyurlViewHelper::class, TinyurlViewHelper::class)
+
+        // Configure event listeners.
         ->set(TypoLink::class, TypoLink::class)
         ->tag(
             'event.listener',

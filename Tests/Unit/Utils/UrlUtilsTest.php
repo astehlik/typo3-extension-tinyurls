@@ -27,20 +27,25 @@ use Tx\Tinyurls\Utils\UrlUtils;
  */
 class UrlUtilsTest extends TestCase
 {
-    protected ExtensionConfiguration|MockObject $extensionConfigurationMock;
+    private ExtensionConfiguration|MockObject $extensionConfigurationMock;
 
-    protected GeneralUtilityWrapper|MockObject $generalUtilityMock;
+    private GeneralUtilityWrapper|MockObject $generalUtilityMock;
 
-    protected UrlUtils $urlUtils;
+    private UrlUtils $urlUtils;
+
+    private UrlKeyGenerator|MockObject $urlKeyGeneratorMock;
 
     protected function setUp(): void
     {
         $this->extensionConfigurationMock = $this->createMock(ExtensionConfiguration::class);
         $this->generalUtilityMock = $this->createMock(GeneralUtilityWrapper::class);
+        $this->urlKeyGeneratorMock = $this->createMock(UrlKeyGenerator::class);
 
-        $this->urlUtils = new UrlUtils();
-        $this->urlUtils->injectExtensionConfiguration($this->extensionConfigurationMock);
-        $this->urlUtils->injectGeneralUtility($this->generalUtilityMock);
+        $this->urlUtils = new UrlUtils(
+            $this->extensionConfigurationMock,
+            $this->generalUtilityMock,
+            $this->urlKeyGeneratorMock
+        );
     }
 
     /**
@@ -120,15 +125,12 @@ class UrlUtilsTest extends TestCase
 
     public function testGenerateTinyurlKeyForUidGeneratesKey(): void
     {
-        $urlGeneratorMock = $this->createMock(UrlKeyGenerator::class);
-        $urlGeneratorMock->expects(self::once())
+        $this->urlKeyGeneratorMock->expects(self::once())
             ->method('generateTinyurlKeyForUid')
             ->with(132)
             ->willReturn('thekey');
-        ImplementationManager::getInstance()->setUrlKeyGenerator($urlGeneratorMock);
 
         /** @noinspection PhpDeprecationInspection */
         self::assertSame('thekey', $this->urlUtils->generateTinyurlKeyForUid(132));
-        ImplementationManager::getInstance()->restoreDefaults();
     }
 }

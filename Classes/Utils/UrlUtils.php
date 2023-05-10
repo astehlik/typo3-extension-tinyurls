@@ -16,30 +16,24 @@ namespace Tx\Tinyurls\Utils;
 
 use Tx\Tinyurls\Configuration\ExtensionConfiguration;
 use Tx\Tinyurls\Domain\Model\TinyUrl;
-use Tx\Tinyurls\Object\ImplementationManager;
+use Tx\Tinyurls\UrlKeyGenerator\UrlKeyGenerator;
 use TYPO3\CMS\Core\SingletonInterface;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * Contains utilities for creating tiny url keys and url hashes.
  */
 class UrlUtils implements SingletonInterface
 {
-    /**
-     * Contains the extension configration.
-     *
-     * @var ExtensionConfiguration
-     */
-    protected $extensionConfiguration;
-
-    /**
-     * @var GeneralUtilityWrapper
-     */
-    protected $generalUtility;
+    public function __construct(
+        private readonly ExtensionConfiguration $extensionConfiguration,
+        private readonly GeneralUtilityWrapper $generalUtility,
+        private readonly UrlKeyGenerator $urlKeyGenerator
+    ) {
+    }
 
     public function buildTinyUrl(string $tinyUrlKey): string
     {
-        if ($this->getExtensionConfiguration()->areSpeakingUrlsEnabled()) {
+        if ($this->extensionConfiguration->areSpeakingUrlsEnabled()) {
             return $this->createSpeakingTinyUrl($tinyUrlKey);
         }
 
@@ -51,7 +45,7 @@ class UrlUtils implements SingletonInterface
      */
     public function createSpeakingTinyUrl(string $tinyUrlKey): string
     {
-        $speakingUrl = $this->getExtensionConfiguration()->getSpeakingUrlTemplate();
+        $speakingUrl = $this->extensionConfiguration->getSpeakingUrlTemplate();
 
         $speakingUrl = str_replace('###TINY_URL_KEY###', $tinyUrlKey, $speakingUrl);
 
@@ -65,7 +59,7 @@ class UrlUtils implements SingletonInterface
         foreach ($matches[1] as $match) {
             $speakingUrl = str_replace(
                 '###' . $match . '###',
-                $this->getGeneralUtility()->getIndpEnv($match),
+                $this->generalUtility->getIndpEnv($match),
                 $speakingUrl
             );
         }
@@ -92,45 +86,12 @@ class UrlUtils implements SingletonInterface
      */
     public function generateTinyurlKeyForUid(int $uid): string
     {
-        $urlKeyGenerator = ImplementationManager::getInstance()->getUrlKeyGenerator();
-        return $urlKeyGenerator->generateTinyurlKeyForUid($uid);
-    }
-
-    public function injectExtensionConfiguration(ExtensionConfiguration $extensionConfiguration): void
-    {
-        $this->extensionConfiguration = $extensionConfiguration;
-    }
-
-    public function injectGeneralUtility(GeneralUtilityWrapper $generalUtility): void
-    {
-        $this->generalUtility = $generalUtility;
+        return $this->urlKeyGenerator->generateTinyurlKeyForUid($uid);
     }
 
     protected function createEidUrl(string $tinyUrlKey): string
     {
-        return $this->getGeneralUtility()->getIndpEnv('TYPO3_SITE_URL')
+        return $this->generalUtility->getIndpEnv('TYPO3_SITE_URL')
             . '?eID=tx_tinyurls&tx_tinyurls[key]=' . $tinyUrlKey;
-    }
-
-    /**
-     * @codeCoverageIgnore
-     */
-    protected function getExtensionConfiguration(): ExtensionConfiguration
-    {
-        if ($this->extensionConfiguration === null) {
-            $this->extensionConfiguration = GeneralUtility::makeInstance(ExtensionConfiguration::class);
-        }
-        return $this->extensionConfiguration;
-    }
-
-    /**
-     * @codeCoverageIgnore
-     */
-    protected function getGeneralUtility(): GeneralUtilityWrapper
-    {
-        if ($this->generalUtility === null) {
-            $this->generalUtility = GeneralUtility::makeInstance(GeneralUtilityWrapper::class);
-        }
-        return $this->generalUtility;
     }
 }
