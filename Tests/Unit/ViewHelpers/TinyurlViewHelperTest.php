@@ -15,121 +15,106 @@ namespace Tx\Tinyurls\Tests\Unit\ViewHelpers;
  *                                                                        */
 
 use PHPUnit\Framework\MockObject\MockObject;
-use Tx\Tinyurls\TinyUrl\Api;
+use Tx\Tinyurls\Domain\Model\TinyUrl;
+use Tx\Tinyurls\TinyUrl\TinyUrlGenerator;
 use Tx\Tinyurls\ViewHelpers\TinyurlViewHelper;
 use TYPO3\TestingFramework\Core\Unit\UnitTestCase;
-use TYPO3Fluid\Fluid\Core\Rendering\RenderingContextInterface;
 
 class TinyurlViewHelperTest extends UnitTestCase
 {
-    protected bool $resetSingletonInstances = true;
+    private MockObject|TinyUrlGenerator $tinyUrlGeneratorMock;
 
-    /**
-     * @var Api|MockObject
-     */
-    protected $tinyUrlApi;
+    private TinyurlViewHelper $tinyUrlViewHelper;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->tinyUrlApi = $this->createMock(Api::class);
-        TinyurlViewHelper::setTinyUrlApi($this->tinyUrlApi);
+        $this->tinyUrlGeneratorMock = $this->createMock(TinyUrlGenerator::class);
+
+        $this->tinyUrlViewHelper = new TinyurlViewHelper($this->tinyUrlGeneratorMock);
     }
 
     public function testCustomUrlKeyIsPassedToTinyUrlApi(): void
     {
-        $this->tinyUrlApi->expects(self::once())
-            ->method('setUrlKey')
-            ->with('theurl-key');
+        $this->tinyUrlGeneratorMock->expects(self::once())
+            ->method('generateTinyUrl')
+            ->with(self::callback(fn(TinyUrl $tinyUrl): bool => $tinyUrl->getCustomUrlKey() === 'theurl-key'));
 
         $arguments = [
             'url' => 'http://the-url.tld',
             'urlKey' => 'theurl-key',
         ];
 
-        $this->callRenderStatic($arguments);
+        $this->callRender($arguments);
     }
 
     public function testOnlyOneTimeValidSetsDeleteOnUse(): void
     {
-        $this->tinyUrlApi->expects(self::once())
-            ->method('setDeleteOnUse')
-            ->with(true);
+        $this->tinyUrlGeneratorMock->expects(self::once())
+            ->method('generateTinyUrl')
+            ->with(self::callback(fn(TinyUrl $tinyUrl): bool => $tinyUrl->getDeleteOnUse() === true));
 
         $arguments = [
             'url' => 'http://www.url.tld',
             'onlyOneTimeValid' => true,
         ];
-        $this->callRenderStatic($arguments);
+
+        $this->callRender($arguments);
     }
 
     public function testRetrievesUrlFromRenderChildrenIfNotProvidedAsArgument(): void
     {
-        $renderChildrenClosure = function () {
-            return 'http://the-children-url.tld';
-        };
+        $this->tinyUrlGeneratorMock->expects(self::once())
+            ->method('generateTinyUrl')
+            ->with(
+                self::callback(
+                    fn(TinyUrl $tinyUrl): bool => $tinyUrl->getTargetUrl() === 'http://the-children-url.tld'
+                )
+            );
 
-        $this->tinyUrlApi->expects(self::once())
-            ->method('getTinyUrl')
-            ->with('http://the-children-url.tld')
-            ->willReturn('');
-
-        $this->callRenderStaticWithRenderChildrenClosure([], $renderChildrenClosure);
+        $this->callRender(childrenOutput: 'http://the-children-url.tld');
     }
 
     public function testUrlIsPassedToTinyUrlApi(): void
     {
-        $this->tinyUrlApi->expects(self::once())
-            ->method('getTinyUrl')
-            ->with('http://the-url.tld')
-            ->willReturn('');
+        $this->tinyUrlGeneratorMock->expects(self::once())
+            ->method('generateTinyUrl')
+            ->with(self::callback(fn(TinyUrl $tinyUrl): bool => $tinyUrl->getTargetUrl() === 'http://the-url.tld'));
 
         $arguments = ['url' => 'http://the-url.tld'];
-        $this->callRenderStatic($arguments);
+        $this->callRender($arguments);
     }
 
     public function testValidUntilIsPassedToTinyUrlApi(): void
     {
-        $this->tinyUrlApi->expects(self::once())
-            ->method('setValidUntil')
-            ->with(3848909);
+        $this->tinyUrlGeneratorMock->expects(self::once())
+            ->method('generateTinyUrl')
+            ->with(self::callback(fn(TinyUrl $tinyUrl): bool => $tinyUrl->getValidUntil()->getTimestamp() === 3848909));
 
         $arguments = [
             'url' => 'http://the-url.tld',
             'validUntil' => 3848909,
         ];
 
-        $this->callRenderStatic($arguments);
+        $this->callRender($arguments);
     }
 
-    private function buildArguments(array $arguments)
+    private function callRender(array $arguments = [], string $childrenOutput = ''): void
     {
-        $viewHelper = new TinyurlViewHelper();
-        $argumentDefinitions = $viewHelper->prepareArguments();
-        foreach ($argumentDefinitions as $argumentName => $argumentDefinition) {
-            if (!isset($arguments[$argumentName])) {
-                $arguments[$argumentName] = $argumentDefinition->getDefaultValue();
-            }
-        }
-        return $arguments;
-    }
+        $defaultArguments = [
+            'url' => null,
+            'onlyOneTimeValid' => false,
+            'validUntil' => 0,
+            'urlKey' => '',
+        ];
 
-    private function callRenderStatic(array $arguments): void
-    {
-        $renderChildrenClosure = function (): void {
-            // Nothing to do here.
-        };
+        $arguments = array_merge($defaultArguments, $arguments);
 
-        $this->callRenderStaticWithRenderChildrenClosure($arguments, $renderChildrenClosure);
-    }
+        $this->tinyUrlViewHelper->setArguments($arguments);
 
-    private function callRenderStaticWithRenderChildrenClosure(array $arguments, \Closure $renderChildrenClosure): void
-    {
-        TinyurlViewHelper::renderStatic(
-            $this->buildArguments($arguments),
-            $renderChildrenClosure,
-            $this->createMock(RenderingContextInterface::class)
-        );
+        $this->tinyUrlViewHelper->setRenderChildrenClosure(fn() => $childrenOutput);
+
+        $this->tinyUrlViewHelper->render();
     }
 }

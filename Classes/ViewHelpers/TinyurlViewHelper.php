@@ -14,9 +14,8 @@ namespace Tx\Tinyurls\ViewHelpers;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
-use Tx\Tinyurls\TinyUrl\Api as TinyUrlApi;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3Fluid\Fluid\Core\Rendering\RenderingContextInterface;
+use Tx\Tinyurls\Domain\Model\TinyUrl;
+use Tx\Tinyurls\TinyUrl\TinyUrlGenerator;
 use TYPO3Fluid\Fluid\Core\ViewHelper\AbstractViewHelper;
 
 /**
@@ -35,63 +34,8 @@ use TYPO3Fluid\Fluid\Core\ViewHelper\AbstractViewHelper;
  */
 class TinyurlViewHelper extends AbstractViewHelper
 {
-    /**
-     * @var TinyUrlApi
-     */
-    private static $tinyUrlApi;
-
-    /**
-     * @return string Rendered link
-     */
-    public static function renderStatic(
-        array $arguments,
-        \Closure $renderChildrenClosure,
-        RenderingContextInterface $renderingContext
-    ) {
-        $url = $arguments['url'];
-        $onlyOneTimeValid = $arguments['onlyOneTimeValid'];
-        $validUntil = $arguments['validUntil'];
-        $urlKey = $arguments['urlKey'];
-
-        if ($url === null) {
-            $url = $renderChildrenClosure();
-        }
-
-        $tinyUrlApi = static::getTinyUrlApi();
-
-        if ($onlyOneTimeValid) {
-            $tinyUrlApi->setDeleteOnUse($onlyOneTimeValid);
-        }
-
-        if ($validUntil > 0) {
-            $tinyUrlApi->setValidUntil($validUntil);
-        }
-
-        if ($urlKey !== '') {
-            $tinyUrlApi->setUrlKey($urlKey);
-        }
-
-        return $tinyUrlApi->getTinyUrl($url);
-    }
-
-    /**
-     * @internal no public API! Currently used for unit testing
-     */
-    public static function setTinyUrlApi(TinyUrlApi $tinyUrlApi): void
+    public function __construct(private readonly TinyUrlGenerator $tinyUrlGenerator)
     {
-        static::$tinyUrlApi = $tinyUrlApi;
-    }
-
-    /**
-     * @codeCoverageIgnore
-     */
-    protected static function getTinyUrlApi(): TinyUrlApi
-    {
-        if (static::$tinyUrlApi) {
-            return static::$tinyUrlApi;
-        }
-
-        return GeneralUtility::makeInstance(TinyUrlApi::class);
     }
 
     public function initializeArguments(): void
@@ -106,5 +50,37 @@ class TinyurlViewHelper extends AbstractViewHelper
         );
         $this->registerArgument('validUntil', 'int', 'Timestamp until generated link is valid', false, 0);
         $this->registerArgument('urlKey', 'string', 'Custom url key', false, '');
+    }
+
+    /**
+     * @return string Rendered link
+     */
+    public function render(): string
+    {
+        $url = $this->arguments['url'];
+        $onlyOneTimeValid = $this->arguments['onlyOneTimeValid'];
+        $validUntil = $this->arguments['validUntil'];
+        $urlKey = $this->arguments['urlKey'];
+
+        if ($url === null) {
+            $url = $this->renderChildren();
+        }
+
+        $tinyUrl = TinyUrl::createNew();
+        $tinyUrl->setTargetUrl($url);
+
+        if ($onlyOneTimeValid) {
+            $tinyUrl->enableDeleteOnUse();
+        }
+
+        if ($validUntil > 0) {
+            $tinyUrl->setValidUntil(new \DateTimeImmutable('@' . $validUntil));
+        }
+
+        if ($urlKey !== '') {
+            $tinyUrl->setCustomUrlKey($urlKey);
+        }
+
+        return $this->tinyUrlGenerator->generateTinyUrl($tinyUrl);
     }
 }
