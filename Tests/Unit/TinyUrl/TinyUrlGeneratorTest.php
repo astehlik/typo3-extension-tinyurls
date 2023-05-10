@@ -16,6 +16,7 @@ namespace Tx\Tinyurls\Tests\Unit\TinyUrl;
 
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Tx\Tinyurls\Configuration\TypoScriptConfigurator;
 use Tx\Tinyurls\Domain\Model\TinyUrl;
 use Tx\Tinyurls\Domain\Repository\TinyUrlRepository;
 use Tx\Tinyurls\Exception\TinyUrlNotFoundException;
@@ -37,6 +38,7 @@ class TinyUrlGeneratorTest extends TestCase
 
         $this->tinyUrlGenerator = new TinyUrlGenerator(
             $this->tinyUrlRepositoryMock,
+            new TypoScriptConfigurator(),
             $this->urlUtilsMock
         );
     }

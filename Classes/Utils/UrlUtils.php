@@ -82,7 +82,7 @@ class UrlUtils implements SingletonInterface
     /**
      * Generates a unique tinyurl key for the record with the given UID.
      *
-     * @deprecated Use the UrlKeyGenerator for generating the URL key or regenerateUrlKey() instead.
+     * @deprecated use the UrlKeyGenerator for generating the URL key or regenerateUrlKey() instead
      */
     public function generateTinyurlKeyForUid(int $uid): string
     {

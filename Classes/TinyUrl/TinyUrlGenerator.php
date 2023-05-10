@@ -14,6 +14,7 @@ namespace Tx\Tinyurls\TinyUrl;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
+use Tx\Tinyurls\Configuration\TypoScriptConfigurator;
 use Tx\Tinyurls\Domain\Model\TinyUrl;
 use Tx\Tinyurls\Domain\Repository\TinyUrlRepository;
 use Tx\Tinyurls\Exception\TinyUrlNotFoundException;
@@ -29,6 +30,7 @@ class TinyUrlGenerator
 
     public function __construct(
         private readonly TinyUrlRepository $tinyUrlRepository,
+        private readonly TypoScriptConfigurator $typoScriptConfigurator,
         private readonly UrlUtils $urlUtils
     ) {
         $this->tinyurl = TinyUrl::createNew();
@@ -40,11 +42,7 @@ class TinyUrlGenerator
             return '';
         }
 
-        try {
-            $tinyUrl = $this->tinyUrlRepository->findTinyUrlByTargetUrl($tinyUrl->getTargetUrl());
-        } catch (TinyUrlNotFoundException) {
-            $this->tinyUrlRepository->insertNewTinyUrl($tinyUrl);
-        }
+        $tinyUrl = $this->createOrFetchTinyUrl($tinyUrl);
 
         return $this->urlUtils->buildTinyUrl($tinyUrl->getUrlkey());
     }
@@ -56,8 +54,8 @@ class TinyUrlGenerator
      * @param string $targetUrl The URL that should be minified
      *
      * @return string The generated tinyurl
-     * @deprecated Will be removed with the next major version! Use generateTinyUrl() instead.
      *
+     * @deprecated will be removed with the next major version! Use generateTinyUrl() instead
      */
     public function getTinyUrl(string $targetUrl): string
     {
@@ -94,12 +92,7 @@ class TinyUrlGenerator
      */
     public function setOptionDeleteOnUse(bool $deleteOnUse): void
     {
-        if (!$deleteOnUse) {
-            $this->tinyurl->disableDeleteOnUse();
-            return;
-        }
-
-        $this->tinyurl->enableDeleteOnUse();
+        $this->typoScriptConfigurator->setOptionDeleteOnUse($this->tinyurl, $deleteOnUse);
     }
 
     /**
@@ -109,12 +102,7 @@ class TinyUrlGenerator
      */
     public function setOptionUrlKey(string $urlKey): void
     {
-        if ($urlKey === '') {
-            $this->tinyurl->resetCustomUrlKey();
-            return;
-        }
-
-        $this->tinyurl->setCustomUrlKey($urlKey);
+        $this->typoScriptConfigurator->setOptionUrlKey($this->tinyurl, $urlKey);
     }
 
     /**
@@ -124,6 +112,20 @@ class TinyUrlGenerator
      */
     public function setOptionValidUntil(int $validUntil): void
     {
-        $this->tinyurl->setValidUntil(new \DateTime('@' . $validUntil));
+        $this->typoScriptConfigurator->setOptionValidUntil($this->tinyurl, $validUntil);
+    }
+
+    private function createOrFetchTinyUrl(TinyUrl $tinyUrl): TinyUrl
+    {
+        if ($tinyUrl->getTargetUrl() === '') {
+            throw new \InvalidArgumentException('Target URL must not be empty!');
+        }
+
+        try {
+            return $this->tinyUrlRepository->findTinyUrlByTargetUrl($tinyUrl->getTargetUrl());
+        } catch (TinyUrlNotFoundException) {
+            $this->tinyUrlRepository->insertNewTinyUrl($tinyUrl);
+            return $this->tinyUrlRepository->findTinyUrlByTargetUrl($tinyUrl->getTargetUrl());
+        }
     }
 }

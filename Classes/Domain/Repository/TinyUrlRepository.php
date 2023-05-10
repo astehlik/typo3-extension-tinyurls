@@ -16,9 +16,8 @@ namespace Tx\Tinyurls\Domain\Repository;
 
 use Tx\Tinyurls\Domain\Model\TinyUrl;
 use Tx\Tinyurls\Exception\TinyUrlNotFoundException;
-use TYPO3\CMS\Core\SingletonInterface;
 
-interface TinyUrlRepository extends SingletonInterface
+interface TinyUrlRepository
 {
     public const TABLE_URLS = 'tx_tinyurls_urls';
 

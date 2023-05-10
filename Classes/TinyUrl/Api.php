@@ -15,6 +15,7 @@ namespace Tx\Tinyurls\TinyUrl;
  *                                                                        */
 
 use Tx\Tinyurls\Configuration\TypoScriptConfigurator;
+use Tx\Tinyurls\Domain\Model\TinyUrl;
 use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
 
 /**
@@ -24,10 +25,13 @@ use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
  */
 class Api
 {
+    private TinyUrl $tinyUrl;
+
     public function __construct(
-        private readonly TinyUrlGenerator       $tinyUrlGenerator,
+        private readonly TinyUrlGenerator $tinyUrlGenerator,
         private readonly TypoScriptConfigurator $typoScriptConfigurator
     ) {
+        $this->tinyUrl = TinyUrl::createNew();
     }
 
     /**
@@ -41,7 +45,17 @@ class Api
      */
     public function getTinyUrl(string $targetUrl): string
     {
-        return $this->tinyUrlGenerator->getTinyUrl($targetUrl);
+        $tinyUrl = clone $this->tinyUrl;
+        $tinyUrl->setTargetUrl($targetUrl);
+        return $this->tinyUrlGenerator->generateTinyUrl($tinyUrl);
+    }
+
+    /**
+     * @internal for testing purposes only
+     */
+    public function getTinyUrlInstance(): TinyUrl
+    {
+        return $this->tinyUrl;
     }
 
     /**
@@ -57,7 +71,12 @@ class Api
      */
     public function initializeConfigFromTyposcript(array $config, ContentObjectRenderer $contentObject): void
     {
-        $this->typoScriptConfigurator->initializeConfigFromTyposcript($config, $contentObject);
+        $this->typoScriptConfigurator->initializeConfigFromTyposcript($this->tinyUrl, $config, $contentObject);
+    }
+
+    public function reset(): void
+    {
+        $this->tinyUrl = TinyUrl::createNew();
     }
 
     /**
@@ -65,7 +84,7 @@ class Api
      */
     public function setComment(string $comment): void
     {
-        $this->tinyUrlGenerator->setComment($comment);
+        $this->tinyUrl->setComment($comment);
     }
 
     /**
@@ -74,7 +93,12 @@ class Api
      */
     public function setDeleteOnUse(bool $deleteOnUse): void
     {
-        $this->tinyUrlGenerator->setOptionDeleteOnUse($deleteOnUse);
+        if (!$deleteOnUse) {
+            $this->tinyUrl->disableDeleteOnUse();
+            return;
+        }
+
+        $this->tinyUrl->enableDeleteOnUse();
     }
 
     /**
@@ -82,7 +106,7 @@ class Api
      */
     public function setUrlKey(string $urlKey): void
     {
-        $this->tinyUrlGenerator->setOptionUrlKey($urlKey);
+        $this->tinyUrl->setCustomUrlKey($urlKey);
     }
 
     /**
@@ -90,6 +114,6 @@ class Api
      */
     public function setValidUntil(int $validUntil): void
     {
-        $this->tinyUrlGenerator->setOptionValidUntil($validUntil);
+        $this->tinyUrl->setValidUntil(new \DateTimeImmutable('@' . $validUntil));
     }
 }

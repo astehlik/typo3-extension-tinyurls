@@ -17,7 +17,6 @@ namespace Tx\Tinyurls\UrlKeyGenerator;
 use Tx\Tinyurls\Configuration\ExtensionConfiguration;
 use Tx\Tinyurls\Domain\Model\TinyUrl;
 use Tx\Tinyurls\Utils\GeneralUtilityWrapper;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * Contains utilities for creating tiny url keys and url hashes.

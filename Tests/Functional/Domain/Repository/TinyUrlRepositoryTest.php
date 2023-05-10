@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Tx\Tinyurls\Tests\Functional\Domain\Repository;
 
 use Tx\Tinyurls\Domain\Repository\TinyUrlRepository;
-use Tx\Tinyurls\Object\ImplementationManager;
 use Tx\Tinyurls\Tests\Functional\AbstractFunctionalTestCase;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class TinyUrlRepositoryTest extends AbstractFunctionalTestCase
 {
@@ -15,7 +15,8 @@ class TinyUrlRepositoryTest extends AbstractFunctionalTestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->tinyUrlRepository = ImplementationManager::getInstance()->getTinyUrlRepository();
+
+        $this->tinyUrlRepository = GeneralUtility::makeInstance(TinyUrlRepository::class);
     }
 
     public function testCountTinyUrlHitRaisesCounter(): void

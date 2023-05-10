@@ -32,12 +32,11 @@ use TYPO3\CMS\Frontend\Controller\ErrorController;
  */
 class EidController
 {
+    private ?ErrorController $errorController = null;
+
     public function __construct(protected readonly TinyUrlRepository $tinyUrlRepository)
     {
     }
-
-    private ?ErrorController $errorController = null;
-
 
     public function setErrorController(ErrorController $errorController): void
     {

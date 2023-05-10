@@ -14,192 +14,93 @@ namespace Tx\Tinyurls\Tests\Unit\Hooks;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Tx\Tinyurls\Hooks\TypoLink;
 use Tx\Tinyurls\TinyUrl\Api;
+use TYPO3\CMS\Core\LinkHandling\LinkService;
 use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
+use TYPO3\CMS\Frontend\Event\AfterLinkIsGeneratedEvent;
+use TYPO3\CMS\Frontend\Typolink\LinkResult;
 
 class TypoLinkTest extends TestCase
 {
-    /**
-     * @var array
-     */
-    protected $finalTag;
+    private const TARGET_URL = 'https://the-tiny-url.tld';
 
-    /**
-     * @var array
-     */
-    protected $finalTagOriginal;
+    private array $linkInstructions;
 
-    /**
-     * @var array
-     */
-    protected $finalTagParts;
-
-    /**
-     * @var array
-     */
-    protected $finalTagPartsOriginal;
-
-    /**
-     * @var string
-     */
-    protected $lastTypoLinkUrlOriginal;
-
-    /**
-     * @var Api|MockObject
-     */
-    protected $tinyUrlApiMock;
-
-    /**
-     * @var array
-     */
-    protected $typoLinkConfig;
-
-    /**
-     * @var array
-     */
-    protected $typoLinkConfigOriginal;
-
-    /**
-     * @var TypoLink
-     */
-    protected $typoLinkHook;
+    private TypoLink $typoLinkHook;
 
     protected function setUp(): void
     {
         $this->tinyUrlApiMock = $this->createMock(Api::class);
-        $this->typoLinkHook = new TypoLink();
-        $this->typoLinkHook->setTinyUrlApi($this->tinyUrlApiMock);
+        $this->contentObjectRendererMock = $this->createMock(ContentObjectRenderer::class);
+
+        $this->typoLinkHook = new TypoLink($this->tinyUrlApiMock);
     }
 
     public function testApiGetTinyUrlIsCalledWithOriginalUrl(): void
     {
-        $contentObjectRendererMock = $this->getContentObjectRendererMock();
-        $typoLinkParameters = $this->getTypoLinkParameterArray();
-
         $this->tinyUrlApiMock->expects(self::once())
             ->method('getTinyUrl')
-            ->with($this->lastTypoLinkUrlOriginal)
+            ->with(self::TARGET_URL)
             ->willReturn('the tiny url');
 
-        $this->typoLinkHook->convertTypolinkToTinyUrl($typoLinkParameters, $contentObjectRendererMock);
+        $this->typoLinkHook->__invoke($this->getAfterLinkCreatedEvent());
     }
 
     public function testApiIsInitializedWithLinkConfig(): void
     {
-        $contentObjectRendererMock = $this->getContentObjectRendererMock();
-        $typoLinkParameters = $this->getTypoLinkParameterArray();
-
         $this->tinyUrlApiMock->method('getTinyUrl')->willReturn('the url');
+
+        $event = $this->getAfterLinkCreatedEvent(tinyUrlConfig: ['the' => 'config']);
 
         $this->tinyUrlApiMock->expects(self::once())
             ->method('initializeConfigFromTyposcript')
-            ->with($this->typoLinkConfigOriginal, $contentObjectRendererMock);
+            ->with($this->linkInstructions, $this->contentObjectRendererMock);
 
-        $this->typoLinkHook->convertTypolinkToTinyUrl($typoLinkParameters, $contentObjectRendererMock);
-    }
-
-    public function testContentObjectRendererLastTypoLinkUrlIsSetToTinyUrl(): void
-    {
-        $contentObjectRendererMock = $this->getContentObjectRendererMock();
-        $typoLinkParameters = $this->getTypoLinkParameterArray();
-
-        $this->tinyUrlApiMock->method('getTinyUrl')->willReturn('http://the-tiny-url');
-
-        $this->typoLinkHook->convertTypolinkToTinyUrl($typoLinkParameters, $contentObjectRendererMock);
-
-        self::assertSame('http://the-tiny-url', $contentObjectRendererMock->lastTypoLinkUrl);
-    }
-
-    public function testFinalTagPartsUrlIsReplacedWithTinyUrl(): void
-    {
-        $contentObjectRendererMock = $this->getContentObjectRendererMock();
-        $typoLinkParameters = $this->getTypoLinkParameterArray();
-
-        $this->tinyUrlApiMock->method('getTinyUrl')->willReturn('http://the-tiny-url');
-
-        $this->typoLinkHook->convertTypolinkToTinyUrl($typoLinkParameters, $contentObjectRendererMock);
-
-        self::assertSame('http://the-tiny-url', $this->finalTagParts['url']);
-    }
-
-    public function testFinalTagUrlIsReplacedWithTinyUrl(): void
-    {
-        $contentObjectRendererMock = $this->getContentObjectRendererMock();
-        $typoLinkParameters = $this->getTypoLinkParameterArray();
-
-        $this->tinyUrlApiMock->method('getTinyUrl')->willReturn('http://the-tiny-url');
-
-        $this->typoLinkHook->convertTypolinkToTinyUrl($typoLinkParameters, $contentObjectRendererMock);
-
-        self::assertSame('<a href="http://the-tiny-url">http://the-tiny-url</a>', $this->finalTag);
+        $this->typoLinkHook->__invoke($event);
     }
 
     public function testSkipsProcessingForMailtoUrl(): void
     {
-        $contentObjectRendererMock = $this->getContentObjectRendererMock();
-        $typoLinkParameterArray = $this->getTypoLinkParameterArray('mailto');
-        $this->typoLinkHook->convertTypolinkToTinyUrl($typoLinkParameterArray, $contentObjectRendererMock);
-        $this->assertLinkUnchanged($contentObjectRendererMock);
+        $this->tinyUrlApiMock->expects(self::never())->method('getTinyUrl');
+
+        $this->typoLinkHook->__invoke($this->getAfterLinkCreatedEvent(LinkService::TYPE_EMAIL));
     }
 
     public function testSkipsProcessingIfDisabled(): void
     {
-        $contentObjectRendererMock = $this->getContentObjectRendererMock();
-        $typoLinkParameterArray = $this->getTypoLinkParameterArray('page', false);
-        $this->typoLinkHook->convertTypolinkToTinyUrl($typoLinkParameterArray, $contentObjectRendererMock);
-        $this->assertLinkUnchanged($contentObjectRendererMock);
+        $this->tinyUrlApiMock->expects(self::never())->method('getTinyUrl');
+
+        $this->typoLinkHook->__invoke($this->getAfterLinkCreatedEvent(tinyUrlEnabled: false));
     }
 
-    protected function assertLinkUnchanged(ContentObjectRenderer $contentObjectRendererMock): void
+    public function testUrlIsReplacedWithTinyUrl(): void
     {
-        self::assertSame($this->lastTypoLinkUrlOriginal, $contentObjectRendererMock->lastTypoLinkUrl);
-        self::assertSame($this->finalTagOriginal, $this->finalTag);
-        self::assertSame($this->finalTagPartsOriginal, $this->finalTagParts);
-        self::assertSame($this->typoLinkConfigOriginal, $this->typoLinkConfig);
+        $this->tinyUrlApiMock->method('getTinyUrl')->willReturn('http://the-tiny-url');
+
+        $event = $this->getAfterLinkCreatedEvent();
+        $this->typoLinkHook->__invoke($event);
+
+        self::assertSame('http://the-tiny-url', $event->getLinkResult()->getUrl());
     }
 
-    /**
-     * @return ContentObjectRenderer|MockObject
-     */
-    protected function getContentObjectRendererMock()
-    {
-        $this->lastTypoLinkUrlOriginal = 'http://the-original.tld';
-
-        /** @var ContentObjectRenderer|MockObject $contentObjectRendererMock */
-        $contentObjectRendererMock = $this->createMock(ContentObjectRenderer::class);
-        $contentObjectRendererMock->lastTypoLinkUrl = $this->lastTypoLinkUrlOriginal;
-        return $contentObjectRendererMock;
-    }
-
-    protected function getTypoLinkParameterArray(string $typoLinkType = 'page', $tinyUrlEnabled = true): array
-    {
-        $linkText = '';
-        $linkDetails = [];
-
-        $this->typoLinkConfig = [
+    protected function getAfterLinkCreatedEvent(
+        string $typoLinkType = LinkService::TYPE_URL,
+        $tinyUrlEnabled = true,
+        $tinyUrlConfig = []
+    ): AfterLinkIsGeneratedEvent {
+        $this->linkInstructions = [
             'tinyurl' => $tinyUrlEnabled,
             'someother' => 'config',
         ];
-        $this->typoLinkConfigOriginal = $this->typoLinkConfig;
 
-        $this->finalTag = '<a href="' . $this->lastTypoLinkUrlOriginal . '">' . $this->lastTypoLinkUrlOriginal . '</a>';
-        $this->finalTagOriginal = $this->finalTag;
+        if ($tinyUrlConfig !== []) {
+            $this->linkInstructions['tinyurl.'] = $tinyUrlConfig;
+        }
 
-        $this->finalTagParts = [
-            'TYPE' => $typoLinkType,
-            'url' => $this->lastTypoLinkUrlOriginal,
-        ];
-        $this->finalTagPartsOriginal = $this->finalTagParts;
+        $link = new LinkResult($typoLinkType, self::TARGET_URL);
 
-        return [
-            'conf' => &$this->typoLinkConfig,
-            'linktxt' => $linkText,
-            'finalTag' => &$this->finalTag,
-            'finalTagParts' => &$this->finalTagParts,
-            'linkDetails' => $linkDetails,
-        ];
+        return new AfterLinkIsGeneratedEvent($link, $this->contentObjectRendererMock, $this->linkInstructions);
     }
 }

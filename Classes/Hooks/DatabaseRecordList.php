@@ -31,13 +31,14 @@ class DatabaseRecordList implements SingletonInterface
     /**
      * Cache for the URL display query.
      */
-    protected ?string $urlDisplayQuery = '';
+    protected ?string $urlDisplayQuery = null;
 
     public function __construct(private readonly UrlUtils $urlUtils)
     {
     }
 
-    public function __invoke(ModifyDatabaseQueryForRecordListingEvent $modifyQueryEvent): void {
+    public function __invoke(ModifyDatabaseQueryForRecordListingEvent $modifyQueryEvent): void
+    {
         if ($modifyQueryEvent->getTable() !== TinyUrlRepository::TABLE_URLS) {
             return;
         }
@@ -68,9 +69,7 @@ class DatabaseRecordList implements SingletonInterface
         }
 
         $quotedUrlParts = array_map(
-            function (string $urlPart) use ($queryBuilder) {
-                return $queryBuilder->quote($urlPart);
-            },
+            fn (string $urlPart) => $queryBuilder->quote($urlPart),
             $tinyUrlParts
         );
         $concatParts = [

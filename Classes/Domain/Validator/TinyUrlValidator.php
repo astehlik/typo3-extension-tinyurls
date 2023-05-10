@@ -21,8 +21,6 @@ class TinyUrlValidator implements ValidatorInterface
 
     /**
      * Returns the options of this validator which can be specified in the constructor.
-     *
-     * @return array
      */
     public function getOptions(): array
     {
@@ -38,8 +36,6 @@ class TinyUrlValidator implements ValidatorInterface
      * the Error Messages object which occurred.
      *
      * @param TinyUrl $value The value that should be validated
-     *
-     * @return Result
      */
     public function validate($value): Result
     {

@@ -31,8 +31,7 @@ class TceDataMap
     public function __construct(
         protected readonly TinyUrlRepository $tinyUrlRepository,
         protected readonly UrlUtils $urlUtils
-    )
-    {
+    ) {
     }
 
     /**
@@ -56,8 +55,7 @@ class TceDataMap
         int|string $recordId,
         array &$fieldArray,
         DataHandler $tcemain
-    ): void
-    {
+    ): void {
         if ($table !== TinyUrlRepository::TABLE_URLS) {
             return;
         }

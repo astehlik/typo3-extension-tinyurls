@@ -14,9 +14,11 @@ namespace Tx\Tinyurls\Domain\Repository;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
+use Tx\Tinyurls\Configuration\ExtensionConfiguration;
 use Tx\Tinyurls\Database\StoragePageQueryRestriction;
 use Tx\Tinyurls\Domain\Model\TinyUrl;
 use Tx\Tinyurls\Exception\TinyUrlNotFoundException;
+use Tx\Tinyurls\Utils\UrlUtils;
 use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\QueryBuilder;
@@ -24,7 +26,13 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class TinyUrlDoctrineRepository extends AbstractTinyUrlDatabaseRepository implements TinyUrlRepository
 {
-    protected ?ConnectionPool $databaseConnectionPool = null;
+    public function __construct(
+        private readonly ConnectionPool $databaseConnectionPool,
+        ExtensionConfiguration $extensionConfiguration,
+        UrlUtils $urlUtils
+    ) {
+        parent::__construct($extensionConfiguration, $urlUtils);
+    }
 
     /**
      * See: http://lists.typo3.org/pipermail/typo3-dev/2007-December/026936.html
@@ -136,11 +144,6 @@ class TinyUrlDoctrineRepository extends AbstractTinyUrlDatabaseRepository implem
             ->executeStatement();
     }
 
-    public function setDatabaseConnectionPool(ConnectionPool $databaseConnectionPool): void
-    {
-        $this->databaseConnectionPool = $databaseConnectionPool;
-    }
-
     public function updateTinyUrl(TinyUrl $tinyUrl): void
     {
         $this->prepareTinyUrlForUpdate($tinyUrl);
@@ -158,29 +161,18 @@ class TinyUrlDoctrineRepository extends AbstractTinyUrlDatabaseRepository implem
 
     protected function getDatabaseConnection(): Connection
     {
-        return $this->getDatabaseConnectionPool()
+        return $this->databaseConnectionPool
             ->getConnectionForTable(static::TABLE_URLS);
-    }
-
-    /**
-     * @codeCoverageIgnore
-     */
-    protected function getDatabaseConnectionPool(): ConnectionPool
-    {
-        if ($this->databaseConnectionPool === null) {
-            $this->databaseConnectionPool = GeneralUtility::makeInstance(ConnectionPool::class);
-        }
-        return $this->databaseConnectionPool;
     }
 
     protected function getQueryBuilder(): QueryBuilder
     {
-        $queryBuilder = $this->getDatabaseConnectionPool()
+        $queryBuilder = $this->databaseConnectionPool
             ->getQueryBuilderForTable(static::TABLE_URLS);
 
         $queryBuilder->getRestrictions()->removeAll();
 
-        $storagePid = $this->getExtensionConfiguration()->getUrlRecordStoragePid();
+        $storagePid = $this->extensionConfiguration->getUrlRecordStoragePid();
         $storagePageRestriction = GeneralUtility::makeInstance(StoragePageQueryRestriction::class, $storagePid);
         $queryBuilder->getRestrictions()->add($storagePageRestriction);
 

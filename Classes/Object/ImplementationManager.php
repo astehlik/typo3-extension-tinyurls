@@ -22,7 +22,7 @@ use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
- * @deprecated Use Service configuration instead.
+ * @deprecated use Service configuration instead
  */
 class ImplementationManager implements SingletonInterface
 {
@@ -40,7 +40,7 @@ class ImplementationManager implements SingletonInterface
     }
 
     /**
-     * @deprecated Will be removed in next major version, use Dependency Injection instead.
+     * @deprecated will be removed in next major version, use Dependency Injection instead
      */
     public static function getInstance(): self
     {
@@ -49,7 +49,8 @@ class ImplementationManager implements SingletonInterface
 
     /**
      * @codeCoverageIgnore
-     * @deprecated Will be removed in next major version, use Dependency Injection instead.
+     *
+     * @deprecated will be removed in next major version, use Dependency Injection instead
      */
     public function getTinyUrlRepository(): TinyUrlRepository
     {
@@ -60,7 +61,7 @@ class ImplementationManager implements SingletonInterface
     }
 
     /**
-     * @deprecated Will be removed in next major version, use Dependency Injection instead.
+     * @deprecated will be removed in next major version, use Dependency Injection instead
      */
     public function getTinyUrlRepositoryClass(): string
     {
@@ -69,7 +70,8 @@ class ImplementationManager implements SingletonInterface
 
     /**
      * @codeCoverageIgnore
-     * @deprecated Will be removed in next major version, use Dependency Injection instead.
+     *
+     * @deprecated will be removed in next major version, use Dependency Injection instead
      */
     public function getUrlKeyGenerator(): UrlKeyGenerator
     {
@@ -80,7 +82,7 @@ class ImplementationManager implements SingletonInterface
     }
 
     /**
-     * @deprecated Will be removed in next major version, use Dependency Injection instead.
+     * @deprecated will be removed in next major version, use Dependency Injection instead
      */
     public function getUrlKeyGeneratorClass(): string
     {
@@ -88,7 +90,7 @@ class ImplementationManager implements SingletonInterface
     }
 
     /**
-     * @deprecated Will be removed in next major version, use Dependency Injection instead.
+     * @deprecated will be removed in next major version, use Dependency Injection instead
      */
     public function restoreDefaults(): void
     {
@@ -100,7 +102,7 @@ class ImplementationManager implements SingletonInterface
     }
 
     /**
-     * @deprecated Will be removed in next major version, use Dependency Injection instead.
+     * @deprecated will be removed in next major version, use Dependency Injection instead
      */
     public function setTinyUrlRepository(TinyUrlRepository $tinyUrlRepository): void
     {
@@ -108,7 +110,7 @@ class ImplementationManager implements SingletonInterface
     }
 
     /**
-     * @deprecated Will be removed in next major version, use Dependency Injection instead.
+     * @deprecated will be removed in next major version, use Dependency Injection instead
      */
     public function setTinyUrlRepositoryClass(string $tinyUrlRepositoryClass): void
     {
@@ -117,7 +119,7 @@ class ImplementationManager implements SingletonInterface
     }
 
     /**
-     * @deprecated Will be removed in next major version, use Dependency Injection instead.
+     * @deprecated will be removed in next major version, use Dependency Injection instead
      */
     public function setUrlKeyGenerator(UrlKeyGenerator $urlKeyGenerator): void
     {
@@ -125,7 +127,7 @@ class ImplementationManager implements SingletonInterface
     }
 
     /**
-     * @deprecated Will be removed in next major version, use Dependency Injection instead.
+     * @deprecated will be removed in next major version, use Dependency Injection instead
      */
     public function setUrlKeyGeneratorClass(string $urlKeyGeneratorClass): void
     {

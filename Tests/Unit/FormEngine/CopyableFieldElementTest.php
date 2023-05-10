@@ -62,7 +62,7 @@ class CopyableFieldElementTest extends TestCase
         $this->formFieldViewMock
             ->expects(self::exactly(2))
             ->method('assign')
-            ->willReturnCallback(fn(string $name, string $value) => match (true) {
+            ->willReturnCallback(fn (string $name, string $value) => match (true) {
                 $name === 'fieldValue' && $value === 'testval' => 1,
                 $name === 'clipboardIcon' && $value === 'icon html' => 2,
                 default => throw new \LogicException('Unexpected name or value: ' . $name . ' ' . $value),
