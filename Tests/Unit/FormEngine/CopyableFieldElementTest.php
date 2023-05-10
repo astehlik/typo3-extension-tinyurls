@@ -14,7 +14,6 @@ namespace Tx\Tinyurls\Tests\Unit\FormEngine;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
-use DMS\PHPUnitExtensions\ArraySubset\ArraySubsetAsserts;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Tx\Tinyurls\FormEngine\CopyableFieldElement;
@@ -26,27 +25,13 @@ use TYPO3\CMS\Fluid\View\StandaloneView;
 
 class CopyableFieldElementTest extends TestCase
 {
-    use ArraySubsetAsserts;
+    private CopyableFieldElement $copyableFieldElement;
 
-    /**
-     * @var CopyableFieldElement
-     */
-    private $copyableFieldElement;
+    private StandaloneView|MockObject $formFieldViewMock;
 
-    /**
-     * @var MockObject|StandaloneView
-     */
-    private $formFieldViewMock;
+    private GeneralUtilityWrapper|MockObject $generalUtilityWrapperMock;
 
-    /**
-     * @var GeneralUtilityWrapper|MockObject
-     */
-    private $generalUtilityWrapperMock;
-
-    /**
-     * @var IconFactory|MockObject
-     */
-    private $iconFactoryMock;
+    private MockObject|IconFactory $iconFactoryMock;
 
     protected function setUp(): void
     {
@@ -72,31 +57,16 @@ class CopyableFieldElementTest extends TestCase
         $this->copyableFieldElement->render();
     }
 
-    public function testRenderAssignsClipboardIconToTemplate(): void
+    public function testRenderAssignsExpectedVariablesToTemplate(): void
     {
-        $this->formFieldViewMock->expects(self::atLeast(1))
+        $this->formFieldViewMock
+            ->expects(self::exactly(2))
             ->method('assign')
-            ->withConsecutive(
-                [],
-                [
-                    'clipboardIcon',
-                    'icon html',
-                ]
-            );
-
-        $this->copyableFieldElement->render();
-    }
-
-    public function testRenderAssignsFieldValueToTemplate(): void
-    {
-        $this->formFieldViewMock->expects(self::atLeast(1))
-            ->method('assign')
-            ->withConsecutive(
-                [
-                    'fieldValue',
-                    'testval',
-                ]
-            );
+            ->willReturnCallback(fn(string $name, string $value) => match (true) {
+                $name === 'fieldValue' && $value === 'testval' => 1,
+                $name === 'clipboardIcon' && $value === 'icon html' => 2,
+                default => throw new \LogicException('Unexpected name or value: ' . $name . ' ' . $value),
+            });
 
         $this->copyableFieldElement->render();
     }
@@ -134,19 +104,17 @@ class CopyableFieldElementTest extends TestCase
 
     public function testRenderLoadsAdditionalLanguageLabels(): void
     {
-        self::assertArraySubset(
-            [
-                'additionalInlineLanguageLabelFiles' => ['EXT:tinyurls/Resources/Private/Language/locallang_db_js.xlf'],
-            ],
-            $this->copyableFieldElement->render()
+        self::assertSame(
+            ['EXT:tinyurls/Resources/Private/Language/locallang_db_js.xlf'],
+            $this->copyableFieldElement->render()['additionalInlineLanguageLabelFiles']
         );
     }
 
     public function testRenderLoadsCopyToClipboardJsModule(): void
     {
-        self::assertArraySubset(
-            ['requireJsModules' => ['TYPO3/CMS/Tinyurls/CopyToClipboard']],
-            $this->copyableFieldElement->render()
+        self::assertSame(
+            ['TYPO3/CMS/Tinyurls/CopyToClipboard'],
+            $this->copyableFieldElement->render()['requireJsModules']
         );
     }
 
@@ -170,28 +138,19 @@ class CopyableFieldElementTest extends TestCase
         $this->copyableFieldElement->setFormFieldView($this->createFormFieldViewMock());
     }
 
-    /**
-     * @return MockObject|StandaloneView
-     */
-    private function createFormFieldViewMock(): StandaloneView
+    private function createFormFieldViewMock(): MockObject|StandaloneView
     {
         $this->formFieldViewMock = $this->createMock(StandaloneView::class);
         return $this->formFieldViewMock;
     }
 
-    /**
-     * @return GeneralUtilityWrapper|MockObject
-     */
-    private function getGeneralUtilityWrapperMock(): GeneralUtilityWrapper
+    private function getGeneralUtilityWrapperMock(): GeneralUtilityWrapper|MockObject
     {
         $this->generalUtilityWrapperMock = $this->createMock(GeneralUtilityWrapper::class);
         return $this->generalUtilityWrapperMock;
     }
 
-    /**
-     * @return IconFactory|MockObject
-     */
-    private function getIconFactoryMock(): IconFactory
+    private function getIconFactoryMock(): IconFactory|MockObject
     {
         $iconFactoryMock = $this->createMock(IconFactory::class);
         $iconMock = $this->createMock(Icon::class);
@@ -201,10 +160,7 @@ class CopyableFieldElementTest extends TestCase
         return $this->iconFactoryMock;
     }
 
-    /**
-     * @return MockObject|NodeFactory
-     */
-    private function getNodeFactoryMock(): NodeFactory
+    private function getNodeFactoryMock(): MockObject|NodeFactory
     {
         return $this->createMock(NodeFactory::class);
     }
