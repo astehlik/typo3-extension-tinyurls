@@ -2,27 +2,15 @@
 
 /** @noinspection PhpFullyQualifiedNameUsageInspection */
 
-if (!defined('TYPO3_MODE')) {
-    die('Access denied.');
-}
+defined('TYPO3') or die();
 
 // Register the eID processor.
 $GLOBALS['TYPO3_CONF_VARS']['FE']['eID_include']['tx_tinyurls'] =
     \Tx\Tinyurls\Controller\EidController::class . '::tinyUrlRedirect';
 
-// Register the hook for converting typolinks to tinyurls.
-$GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['tslib/class.tslib_content.php']['typoLink_PostProc']['tx_tinyurls'] =
-    \Tx\Tinyurls\Hooks\TypoLink::class . '->convertTypolinkToTinyUrl';
-
 // Register the TYPO3 Backend hook class.
 $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['t3lib/class.t3lib_tcemain.php']['processDatamapClass'][] =
     Tx\Tinyurls\Hooks\TceDataMap::class;
-
-// Modify the rendering of the list module.
-$databaseRecordList = \TYPO3\CMS\Recordlist\RecordList\DatabaseRecordList::class;
-$GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS'][$databaseRecordList]['modifyQuery']['tx_tinyurls'] =
-    \Tx\Tinyurls\Hooks\DatabaseRecordList::class;
-unset($databaseRecordList);
 
 $GLOBALS['TYPO3_CONF_VARS']['SYS']['formEngine']['nodeRegistry'][1460107841] = [
     'nodeName' => 'tx_tinyurls_copyable_field',
