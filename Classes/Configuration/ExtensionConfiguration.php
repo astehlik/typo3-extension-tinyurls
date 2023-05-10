@@ -18,7 +18,6 @@ use Tx\Tinyurls\TinyUrl\TinyUrlGenerator;
 use TYPO3\CMS\Core\Configuration\ExtensionConfiguration as TYPO3ExtensionConfiguration;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
 
 /**
  * Contains utilities for getting configuration.
@@ -43,6 +42,10 @@ class ExtensionConfiguration implements SingletonInterface
     ];
 
     protected ?TypoScriptConfigurator $typoScriptConfigurator = null;
+
+    public function __construct(protected readonly TYPO3ExtensionConfiguration $typo3extensionConfiguration)
+    {
+    }
 
     /**
      * Appends a PID query to the given where statement.
@@ -72,17 +75,6 @@ class ExtensionConfiguration implements SingletonInterface
         return (string)$this->getExtensionConfigurationValueInternal('base62Dictionary');
     }
 
-    /**
-     * Returns the extension configuration.
-     *
-     * @deprecated please use the matching getter for retrieving a config value
-     */
-    public function getExtensionConfiguration(): array
-    {
-        $this->initializeExtensionConfiguration();
-        return $this->extensionConfiguration;
-    }
-
     public function getMinimalRandomKeyLength(): int
     {
         return (int)$this->getExtensionConfigurationValueInternal('minimalRandomKeyLength');
@@ -101,21 +93,6 @@ class ExtensionConfiguration implements SingletonInterface
     public function getUrlRecordStoragePid(): int
     {
         return (int)$this->getExtensionConfigurationValueInternal('urlRecordStoragePID');
-    }
-
-    /**
-     * Initializes the tinyurl configuration with default values and
-     * if the user set his own values they are parsed through stdWrap.
-     *
-     * @deprecated please use the TypoScriptConfigurator class instead
-     */
-    public function initializeConfigFromTyposcript(
-        array $config,
-        ContentObjectRenderer $contentObject,
-        TinyUrlGenerator $tinyUrlGenerator
-    ): void {
-        $typoScriptConfigurator = $this->getTypoScriptConfigurator($tinyUrlGenerator);
-        $typoScriptConfigurator->initializeConfigFromTyposcript($config, $contentObject);
     }
 
     public function setTypoScriptConfigurator(TypoScriptConfigurator $typoScriptConfigurator): void
@@ -174,7 +151,6 @@ class ExtensionConfiguration implements SingletonInterface
 
     private function loadExtensionConfiguration(): array
     {
-        $extensionConfiguration = GeneralUtility::makeInstance(TYPO3ExtensionConfiguration::class);
-        return $extensionConfiguration->get('tinyurls');
+        return $this->typo3extensionConfiguration->get('tinyurls');
     }
 }
