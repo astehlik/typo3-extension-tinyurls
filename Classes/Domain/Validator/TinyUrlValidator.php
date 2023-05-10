@@ -14,22 +14,16 @@ use TYPO3\CMS\Extbase\Validation\Validator\ValidatorInterface;
 
 class TinyUrlValidator implements ValidatorInterface
 {
-    /**
-     * @var Result
-     */
-    protected $result;
+    protected Result $result;
 
-    /**
-     * @var TinyUrlRepository
-     */
-    protected $tinyUrlRepository;
+    protected ?TinyUrlRepository $tinyUrlRepository = null;
 
     /**
      * Returns the options of this validator which can be specified in the constructor.
      *
      * @return array
      */
-    public function getOptions()
+    public function getOptions(): array
     {
         return [];
     }
@@ -47,7 +41,7 @@ class TinyUrlValidator implements ValidatorInterface
      *
      * @return Result
      */
-    public function validate($value)
+    public function validate($value): Result
     {
         $this->result = new Result();
 
@@ -99,5 +93,9 @@ class TinyUrlValidator implements ValidatorInterface
             $error = new Error('The validUntil DateTime must not be in the past.', 1488307858);
             $this->result->forProperty('validUntil')->addError($error);
         }
+    }
+
+    public function setOptions(array $options): void
+    {
     }
 }
