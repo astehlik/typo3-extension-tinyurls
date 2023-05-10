@@ -67,6 +67,7 @@ jobs:
         with:
           php_version: ${{ matrix.php_version }}
       - run: |
+          ln -s .Build/Web/typo3conf/ext
           bash .Build/bin/t3_run_tests.sh -s unit -p ${{ matrix.php_version }}
 
   "php-functional-tests-sqlite-82":
@@ -78,6 +79,7 @@ jobs:
         with:
           php_version: "${{ env.MAIN_PHP_VERSION }}"
       - run: |
+          ln -s .Build/Web/typo3conf/ext
           bash .Build/bin/t3_run_tests.sh -s functional -d sqlite -p ${{ env.MAIN_PHP_VERSION }}
 
   "php-functional-tests-mariadb-main":
@@ -89,6 +91,7 @@ jobs:
         with:
           php_version: ${{ env.MAIN_PHP_VERSION }}
       - run: |
+          ln -s .Build/Web/typo3conf/ext
           bash .Build/bin/t3_run_tests.sh -s functional -p ${{ env.MAIN_PHP_VERSION }}
 
   "php-lint":
