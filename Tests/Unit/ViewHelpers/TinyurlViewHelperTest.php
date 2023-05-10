@@ -90,7 +90,9 @@ class TinyurlViewHelperTest extends UnitTestCase
     {
         $this->tinyUrlGeneratorMock->expects(self::once())
             ->method('generateTinyUrl')
-            ->with(self::callback(fn (TinyUrl $tinyUrl): bool => $tinyUrl->getValidUntil()->getTimestamp() === 3848909));
+            ->with(
+                self::callback(fn (TinyUrl $tinyUrl): bool => $tinyUrl->getValidUntil()->getTimestamp() === 3848909)
+            );
 
         $arguments = [
             'url' => 'http://the-url.tld',
