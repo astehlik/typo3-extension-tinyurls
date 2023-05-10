@@ -12,7 +12,7 @@ jobs:
     name: "Composer validate"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: ./.github/workflows/composer
         with:
           php_version: "${{ env.MAIN_PHP_VERSION }}"
@@ -23,7 +23,7 @@ jobs:
     name: "Composer normalize"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: ./.github/workflows/composer
         with:
           php_version: "${{ env.MAIN_PHP_VERSION }}"
@@ -34,7 +34,7 @@ jobs:
     name: "PHP_CodeSniffer check"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: ./.github/workflows/composer
         with:
           php_version: "${{ env.MAIN_PHP_VERSION }}"
@@ -48,7 +48,7 @@ jobs:
     name: "PHP CS Fixer check"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: ./.github/workflows/composer
         with:
           php_version: "8.1"
@@ -62,7 +62,7 @@ jobs:
         php_version: ["8.1", "8.2"]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: ./.github/workflows/composer
         with:
           php_version: ${{ matrix.php_version }}
@@ -73,7 +73,7 @@ jobs:
     name: "Functional tests on SQLite"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: ./.github/workflows/composer
         with:
           php_version: "${{ env.MAIN_PHP_VERSION }}"
@@ -84,7 +84,7 @@ jobs:
     name: "Functional tests on MariaDB"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: ./.github/workflows/composer
         with:
           php_version: ${{ env.MAIN_PHP_VERSION }}
@@ -98,7 +98,7 @@ jobs:
         php_version: ["8.1", "8.2"]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: ./.github/workflows/composer
         with:
           php_version: ${{ matrix.php_version }}
@@ -110,7 +110,7 @@ jobs:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/develop'
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: ./.github/workflows/composer
         with:
           php_version: ${{ env.MAIN_PHP_VERSION }}
@@ -127,7 +127,7 @@ jobs:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/develop'
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: ./.github/workflows/composer
         with:
           php_version: ${{ env.MAIN_PHP_VERSION }}
@@ -149,7 +149,7 @@ jobs:
     env:
       CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: actions/download-artifact@v3
         with:
           name: coverage-phpunit
@@ -172,7 +172,7 @@ jobs:
     name: "Scan for deprecated and breaking code using typo3scan"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: ./.github/workflows/composer
         with:
           php_version: "${{ env.MAIN_PHP_VERSION }}"
