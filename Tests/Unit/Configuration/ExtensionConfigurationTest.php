@@ -91,14 +91,6 @@ class ExtensionConfigurationTest extends TestCase
         self::assertArrayHasKey('createSpeakingURLs', $this->extensionConfiguration->getExtensionConfiguration());
     }
 
-    public function testGetExtensionConfigurationValueThrowsExceptionForNonExistingKey(): void
-    {
-        $this->expectExceptionMessage('The key a non existing key does not exists in the extension configuration');
-
-        /** @noinspection PhpDeprecationInspection */
-        $this->extensionConfiguration->getExtensionConfigurationValue('a non existing key');
-    }
-
     public function testGetMinimalRandomKeyLengthReturnsConfiguredValue(): void
     {
         $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['tinyurls']['base62Dictionary'] = 'asdf';

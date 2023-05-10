@@ -83,22 +83,6 @@ class ExtensionConfiguration implements SingletonInterface
         return $this->extensionConfiguration;
     }
 
-    /**
-     * Returns an extension configuration value.
-     *
-     * @param string $key the configuration key
-     *
-     * @return mixed the configuration value
-     *
-     * @throws \InvalidArgumentException if the configuration key does not exist
-     *
-     * @deprecated please use the matching getter for retrieving the config value
-     */
-    public function getExtensionConfigurationValue(string $key)
-    {
-        return $this->getExtensionConfigurationValueInternal($key);
-    }
-
     public function getMinimalRandomKeyLength(): int
     {
         return (int)$this->getExtensionConfigurationValueInternal('minimalRandomKeyLength');
