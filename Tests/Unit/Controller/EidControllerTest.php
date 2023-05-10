@@ -32,20 +32,11 @@ use TYPO3\CMS\Frontend\Controller\ErrorController;
  */
 class EidControllerTest extends TestCase
 {
-    /**
-     * @var EidController
-     */
-    protected $eidController;
+    protected EidController $eidController;
 
-    /**
-     * @var ErrorController|MockObject
-     */
-    protected $errorControllerMock;
+    protected MockObject|ErrorController $errorControllerMock;
 
-    /**
-     * @var MockObject|TinyUrlRepository
-     */
-    protected $tinyUrlRepositoryMock;
+    protected TinyUrlRepository|MockObject $tinyUrlRepositoryMock;
 
     protected function setUp(): void
     {

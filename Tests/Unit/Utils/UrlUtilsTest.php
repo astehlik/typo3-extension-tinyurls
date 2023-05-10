@@ -27,20 +27,11 @@ use Tx\Tinyurls\Utils\UrlUtils;
  */
 class UrlUtilsTest extends TestCase
 {
-    /**
-     * @var ExtensionConfiguration|MockObject
-     */
-    protected $extensionConfigurationMock;
+    protected ExtensionConfiguration|MockObject $extensionConfigurationMock;
 
-    /**
-     * @var GeneralUtilityWrapper|MockObject
-     */
-    protected $generalUtilityMock;
+    protected GeneralUtilityWrapper|MockObject $generalUtilityMock;
 
-    /**
-     * @var UrlUtils
-     */
-    protected $urlUtils;
+    protected UrlUtils $urlUtils;
 
     protected function setUp(): void
     {

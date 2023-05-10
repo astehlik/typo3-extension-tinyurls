@@ -14,7 +14,6 @@ namespace Tx\Tinyurls\Tests\Unit\Hooks;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
-use DMS\PHPUnitExtensions\ArraySubset\ArraySubsetAsserts;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Tx\Tinyurls\Domain\Model\TinyUrl;
@@ -25,17 +24,9 @@ use TYPO3\CMS\Core\DataHandling\DataHandler;
 
 class TceDataMapTest extends TestCase
 {
-    use ArraySubsetAsserts;
+    protected TceDataMap $tceDataMapHook;
 
-    /**
-     * @var TceDataMap
-     */
-    protected $tceDataMapHook;
-
-    /**
-     * @var MockObject|TinyUrlRepository
-     */
-    protected $tinyUrlRepositoryMock;
+    protected TinyUrlRepository|MockObject $tinyUrlRepositoryMock;
 
     protected function setUp(): void
     {
@@ -203,10 +194,7 @@ class TceDataMapTest extends TestCase
         self::assertSame($fieldArrayOriginal, $fieldArray);
     }
 
-    /**
-     * @return DataHandler|MockObject
-     */
-    protected function getDataHandlerMock()
+    private function getDataHandlerMock(): DataHandler|MockObject
     {
         return $this->createMock(DataHandler::class);
     }
