@@ -14,7 +14,8 @@ namespace Tx\Tinyurls\Domain\Model;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
-use Tx\Tinyurls\Object\ImplementationManager;
+use Tx\Tinyurls\Utils\UrlUtils;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class TinyUrl
 {
@@ -26,7 +27,7 @@ class TinyUrl
 
     protected bool $deleteOnUse = false;
 
-    protected int $pid;
+    protected int $pid = 0;
 
     protected string $targetUrl = '';
 
@@ -34,13 +35,13 @@ class TinyUrl
 
     protected string $targetUrlHashOriginal = '';
 
-    protected \DateTime $tstamp;
+    protected \DateTimeInterface $tstamp;
 
     protected int $uid = 0;
 
     protected string $urlkey = '';
 
-    protected ?\DateTime $validUntil = null;
+    protected ?\DateTimeInterface $validUntil = null;
 
     public static function createFromDatabaseRow(array $databaseRow): self
     {
@@ -116,7 +117,7 @@ class TinyUrl
         return $this->targetUrlHash;
     }
 
-    public function getTstamp(): \DateTime
+    public function getTstamp(): \DateTimeInterface
     {
         return $this->tstamp;
     }
@@ -131,7 +132,7 @@ class TinyUrl
         return $this->urlkey;
     }
 
-    public function getValidUntil(): \DateTime
+    public function getValidUntil(): \DateTimeInterface
     {
         return $this->validUntil;
     }
@@ -177,18 +178,29 @@ class TinyUrl
         if ($this->hasCustomUrlKey()) {
             $this->urlkey = $this->getCustomUrlKey();
         }
-        $this->tstamp = new \DateTime();
+        $this->tstamp = new \DateTimeImmutable();
     }
 
+    /**
+     * @codeCoverageIgnore
+     *
+     * @deprecated Will be removed in the next major version. Use UrlKeyGenerator instance directly instead.
+     */
     public function regenerateUrlKey(): void
     {
-        $tinyUrlKeyGenerator = ImplementationManager::getInstance()->getUrlKeyGenerator();
-        $this->urlkey = $tinyUrlKeyGenerator->generateTinyurlKeyForTinyUrl($this);
+        /** @var UrlUtils $urlUtils */
+        $urlUtils = GeneralUtility::makeInstance(UrlUtils::class);
+        $urlUtils->regenerateUrlKey($this);
     }
 
     public function resetCustomUrlKey(): void
     {
         $this->customUrlKey = null;
+    }
+
+    public function resetValidUntil(): void
+    {
+        $this->validUntil = null;
     }
 
     public function setComment(string $comment): void
@@ -207,6 +219,11 @@ class TinyUrl
         $this->customUrlKey = $customUrlKey;
     }
 
+    public function setGeneratedUrlKey(string $urlkey): void
+    {
+        $this->urlkey = $urlkey;
+    }
+
     public function setPid(int $pid): void
     {
         $this->pid = $pid;
@@ -217,7 +234,7 @@ class TinyUrl
         $this->targetUrl = $targetUrl;
     }
 
-    public function setValidUntil(\DateTime $validUntil): void
+    public function setValidUntil(\DateTimeInterface $validUntil): void
     {
         $this->validUntil = $validUntil;
     }
@@ -226,7 +243,7 @@ class TinyUrl
     {
         $this->uid = (int)$databaseRow['uid'];
         $this->pid = (int)$databaseRow['pid'];
-        $this->tstamp = new \DateTime('@' . (int)$databaseRow['tstamp']);
+        $this->tstamp = new \DateTimeImmutable('@' . (int)$databaseRow['tstamp']);
         $this->counter = (int)$databaseRow['counter'];
         $this->comment = (string)$databaseRow['comment'];
         $this->urlkey = (string)$databaseRow['urlkey'];
@@ -235,7 +252,7 @@ class TinyUrl
         $this->targetUrlHashOriginal = (string)$databaseRow['target_url_hash'];
         $this->deleteOnUse = (bool)$databaseRow['delete_on_use'];
         $this->validUntil = (int)$databaseRow['valid_until'] !== 0
-            ? new \DateTime('@' . (int)$databaseRow['valid_until'])
+            ? new \DateTimeImmutable('@' . (int)$databaseRow['valid_until'])
             : null;
     }
 
