@@ -61,7 +61,8 @@ return [
             'config' => [
                 'type' => 'input',
                 'size' => 50,
-                'eval' => 'required,trim,nospace,unique',
+                'required' => true,
+                'eval' => 'trim,nospace,unique',
             ],
         ],
         'target_url_hash' => [
@@ -70,7 +71,7 @@ return [
             'config' => [
                 'type' => 'input',
                 'size' => 30,
-                'eval' => 'required',
+                'required' => true,
                 'readOnly' => 1,
             ],
         ],
@@ -85,9 +86,8 @@ return [
         'valid_until' => [
             'label' => $languagePrefix . 'valid_until',
             'config' => [
-                'type' => 'input',
-                'renderType' => 'inputDateTime',
-                'eval' => 'datetime,int',
+                'type' => 'datetime',
+                'format' => 'datetime',
                 'default' => 0,
             ],
         ],
