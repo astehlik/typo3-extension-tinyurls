@@ -46,5 +46,8 @@ jobs:
       - name: Install tailor
         run: composer global require typo3/tailor --prefer-dist --no-progress --no-suggest
 
+      - name: Cleanup repository for TER upload
+        run: touch ready_for_release.txt && bash Build/cleanup_for_ter.sh
+
       - name: Publish to TER
         run: php ~/.composer/vendor/bin/tailor ter:publish --comment "${{ env.comment }}" ${{ env.version }}
