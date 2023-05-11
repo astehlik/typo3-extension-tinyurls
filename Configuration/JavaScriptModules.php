@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 return [
     // required import configurations of other extensions,
     // in case a module imports from another package
