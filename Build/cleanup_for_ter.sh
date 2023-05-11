@@ -15,4 +15,6 @@ rm -Rf .git
 rm -Rf .github
 rm -Rf Build
 rm -f .gitignore
+rm -Rf Tests
+rm -Rf typo3temp
 rm ready_for_release.txt
