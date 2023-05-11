@@ -14,35 +14,29 @@ namespace Tx\Tinyurls\Tests\Unit\Hooks;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
-use DMS\PHPUnitExtensions\ArraySubset\ArraySubsetAsserts;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Tx\Tinyurls\Domain\Model\TinyUrl;
 use Tx\Tinyurls\Domain\Repository\TinyUrlRepository;
 use Tx\Tinyurls\Exception\TinyUrlNotFoundException;
 use Tx\Tinyurls\Hooks\TceDataMap;
+use Tx\Tinyurls\Utils\UrlUtils;
 use TYPO3\CMS\Core\DataHandling\DataHandler;
 
 class TceDataMapTest extends TestCase
 {
-    use ArraySubsetAsserts;
+    private TceDataMap $tceDataMapHook;
 
-    /**
-     * @var TceDataMap
-     */
-    protected $tceDataMapHook;
+    private TinyUrlRepository|MockObject $tinyUrlRepositoryMock;
 
-    /**
-     * @var MockObject|TinyUrlRepository
-     */
-    protected $tinyUrlRepositoryMock;
+    private UrlUtils|MockObject $urlUtilsMock;
 
     protected function setUp(): void
     {
         $this->tinyUrlRepositoryMock = $this->createMock(TinyUrlRepository::class);
+        $this->urlUtilsMock = $this->createMock(UrlUtils::class);
 
-        $this->tceDataMapHook = new TceDataMap();
-        $this->tceDataMapHook->injectTinyUrlRepository($this->tinyUrlRepositoryMock);
+        $this->tceDataMapHook = new TceDataMap($this->tinyUrlRepositoryMock, $this->urlUtilsMock);
     }
 
     public function testDoesNotRegenerateKeyForExistingUnchangedRecord(): void
@@ -71,7 +65,7 @@ class TceDataMapTest extends TestCase
 
     public function testGeneratesHashForChangedUrl(): void
     {
-        $fieldArray = $fieldArrayOriginal = ['the field' => 'the value'];
+        $fieldArray = ['the field' => 'the value'];
         $tinyUrlMock = $this->createMock(TinyUrl::class);
         $tinyUrlMock->method('getTargetUrlHasChanged')->willReturn(true);
         $tinyUrlMock->method('getTargetUrlHash')->willReturn('the new hash');
@@ -92,7 +86,7 @@ class TceDataMapTest extends TestCase
             $this->getDataHandlerMock()
         );
 
-        self::assertArraySubset(['target_url_hash' => 'the new hash'], $fieldArray);
+        self::assertSame('the new hash', $fieldArray['target_url_hash']);
     }
 
     public function testGeneratesKeyForChangedUrl(): void
@@ -103,8 +97,9 @@ class TceDataMapTest extends TestCase
         $tinyUrlMock->method('getTargetUrlHasChanged')->willReturn(true);
         $tinyUrlMock->method('getUrlKey')->willReturn('the new key');
 
-        $tinyUrlMock->expects(self::once())
-            ->method('regenerateUrlKey');
+        $this->urlUtilsMock->expects(self::once())
+            ->method('regenerateUrlKey')
+            ->with($tinyUrlMock);
 
         $this->tinyUrlRepositoryMock->expects(self::once())
             ->method('findTinyUrlByUid')
@@ -122,7 +117,7 @@ class TceDataMapTest extends TestCase
             $this->getDataHandlerMock()
         );
 
-        self::assertArraySubset(['urlkey' => 'the new key'], $fieldArray);
+        self::assertSame('the new key', $fieldArray['urlkey']);
     }
 
     public function testGeneratesKeyForNewRecord(): void
@@ -134,7 +129,7 @@ class TceDataMapTest extends TestCase
         $tinyUrlMock->method('getTargetUrlHasChanged')->willReturn(true);
         $tinyUrlMock->method('getUrlKey')->willReturn('the key');
 
-        $tinyUrlMock->expects(self::once())
+        $this->urlUtilsMock->expects(self::once())
             ->method('regenerateUrlKey');
 
         $this->tinyUrlRepositoryMock->expects(self::once())
@@ -156,7 +151,8 @@ class TceDataMapTest extends TestCase
             $dataHandlerMock
         );
 
-        self::assertArraySubset(['target_url_hash' => 'the hash', 'urlkey' => 'the key'], $fieldArray);
+        self::assertSame('the hash', $fieldArray['target_url_hash']);
+        self::assertSame('the key', $fieldArray['urlkey']);
     }
 
     public function testSkippsProcessingForNonTinyUrlTable(): void
@@ -202,10 +198,7 @@ class TceDataMapTest extends TestCase
         self::assertSame($fieldArrayOriginal, $fieldArray);
     }
 
-    /**
-     * @return DataHandler|MockObject
-     */
-    protected function getDataHandlerMock()
+    private function getDataHandlerMock(): DataHandler|MockObject
     {
         return $this->createMock(DataHandler::class);
     }

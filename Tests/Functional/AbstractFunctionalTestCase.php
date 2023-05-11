@@ -11,13 +11,15 @@ use TYPO3\TestingFramework\Core\Functional\FunctionalTestCase;
 
 abstract class AbstractFunctionalTestCase extends FunctionalTestCase
 {
+    protected array $testExtensionsToLoad = ['typo3conf/ext/tinyurls'];
+
     protected function getTinyUrlRow(): array
     {
         $builder = $this->getConnectionPool()->getQueryBuilderForTable('tx_tinyurls_urls');
         $builder->select('*')
             ->from('tx_tinyurls_urls')
             ->where($builder->expr()->eq('uid', $builder->createNamedParameter(1, \PDO::PARAM_INT)));
-        return $builder->execute()->fetchAssociative();
+        return $builder->executeQuery()->fetchAssociative();
     }
 
     /**
@@ -67,9 +69,14 @@ abstract class AbstractFunctionalTestCase extends FunctionalTestCase
         $fileName = $this->instancePath . '/typo3conf/sites/testing/config.yaml';
         GeneralUtility::writeFile($fileName, $yamlFileContents);
         // Ensure that no other site configuration was cached before
-        $cache = GeneralUtility::makeInstance(CacheManager::class)->getCache('core');
+        $cache = $this->getCacheManager()->getCache('core');
         if ($cache->has('site-configuration')) {
             $cache->remove('site-configuration');
         }
+    }
+
+    private function getCacheManager(): CacheManager
+    {
+        return GeneralUtility::makeInstance(CacheManager::class);
     }
 }

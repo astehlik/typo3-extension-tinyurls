@@ -23,25 +23,19 @@ use Tx\Tinyurls\Exception\TinyUrlNotFoundException;
 
 class TinyUrlValidatorTest extends TestCase
 {
-    /**
-     * @var MockObject|TinyUrlRepository
-     */
-    protected $tinyUrlRepositoryMock;
+    private TinyUrlRepository|MockObject $tinyUrlRepositoryMock;
 
-    /**
-     * @var TinyUrlValidator
-     */
-    protected $tinyUrlValidator;
+    private TinyUrlValidator $tinyUrlValidator;
 
     protected function setUp(): void
     {
         $this->tinyUrlRepositoryMock = $this->createMock(TinyUrlRepository::class);
-        $this->tinyUrlValidator = new TinyUrlValidator();
-        $this->tinyUrlValidator->injectTinyUrlRepository($this->tinyUrlRepositoryMock);
+        $this->tinyUrlValidator = new TinyUrlValidator($this->tinyUrlRepositoryMock);
     }
 
     public function testGetOptionsReturnsEmptyArray(): void
     {
+        // @extensionScannerIgnoreLine
         self::assertSame([], $this->tinyUrlValidator->getOptions());
     }
 

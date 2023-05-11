@@ -10,13 +10,12 @@
         }
     ],
     "require": {
-        "php": "^7.4 || ^8.0",
-        "typo3/cms-core": "^11.5"
+        "php": "^8.1",
+        "typo3/cms-core": "^12.3"
     },
     "require-dev": {
         "de-swebhosting/php-codestyle": "^4.0",
-        "de-swebhosting/typo3-extension-buildtools": "dev-TYPO3_11",
-        "dms/phpunit-arraysubset-asserts": "^0.4",
+        "de-swebhosting/typo3-extension-buildtools": "dev-TYPO3_12",
         "ergebnis/composer-normalize": "^2.28",
         "friendsofphp/php-cs-fixer": "^3.14",
         "michielroos/typo3scan": "^1.7",
@@ -47,7 +46,6 @@
             "always-add-alias-loader": true
         },
         "typo3/cms": {
-            "app-dir": ".Build",
             "extension-key": "tinyurls",
             "web-dir": ".Build/Web"
         }

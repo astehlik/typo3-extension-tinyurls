@@ -12,7 +12,7 @@ jobs:
     name: "Composer validate"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: ./.github/workflows/composer
         with:
           php_version: "${{ env.MAIN_PHP_VERSION }}"
@@ -23,7 +23,7 @@ jobs:
     name: "Composer normalize"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: ./.github/workflows/composer
         with:
           php_version: "${{ env.MAIN_PHP_VERSION }}"
@@ -31,10 +31,10 @@ jobs:
           bash .Build/bin/t3_run_tests.sh -s composerNormalize -n -p ${{ env.MAIN_PHP_VERSION }}
 
   "check-codestyle-codesniffer":
-    name: "PHP code style check"
+    name: "PHP_CodeSniffer check"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: ./.github/workflows/composer
         with:
           php_version: "${{ env.MAIN_PHP_VERSION }}"
@@ -45,24 +45,24 @@ jobs:
           bash .Build/bin/t3_check_codestyle.sh PSRTinyurls
 
   "check-codestyle-php-cs-fixer":
-    name: "PHP code style check"
+    name: "PHP CS Fixer check"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: ./.github/workflows/composer
         with:
           php_version: "8.1"
       - run: |
-          bash .Build/bin/t3_run_tests.sh -s cgl -n -p 8.1
+          bash .Build/bin/t3_run_tests.sh -s cgl -n -p ${{ env.MAIN_PHP_VERSION }}
 
   "php-unit-tests":
     name: "PHP Unit tests"
     strategy:
       matrix:
-        php_version: ["7.4", "8.2"]
+        php_version: ["8.1", "8.2"]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: ./.github/workflows/composer
         with:
           php_version: ${{ matrix.php_version }}
@@ -73,7 +73,7 @@ jobs:
     name: "Functional tests on SQLite"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: ./.github/workflows/composer
         with:
           php_version: "${{ env.MAIN_PHP_VERSION }}"
@@ -84,7 +84,7 @@ jobs:
     name: "Functional tests on MariaDB"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: ./.github/workflows/composer
         with:
           php_version: ${{ env.MAIN_PHP_VERSION }}
@@ -95,10 +95,10 @@ jobs:
     name: "PHP linting"
     strategy:
       matrix:
-        php_version: ["7.4", "8.0", "8.1", "8.2"]
+        php_version: ["8.1", "8.2"]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: ./.github/workflows/composer
         with:
           php_version: ${{ matrix.php_version }}
@@ -110,7 +110,7 @@ jobs:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/develop'
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: ./.github/workflows/composer
         with:
           php_version: ${{ env.MAIN_PHP_VERSION }}
@@ -127,7 +127,7 @@ jobs:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/develop'
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: ./.github/workflows/composer
         with:
           php_version: ${{ env.MAIN_PHP_VERSION }}
@@ -149,7 +149,7 @@ jobs:
     env:
       CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: actions/download-artifact@v3
         with:
           name: coverage-phpunit
@@ -172,11 +172,11 @@ jobs:
     name: "Scan for deprecated and breaking code using typo3scan"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: ./.github/workflows/composer
         with:
           php_version: "${{ env.MAIN_PHP_VERSION }}"
       - uses: shivammathur/setup-php@v2
         with:
           php-version: "${{ env.MAIN_PHP_VERSION }}"
-      - run: php .Build/bin/typo3scan scan --target 11 .
+      - run: php .Build/bin/typo3scan scan --target 12 .

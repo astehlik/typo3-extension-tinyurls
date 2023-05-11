@@ -17,39 +17,34 @@ namespace Tx\Tinyurls\Tests\Unit\Configuration;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Tx\Tinyurls\Configuration\TypoScriptConfigurator;
-use Tx\Tinyurls\TinyUrl\TinyUrlGenerator;
+use Tx\Tinyurls\Domain\Model\TinyUrl;
 use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
 
 class TypoScriptConfiguratorTest extends TestCase
 {
-    /**
-     * @var ContentObjectRenderer|MockObject
-     */
-    protected $contentObjectRendererMock;
+    private ContentObjectRenderer|MockObject $contentObjectRendererMock;
 
-    /**
-     * @var MockObject|TinyUrlGenerator
-     */
-    protected $tinyUrlGeneratorMock;
+    private MockObject|TinyUrl $tinyUrlMock;
 
-    /**
-     * @var TypoScriptConfigurator
-     */
-    protected $typoScriptConfigurator;
+    private TypoScriptConfigurator $typoScriptConfigurator;
 
     protected function setUp(): void
     {
-        $this->tinyUrlGeneratorMock = $this->createMock(TinyUrlGenerator::class);
+        $this->tinyUrlMock = $this->createMock(TinyUrl::class);
         $this->contentObjectRendererMock = $this->createMock(ContentObjectRenderer::class);
-        $this->typoScriptConfigurator = new TypoScriptConfigurator($this->tinyUrlGeneratorMock);
+        $this->typoScriptConfigurator = new TypoScriptConfigurator();
     }
 
     public function testDoesNotSetOptionsIfConfigIsEmpty(): void
     {
-        $this->typoScriptConfigurator->initializeConfigFromTyposcript([], $this->contentObjectRendererMock);
-        $this->tinyUrlGeneratorMock->expects(self::never())->method('setOptionDeleteOnUse');
-        $this->tinyUrlGeneratorMock->expects(self::never())->method('setOptionUrlKey');
-        $this->tinyUrlGeneratorMock->expects(self::never())->method('setOptionValidUntil');
+        $this->tinyUrlMock->expects(self::never())->method('disableDeleteOnUse');
+        $this->tinyUrlMock->expects(self::never())->method('enableDeleteOnUse');
+        $this->tinyUrlMock->expects(self::never())->method('setCustomUrlKey');
+        $this->tinyUrlMock->expects(self::never())->method('resetCustomUrlKey');
+        $this->tinyUrlMock->expects(self::never())->method('setValidUntil');
+        $this->tinyUrlMock->expects(self::never())->method('resetValidUntil');
+
+        $this->initializeConfigFromTyposcript();
     }
 
     public function testOptionValueIsProcessedByStdwrapIfConfigured(): void
@@ -59,89 +54,95 @@ class TypoScriptConfiguratorTest extends TestCase
             ->with('asdf', ['case' => 'upper'])
             ->willReturn('ASDF');
 
-        $this->tinyUrlGeneratorMock->expects(self::once())
-            ->method('setOptionUrlKey')
+        $this->tinyUrlMock->expects(self::once())
+            ->method('setCustomUrlKey')
             ->with('ASDF');
 
-        $this->typoScriptConfigurator->initializeConfigFromTyposcript(
+        $this->initializeConfigFromTyposcript(
             [
                 'tinyurl.' => [
                     'urlKey' => 'asdf',
                     'urlKey.' => ['case' => 'upper'],
                 ],
-            ],
-            $this->contentObjectRendererMock
+            ]
         );
     }
 
     public function testSetsOptionDeleteOnUseDefaultVlaue(): void
     {
-        $this->tinyUrlGeneratorMock->expects(self::once())
-            ->method('setOptionDeleteOnUse')
-            ->with(false);
+        $this->tinyUrlMock->expects(self::once())
+            ->method('disableDeleteOnUse');
+        $this->tinyUrlMock->expects(self::never())
+            ->method('enableDeleteOnUse');
 
-        $this->typoScriptConfigurator->initializeConfigFromTyposcript(
+        $this->initializeConfigFromTyposcript(
             ['tinyurl.' => []],
-            $this->contentObjectRendererMock
         );
     }
 
     public function testSetsOptionDeleteOnUseValueFromConfig(): void
     {
-        $this->tinyUrlGeneratorMock->expects(self::once())
-            ->method('setOptionDeleteOnUse')
-            ->with(true);
+        $this->tinyUrlMock->expects(self::once())
+            ->method('enableDeleteOnUse');
+        $this->tinyUrlMock->expects(self::never())
+            ->method('disableDeleteOnUse');
 
-        $this->typoScriptConfigurator->initializeConfigFromTyposcript(
+        $this->initializeConfigFromTyposcript(
             ['tinyurl.' => ['deleteOnUse' => '1']],
-            $this->contentObjectRendererMock
         );
     }
 
     public function testSetsOptionUrlKeyDefaultValue(): void
     {
-        $this->tinyUrlGeneratorMock->expects(self::once())
-            ->method('setOptionUrlKey')
-            ->with(false);
+        $this->tinyUrlMock->expects(self::once())
+            ->method('resetCustomUrlKey');
 
-        $this->typoScriptConfigurator->initializeConfigFromTyposcript(
+        $this->initializeConfigFromTyposcript(
             ['tinyurl.' => []],
-            $this->contentObjectRendererMock
         );
     }
 
     public function testSetsOptionUrlKeyWithValueFromConfig(): void
     {
-        $this->tinyUrlGeneratorMock->expects(self::once())
-            ->method('setOptionUrlKey')
+        $this->tinyUrlMock->expects(self::once())
+            ->method('setCustomUrlKey')
             ->with('the-new-url-key');
 
-        $this->typoScriptConfigurator->initializeConfigFromTyposcript(
+        $this->initializeConfigFromTyposcript(
             ['tinyurl.' => ['urlKey' => 'the-new-url-key']],
-            $this->contentObjectRendererMock
         );
     }
 
     public function testSetsOptionValidUntilDefaultValue(): void
     {
-        $this->tinyUrlGeneratorMock->expects(self::once())
-            ->method('setOptionValidUntil')
-            ->with(0);
+        $this->tinyUrlMock->expects(self::once())
+            ->method('resetValidUntil');
+        $this->tinyUrlMock->expects(self::never())
+            ->method('setValidUntil');
 
-        $this->typoScriptConfigurator->initializeConfigFromTyposcript(
+        $this->initializeConfigFromTyposcript(
             ['tinyurl.' => []],
-            $this->contentObjectRendererMock
         );
     }
 
     public function testSetsOptionValidUntilWithValueFromConfig(): void
     {
-        $this->tinyUrlGeneratorMock->expects(self::once())
-            ->method('setOptionValidUntil')
-            ->with(2389);
+        $this->tinyUrlMock->expects(self::never())
+            ->method('resetValidUntil');
+        $this->tinyUrlMock->expects(self::once())
+            ->method('setValidUntil')
+            ->with(self::callback(fn (\DateTimeImmutable $dateTime) => $dateTime->getTimestamp() === 2389));
 
-        $this->typoScriptConfigurator->initializeConfigFromTyposcript(
+        $this->initializeConfigFromTyposcript(
             ['tinyurl.' => ['validUntil' => 2389]],
+        );
+    }
+
+    private function initializeConfigFromTyposcript(array $config = []): void
+    {
+        $this->typoScriptConfigurator->initializeConfigFromTyposcript(
+            $this->tinyUrlMock,
+            $config,
             $this->contentObjectRendererMock
         );
     }
