@@ -28,6 +28,7 @@ jobs:
       - name: Get comment
         id: get-comment
         run: |
+          git fetch --depth=1 origin +refs/tags/*:refs/tags/*
           readonly local comment=$(git tag -l --format='%(contents:subject)' v${{ env.version }} | sed "s/^v[0-9.]*[ ]*//g")
 
           if [[ -z "${comment// }" ]]; then
