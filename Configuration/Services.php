@@ -8,6 +8,7 @@ use Tx\Tinyurls\Configuration\TypoScriptConfigurator;
 use Tx\Tinyurls\Domain\Repository\TinyUrlDoctrineRepository;
 use Tx\Tinyurls\Domain\Repository\TinyUrlRepository;
 use Tx\Tinyurls\Hooks\DatabaseRecordList;
+use Tx\Tinyurls\Hooks\TceDataMap;
 use Tx\Tinyurls\Hooks\TypoLink;
 use Tx\Tinyurls\TinyUrl\Api;
 use Tx\Tinyurls\TinyUrl\TinyUrlGenerator;
@@ -30,6 +31,7 @@ return function (ContainerConfigurator $configurator): void {
         // Configure services.
         ->set(ExtensionConfiguration::class, ExtensionConfiguration::class)
         ->set(TypoScriptConfigurator::class, TypoScriptConfigurator::class)
+        ->set(TceDataMap::class, TceDataMap::class)
         ->set(Api::class, Api::class)
         ->set(TinyUrlGenerator::class, TinyUrlGenerator::class)
         ->set(GeneralUtilityWrapper::class, GeneralUtilityWrapper::class)
