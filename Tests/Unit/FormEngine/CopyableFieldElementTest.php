@@ -21,6 +21,7 @@ use Tx\Tinyurls\Utils\GeneralUtilityWrapper;
 use TYPO3\CMS\Backend\Form\NodeFactory;
 use TYPO3\CMS\Core\Imaging\Icon;
 use TYPO3\CMS\Core\Imaging\IconFactory;
+use TYPO3\CMS\Core\Page\JavaScriptModuleInstruction;
 use TYPO3\CMS\Fluid\View\StandaloneView;
 
 class CopyableFieldElementTest extends TestCase
@@ -112,10 +113,13 @@ class CopyableFieldElementTest extends TestCase
 
     public function testRenderLoadsCopyToClipboardJsModule(): void
     {
-        self::assertSame(
-            ['TYPO3/CMS/Tinyurls/CopyToClipboard'],
-            $this->copyableFieldElement->render()['requireJsModules']
-        );
+        self::assertCount(1, $this->copyableFieldElement->render()['requireJsModules']);
+
+        $instruction = $this->copyableFieldElement->render()['requireJsModules'][0];
+
+        self::assertInstanceOf($instruction, JavaScriptModuleInstruction::class);
+
+        self::assertSame('@de-swebhosting/tinyurls/copy-to-clipboard.js', $instruction->getName());
     }
 
     public function testRenderReturnsRenderedFieldTemplate(): void
