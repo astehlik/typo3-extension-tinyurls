@@ -139,11 +139,12 @@ class ExtensionConfiguration implements SingletonInterface
         $finalConfiguration = [];
 
         foreach ($this->extensionConfigurationDefaults as $configKey => $defaultValue) {
-            if (array_key_exists($configKey, $extensionConfiguration)) {
-                $finalConfiguration[$configKey] = $extensionConfiguration[$configKey];
-            } else {
+            if (!array_key_exists($configKey, $extensionConfiguration)) {
                 $finalConfiguration[$configKey] = $defaultValue;
+                continue;
             }
+
+            $finalConfiguration[$configKey] = $extensionConfiguration[$configKey];
         }
 
         $this->extensionConfiguration = $finalConfiguration;
