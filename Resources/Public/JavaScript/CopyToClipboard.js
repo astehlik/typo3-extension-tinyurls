@@ -17,6 +17,8 @@ define(
             },
 
             initializeSingleField: function (copyableFieldContainer) {
+                const me = this;
+
                 const copyButton = copyableFieldContainer.find('.tx-tinyurls-copyable-field-copy-button');
                 const valueField = copyableFieldContainer.find('.tx-tinyurls-copyable-field-value');
 
@@ -26,12 +28,13 @@ define(
 
                 copyButton.click(async function () {
                     try {
-                        await this.writeToClipboard(valueField);
+                        await me.writeToClipboard(valueField);
                         notification.success(
                             TYPO3.lang['tx_tinyurls.copy_to_clipboard.success.title'],
                             TYPO3.lang['tx_tinyurls.copy_to_clipboard.success.message']
                         );
                     } catch (err) {
+                        console.log(err);
                         notification.warning(
                             TYPO3.lang['tx_tinyurls.copy_to_clipboard.error.title'],
                             TYPO3.lang['tx_tinyurls.copy_to_clipboard.error.message']
@@ -48,7 +51,7 @@ define(
                     return;
                 }
 
-                await navigator.clipboard.writeText(selectField.value);
+                await navigator.clipboard.writeText(selectField[0].value);
             }
         };
 
