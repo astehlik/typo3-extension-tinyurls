@@ -117,7 +117,7 @@ class CopyableFieldElementTest extends TestCase
 
         $instruction = $this->copyableFieldElement->render()['requireJsModules'][0];
 
-        self::assertInstanceOf($instruction, JavaScriptModuleInstruction::class);
+        self::assertInstanceOf(JavaScriptModuleInstruction::class, $instruction);
 
         self::assertSame('@de-swebhosting/tinyurls/copy-to-clipboard.js', $instruction->getName());
     }
