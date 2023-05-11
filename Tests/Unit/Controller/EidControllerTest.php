@@ -32,31 +32,43 @@ use TYPO3\CMS\Frontend\Controller\ErrorController;
  */
 class EidControllerTest extends TestCase
 {
-    /**
-     * @var EidController
-     */
-    protected $eidController;
+    private EidController $eidController;
 
-    /**
-     * @var ErrorController|MockObject
-     */
-    protected $errorControllerMock;
+    private MockObject|ErrorController $errorControllerMock;
 
-    /**
-     * @var MockObject|TinyUrlRepository
-     */
-    protected $tinyUrlRepositoryMock;
+    private TinyUrlRepository|MockObject $tinyUrlRepositoryMock;
 
     protected function setUp(): void
     {
         $this->errorControllerMock = $this->createMock(ErrorController::class);
         $this->tinyUrlRepositoryMock = $this->createMock(TinyUrlRepository::class);
 
-        $this->eidController = new EidController();
+        $this->eidController = new EidController($this->tinyUrlRepositoryMock);
         $this->eidController->setErrorController($this->errorControllerMock);
-        $this->eidController->injectTinyUrlRepository($this->tinyUrlRepositoryMock);
 
         $GLOBALS['EXEC_TIME'] = time();
+    }
+
+    public static function tinyUrlRedirectSendsNoCacheHeadersDataProvider(): array
+    {
+        return [
+            [
+                'Expires',
+                '0',
+            ],
+            [
+                'Last-Modified',
+                'gmdate',
+            ],
+            [
+                'Cache-Control',
+                'no-cache, must-revalidate',
+            ],
+            [
+                'Pragma',
+                'no-cache',
+            ],
+        ];
     }
 
     public function testBadRequestExceptionIfNoUrlKeyIsProvided(): void
@@ -187,28 +199,6 @@ class EidControllerTest extends TestCase
         }
 
         self::assertSame($expectedValue, $response->getHeaderLine($headerName));
-    }
-
-    public function tinyUrlRedirectSendsNoCacheHeadersDataProvider(): array
-    {
-        return [
-            [
-                'Expires',
-                '0',
-            ],
-            [
-                'Last-Modified',
-                'gmdate',
-            ],
-            [
-                'Cache-Control',
-                'no-cache, must-revalidate',
-            ],
-            [
-                'Pragma',
-                'no-cache',
-            ],
-        ];
     }
 
     private function processRequest(): ResponseInterface

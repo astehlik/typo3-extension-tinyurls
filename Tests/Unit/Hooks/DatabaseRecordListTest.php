@@ -19,8 +19,9 @@ use PHPUnit\Framework\TestCase;
 use Tx\Tinyurls\Domain\Repository\TinyUrlRepository;
 use Tx\Tinyurls\Hooks\DatabaseRecordList as DatabaseRecordListHooks;
 use Tx\Tinyurls\Utils\UrlUtils;
+use TYPO3\CMS\Backend\RecordList\DatabaseRecordList;
+use TYPO3\CMS\Backend\View\Event\ModifyDatabaseQueryForRecordListingEvent;
 use TYPO3\CMS\Core\Database\Query\QueryBuilder as Typo3QueryBuilder;
-use TYPO3\CMS\Recordlist\RecordList\DatabaseRecordList;
 
 /**
  * Contains a hook for the typolink generation to convert a typolink
@@ -29,20 +30,11 @@ use TYPO3\CMS\Recordlist\RecordList\DatabaseRecordList;
  */
 class DatabaseRecordListTest extends TestCase
 {
-    /**
-     * @var DatabaseRecordListHooks
-     */
-    protected $databaseRecordListHooks;
+    private DatabaseRecordListHooks $databaseRecordListHooks;
 
-    /**
-     * @var DatabaseRecordList
-     */
-    protected $parentRecordListMock;
+    private MockObject|DatabaseRecordList $parentRecordListMock;
 
-    /**
-     * @var MockObject|UrlUtils
-     */
-    private $urlUtilsMock;
+    private MockObject|UrlUtils $urlUtilsMock;
 
     protected function setUp(): void
     {
@@ -123,10 +115,7 @@ class DatabaseRecordListTest extends TestCase
         $this->callModifyQuery($queryBuilder);
     }
 
-    /**
-     * @param MockObject|Typo3QueryBuilder $queryBuilder
-     */
-    private function assertQueryDoesNotChange(Typo3QueryBuilder $queryBuilder): void
+    private function assertQueryDoesNotChange(MockObject|Typo3QueryBuilder $queryBuilder): void
     {
         $queryBuilder->expects(self::never())->method('addSelectLiteral');
     }
@@ -136,13 +125,20 @@ class DatabaseRecordListTest extends TestCase
         $table = TinyUrlRepository::TABLE_URLS,
         $fieldList = ['*']
     ): void {
-        $this->databaseRecordListHooks->modifyQuery([], $table, 1, [], $fieldList, $queryBuilder);
+        $event = new ModifyDatabaseQueryForRecordListingEvent(
+            $queryBuilder,
+            $table,
+            12,
+            $fieldList,
+            1,
+            20,
+            $this->parentRecordListMock
+        );
+
+        $this->databaseRecordListHooks->__invoke($event);
     }
 
-    /**
-     * @return MockObject|Typo3QueryBuilder
-     */
-    private function createQueryBuilderMock(): Typo3QueryBuilder
+    private function createQueryBuilderMock(): MockObject|Typo3QueryBuilder
     {
         $queryBuilder = $this->getMockBuilder(Typo3QueryBuilder::class)
             ->disableOriginalConstructor()

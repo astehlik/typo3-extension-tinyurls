@@ -19,6 +19,7 @@ use TYPO3\CMS\Backend\Form\AbstractNode;
 use TYPO3\CMS\Backend\Form\NodeInterface;
 use TYPO3\CMS\Core\Imaging\Icon;
 use TYPO3\CMS\Core\Imaging\IconFactory;
+use TYPO3\CMS\Core\Page\JavaScriptModuleInstruction;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Fluid\View\StandaloneView;
 
@@ -61,7 +62,9 @@ class CopyableFieldElement extends AbstractNode implements NodeInterface
         $template->assign('clipboardIcon', $this->getClipboardIcon());
         $result['html'] = $template->render();
 
-        $result['requireJsModules'][] = 'TYPO3/CMS/Tinyurls/CopyToClipboard';
+        $result['requireJsModules'][] = JavaScriptModuleInstruction::create(
+            '@de-swebhosting/tinyurls/copy-to-clipboard.js'
+        );
 
         $result['additionalInlineLanguageLabelFiles'][] = 'EXT:tinyurls/Resources/Private/Language/locallang_db_js.xlf';
 
@@ -78,6 +81,7 @@ class CopyableFieldElement extends AbstractNode implements NodeInterface
      */
     protected function getClipboardIcon(): string
     {
+        /** @extensionScannerIgnoreLine */
         $iconFactory = $this->getIconFactory();
         return $iconFactory->getIcon('actions-edit-copy', Icon::SIZE_SMALL)->render();
     }

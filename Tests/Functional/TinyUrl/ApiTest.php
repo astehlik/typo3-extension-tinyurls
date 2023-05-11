@@ -24,15 +24,7 @@ use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
  */
 class ApiTest extends AbstractFunctionalTestCase
 {
-    /**
-     * @var array
-     */
-    protected $testExtensionsToLoad = ['typo3conf/ext/tinyurls'];
-
-    /**
-     * @var Api
-     */
-    protected $tinyUrlsApi;
+    private Api $tinyUrlsApi;
 
     /**
      * Initializes the test subject.
@@ -40,7 +32,7 @@ class ApiTest extends AbstractFunctionalTestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->tinyUrlsApi = GeneralUtility::makeInstance(Api::class);
+        $this->tinyUrlsApi = $this->getContainer()->get(Api::class);
     }
 
     public function testApiDoesNotSetDeleteOnUseByDefault(): void

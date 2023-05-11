@@ -14,7 +14,7 @@ namespace Tx\Tinyurls\Configuration;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
-use Tx\Tinyurls\TinyUrl\TinyUrlGenerator;
+use Tx\Tinyurls\Domain\Model\TinyUrl;
 use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
 
 class TypoScriptConfigurator
@@ -28,44 +28,86 @@ class TypoScriptConfigurator
         'urlKey' => false,
     ];
 
-    protected TinyUrlGenerator $tinyUrlGenerator;
-
-    public function __construct(TinyUrlGenerator $tinyUrlGenerator)
-    {
-        $this->tinyUrlGenerator = $tinyUrlGenerator;
-    }
-
     /**
      * Initializes the tinyurl configuration with default values and
      * if the user set his own values they are parsed through stdWrap.
      */
-    public function initializeConfigFromTyposcript(array $config, ContentObjectRenderer $contentObjectRenderer): void
-    {
+    public function initializeConfigFromTyposcript(
+        TinyUrl $tinyUrl,
+        array $config,
+        ContentObjectRenderer $contentObjectRenderer
+    ): void {
         if (!array_key_exists('tinyurl.', $config)) {
             return;
         }
 
-        $tinyUrlConfig = $config['tinyurl.'];
+        foreach (array_keys($this->tinyurlConfigDefaults) as $configKey) {
+            $configValue = $this->getConfigValue($configKey, $config['tinyurl.'], $contentObjectRenderer);
 
-        foreach ($this->tinyurlConfigDefaults as $configKey => $defaultValue) {
-            $configValue = $defaultValue;
-
-            if (array_key_exists($configKey, $tinyUrlConfig)) {
-                $configValue = $tinyUrlConfig[$configKey];
-
-                if (array_key_exists($configKey . '.', $tinyUrlConfig)) {
-                    $configValue = $contentObjectRenderer->stdWrap(
-                        $configValue,
-                        $tinyUrlConfig[$configKey . '.']
-                    );
-                }
-            }
-
-            $configSetter = 'setOption' . ucfirst($configKey);
-
-            if (method_exists($this->tinyUrlGenerator, $configSetter)) {
-                $this->tinyUrlGenerator->{$configSetter}($configValue);
-            }
+            match ($configKey) {
+                'deleteOnUse' => $this->setOptionDeleteOnUse($tinyUrl, (bool)$configValue),
+                'validUntil' => $this->setOptionValidUntil($tinyUrl, (int)$configValue),
+                'urlKey' => $this->setOptionUrlKey($tinyUrl, (string)$configValue),
+            };
         }
+    }
+
+    /**
+     * @internal Only used for backwards compatibility. Will become private with next major version.
+     */
+    public function setOptionDeleteOnUse(TinyUrl $tinyUrl, bool $deleteOnUse): void
+    {
+        if (!$deleteOnUse) {
+            $tinyUrl->disableDeleteOnUse();
+            return;
+        }
+
+        $tinyUrl->enableDeleteOnUse();
+    }
+
+    /**
+     * @internal Only used for backwards compatibility. Will become private with next major version.
+     */
+    public function setOptionUrlKey(TinyUrl $tinyUrl, string $urlKey): void
+    {
+        if ($urlKey === '') {
+            $tinyUrl->resetCustomUrlKey();
+            return;
+        }
+
+        $tinyUrl->setCustomUrlKey($urlKey);
+    }
+
+    /**
+     * @internal Only used for backwards compatibility. Will become private with next major version.
+     */
+    public function setOptionValidUntil(TinyUrl $tinyUrl, int $validUntil): void
+    {
+        if ($validUntil <= 0) {
+            $tinyUrl->resetValidUntil();
+            return;
+        }
+
+        $tinyUrl->setValidUntil(new \DateTimeImmutable('@' . $validUntil));
+    }
+
+    private function getConfigValue(
+        string $configKey,
+        array $tinyUrlConfig,
+        ContentObjectRenderer $contentObjectRenderer
+    ): mixed {
+        $configValue = $this->tinyurlConfigDefaults[$configKey];
+
+        if (!array_key_exists($configKey, $tinyUrlConfig)) {
+            return $configValue;
+        }
+
+        $configValue = $tinyUrlConfig[$configKey];
+
+        if (!array_key_exists($configKey . '.', $tinyUrlConfig)) {
+            return $configValue;
+        }
+
+        return $contentObjectRenderer->stdWrap($configValue, $tinyUrlConfig[$configKey . '.']);
     }
 }

@@ -14,8 +14,6 @@ namespace Tx\Tinyurls\Tests\Unit\Domain\Repository;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
-use DMS\PHPUnitExtensions\ArraySubset\Constraint\ArraySubset;
-use Doctrine\DBAL\Driver\Statement;
 use PHPUnit\Framework\Constraint\Callback;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -27,6 +25,7 @@ use Tx\Tinyurls\Domain\Repository\TinyUrlRepository;
 use Tx\Tinyurls\Domain\Validator\TinyUrlValidator;
 use Tx\Tinyurls\Exception\TinyUrlNotFoundException;
 use Tx\Tinyurls\Exception\TinyUrlValidationException;
+use Tx\Tinyurls\Utils\UrlUtils;
 use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\QueryBuilder;
@@ -38,42 +37,26 @@ use TYPO3\CMS\Extbase\Error\Result;
  */
 class TinyUrlDoctrineRepositoryTest extends TestCase
 {
-    /**
-     * @var Connection|MockObject
-     */
-    protected $databaseConnectionMock;
+    private Connection|MockObject $databaseConnectionMock;
 
-    /**
-     * @var ConnectionPool|MockObject
-     */
-    protected $databaseConnectionPoolMock;
+    private QueryBuilder|MockObject $databaseQueryBuilderMock;
 
-    /**
-     * @var MockObject|QueryBuilder
-     */
-    protected $databaseQueryBuilderMock;
+    private QueryRestrictionContainerInterface|MockObject $databaseQueryRestrictionsContainerMock;
 
-    /**
-     * @var MockObject|QueryRestrictionContainerInterface
-     */
-    protected $databaseQueryRestrictionsContainerMock;
+    private TinyUrlDoctrineRepository $doctrineRepository;
 
-    /**
-     * @var TinyUrlDoctrineRepository
-     */
-    protected $doctrineRepository;
+    private ExtensionConfiguration|MockObject $extensionConfiugrationMock;
 
-    /**
-     * @var ExtensionConfiguration|MockObject
-     */
-    protected $extensionConfiugrationMock;
+    private TinyUrlValidator|MockObject $tinyUrlValidatorMock;
+
+    private UrlUtils|MockObject $urlUtilsMock;
 
     protected function setUp(): void
     {
         $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['tinyurls'] = [];
 
         $this->databaseConnectionMock = $this->createMock(Connection::class);
-        $this->databaseConnectionPoolMock = $this->createMock(ConnectionPool::class);
+        $databaseConnectionPoolMock = $this->createMock(ConnectionPool::class);
         $this->databaseQueryBuilderMock = $this->createMock(QueryBuilder::class);
         $this->databaseQueryRestrictionsContainerMock = $this->createMock(QueryRestrictionContainerInterface::class);
         $this->extensionConfiugrationMock = $this->createMock(ExtensionConfiguration::class);
@@ -101,33 +84,40 @@ class TinyUrlDoctrineRepositoryTest extends TestCase
         $this->databaseQueryBuilderMock->method('getRestrictions')
             ->willReturn($this->databaseQueryRestrictionsContainerMock);
 
-        $this->databaseConnectionPoolMock->method('getQueryBuilderForTable')
+        $databaseConnectionPoolMock->method('getQueryBuilderForTable')
             ->willReturn($this->databaseQueryBuilderMock);
-        $this->databaseConnectionPoolMock->method('getConnectionForTable')
+        $databaseConnectionPoolMock->method('getConnectionForTable')
             ->willReturn($this->databaseConnectionMock);
 
-        $this->doctrineRepository = new TinyUrlDoctrineRepository();
-        $this->doctrineRepository->setDatabaseConnectionPool($this->databaseConnectionPoolMock);
-        $this->doctrineRepository->injectExtensionConfiguration($this->extensionConfiugrationMock);
+        $this->urlUtilsMock = $this->createMock(UrlUtils::class);
+
+        $this->doctrineRepository = new TinyUrlDoctrineRepository(
+            $databaseConnectionPoolMock,
+            $this->extensionConfiugrationMock,
+            $this->urlUtilsMock
+        );
+
+        $this->tinyUrlValidatorMock = $this->createMock(TinyUrlValidator::class);
+        $this->doctrineRepository->overrideTinyUrlValidator($this->tinyUrlValidatorMock);
     }
 
     public function testCountTinyUrlHitIncreasesCountByOne(): void
     {
-        $resultMock = $this->createMock(Statement::class);
+        $resultMock = $this->createMock(\Doctrine\DBAL\Result::class);
         $resultMock->expects(self::once())
-            ->method('fetch')
+            ->method('fetchAssociative')
             ->willReturn($this->getDummyDatabaseRow());
 
         $this->databaseQueryBuilderMock->expects(self::once())
             ->method('set')
             ->with('counter', '1');
 
-        $this->databaseQueryBuilderMock->expects(self::exactly(2))
-            ->method('execute')
-            ->willReturnOnConsecutiveCalls(
-                null,
-                $resultMock
-            );
+        $this->databaseQueryBuilderMock->expects(self::once())
+            ->method('executeQuery')
+            ->willReturn($resultMock);
+
+        $this->databaseQueryBuilderMock->expects(self::once())
+            ->method('executeStatement');
 
         $tinyUrl = TinyUrl::createNew();
         $tinyUrl->persistPostProcessInsert(3342);
@@ -136,12 +126,12 @@ class TinyUrlDoctrineRepositoryTest extends TestCase
 
     public function testFindTinyUrlByKeyReturnsTinyUrlWithFoundData(): void
     {
-        $resultMock = $this->createMock(Statement::class);
+        $resultMock = $this->createMock(\Doctrine\DBAL\Result::class);
         $resultMock->expects(self::once())
-            ->method('fetch')
+            ->method('fetchAssociative')
             ->willReturn($this->getDummyDatabaseRow());
         $this->databaseQueryBuilderMock->expects(self::once())
-            ->method('execute')
+            ->method('executeQuery')
             ->willReturn($resultMock);
         $tinyUrl = $this->doctrineRepository->findTinyUrlByKey('the key to find');
         self::assertSame(945, $tinyUrl->getUid());
@@ -149,12 +139,12 @@ class TinyUrlDoctrineRepositoryTest extends TestCase
 
     public function testFindTinyUrlByKeyThrowsNotFoundExceptionForEmptyResult(): void
     {
-        $resultMock = $this->createMock(Statement::class);
+        $resultMock = $this->createMock(\Doctrine\DBAL\Result::class);
         $resultMock->expects(self::once())
-            ->method('fetch')
+            ->method('fetchAssociative')
             ->willReturn(false);
         $this->databaseQueryBuilderMock->expects(self::once())
-            ->method('execute')
+            ->method('executeQuery')
             ->willReturn($resultMock);
         $this->expectException(TinyUrlNotFoundException::class);
         $this->doctrineRepository->findTinyUrlByKey('the key to find');
@@ -162,12 +152,12 @@ class TinyUrlDoctrineRepositoryTest extends TestCase
 
     public function testFindTinyUrlByTargetUrlReturnsTinyUrlWithFoundData(): void
     {
-        $resultMock = $this->createMock(Statement::class);
+        $resultMock = $this->createMock(\Doctrine\DBAL\Result::class);
         $resultMock->expects(self::once())
-            ->method('fetch')
+            ->method('fetchAssociative')
             ->willReturn($this->getDummyDatabaseRow());
         $this->databaseQueryBuilderMock->expects(self::once())
-            ->method('execute')
+            ->method('executeQuery')
             ->willReturn($resultMock);
         $tinyUrl = $this->doctrineRepository->findTinyUrlByTargetUrl('http://the-url-to-find.tld');
         self::assertSame(945, $tinyUrl->getUid());
@@ -175,12 +165,12 @@ class TinyUrlDoctrineRepositoryTest extends TestCase
 
     public function testFindTinyUrlByTargetUrlThrowsNotFoundExceptionForEmptyResult(): void
     {
-        $resultMock = $this->createMock(Statement::class);
+        $resultMock = $this->createMock(\Doctrine\DBAL\Result::class);
         $resultMock->expects(self::once())
-            ->method('fetch')
+            ->method('fetchAssociative')
             ->willReturn(false);
         $this->databaseQueryBuilderMock->expects(self::once())
-            ->method('execute')
+            ->method('executeQuery')
             ->willReturn($resultMock);
         $this->expectException(TinyUrlNotFoundException::class);
         $this->doctrineRepository->findTinyUrlByTargetUrl('http://the-url-to-find.tld');
@@ -188,12 +178,12 @@ class TinyUrlDoctrineRepositoryTest extends TestCase
 
     public function testFindTinyUrlByUidReturnsTinyUrlWithFoundData(): void
     {
-        $resultMock = $this->createMock(Statement::class);
+        $resultMock = $this->createMock(\Doctrine\DBAL\Result::class);
         $resultMock->expects(self::once())
-            ->method('fetch')
+            ->method('fetchAssociative')
             ->willReturn($this->getDummyDatabaseRow());
         $this->databaseQueryBuilderMock->expects(self::once())
-            ->method('execute')
+            ->method('executeQuery')
             ->willReturn($resultMock);
         $tinyUrl = $this->doctrineRepository->findTinyUrlByUid(945);
         self::assertSame(945, $tinyUrl->getUid());
@@ -201,12 +191,12 @@ class TinyUrlDoctrineRepositoryTest extends TestCase
 
     public function testFindTinyUrlByUidThrowsNotFoundExceptionForEmptyResult(): void
     {
-        $resultMock = $this->createMock(Statement::class);
+        $resultMock = $this->createMock(\Doctrine\DBAL\Result::class);
         $resultMock->expects(self::once())
-            ->method('fetch')
+            ->method('fetchAssociative')
             ->willReturn(false);
         $this->databaseQueryBuilderMock->expects(self::once())
-            ->method('execute')
+            ->method('executeQuery')
             ->willReturn($resultMock);
         $this->expectException(TinyUrlNotFoundException::class);
         $this->doctrineRepository->findTinyUrlByUid(293);
@@ -258,13 +248,20 @@ class TinyUrlDoctrineRepositoryTest extends TestCase
 
     public function testInsertNewTinyUrlPostProcessesTinyUrl(): void
     {
-        $this->prepareInsertQuery(4845);
+        $tinyUrlUid = 4845;
 
-        /** @var MockObject|TinyUrl $tinyUrl */
-        $tinyUrl = $this->createMock(TinyUrl::class);
-        $tinyUrl->expects(self::once())->method('persistPostProcessInsert')->with(4845);
+        $this->prepareInsertQuery($tinyUrlUid);
+
+        $tinyUrl = TinyUrl::createNew();
+        $tinyUrl->setCustomUrlKey('custom-key');
+        $tinyUrl->setTargetUrl('http://the-target-url.tld');
+        self::assertTrue($tinyUrl->getTargetUrlHasChanged());
 
         $this->doctrineRepository->insertNewTinyUrl($tinyUrl);
+
+        self::assertSame($tinyUrlUid, $tinyUrl->getUid());
+        self::assertFalse($tinyUrl->getTargetUrlHasChanged());
+        self::assertFalse($tinyUrl->hasCustomUrlKey());
     }
 
     public function testInsertNewTinyUrlPreProcessesTinyUrl(): void
@@ -282,10 +279,12 @@ class TinyUrlDoctrineRepositoryTest extends TestCase
 
         $tinyUrl = TinyUrl::createNew();
 
+        $this->initializeUrlKeyGeneratorMock($tinyUrl);
+
         $this->prepareInsertQuery(2323);
 
         $this->doctrineRepository->insertNewTinyUrl($tinyUrl);
-        self::assertMatchesRegularExpression('/LD\-[a-z0-9]+/', $tinyUrl->getUrlkey());
+        self::assertSame('the-generated-key', $tinyUrl->getUrlkey());
     }
 
     public function testInsertNewTinyUrlSetsStoragePid(): void
@@ -304,10 +303,9 @@ class TinyUrlDoctrineRepositoryTest extends TestCase
     {
         $this->expectException(TinyUrlValidationException::class);
 
+        $this->initializeTinyUrlValidatorMock(true);
+
         $tinyUrl = TinyUrl::createNew();
-        $validUntil = new \DateTime();
-        $validUntil->modify('-1 day');
-        $tinyUrl->setValidUntil($validUntil);
 
         $this->doctrineRepository->insertNewTinyUrl($tinyUrl);
     }
@@ -315,6 +313,8 @@ class TinyUrlDoctrineRepositoryTest extends TestCase
     public function testInsertNewTinyUrlUpdatesGeneratedUrlKeyInDatabase(): void
     {
         $tinyUrl = TinyUrl::createNew();
+
+        $this->initializeUrlKeyGeneratorMock($tinyUrl);
 
         $this->prepareInsertQuery(2323);
 
@@ -324,7 +324,7 @@ class TinyUrlDoctrineRepositoryTest extends TestCase
                 TinyUrlRepository::TABLE_URLS,
                 self::callback(
                     function (array $databaseRow) {
-                        return preg_match('/LD-[0-9a-z]+/', $databaseRow['urlkey']) === 1;
+                        return $databaseRow['urlkey'] === 'the-generated-key';
                     }
                 )
             );
@@ -347,7 +347,7 @@ class TinyUrlDoctrineRepositoryTest extends TestCase
         $this->databaseQueryBuilderMock->expects(self::once())
             ->method('delete');
         $this->databaseQueryBuilderMock->expects(self::once())
-            ->method('execute');
+            ->method('executeStatement');
         $this->doctrineRepository->purgeInvalidUrls();
     }
 
@@ -370,7 +370,7 @@ class TinyUrlDoctrineRepositoryTest extends TestCase
             ->method('update')
             ->with(
                 TinyUrlRepository::TABLE_URLS,
-                new ArraySubset($tinyUrlData),
+                self::callback(fn (array $databaseRow) => array_diff_assoc($tinyUrlData, $databaseRow) === []),
                 ['uid' => 945]
             );
 
@@ -379,22 +379,33 @@ class TinyUrlDoctrineRepositoryTest extends TestCase
 
     public function testUpdateTinyUrlPostProcessesTinyUrl(): void
     {
-        /** @var MockObject|TinyUrl $tinyUrl */
-        $tinyUrl = $this->createMock(TinyUrl::class);
-        $tinyUrl->method('isNew')->willReturn(false);
-        $tinyUrl->expects(self::once())->method('persistPostProcess');
+        $tinyUrl = TinyUrl::createNew();
+        $tinyUrl->persistPostProcessInsert(34543);
+        $tinyUrl->setTargetUrl('http://the-target-url.tld');
+        $tinyUrl->setCustomUrlKey('the-custom-key');
+
+        self::assertTrue($tinyUrl->getTargetUrlHasChanged());
+        self::assertTrue($tinyUrl->hasCustomUrlKey());
 
         $this->doctrineRepository->updateTinyUrl($tinyUrl);
+
+        self::assertFalse($tinyUrl->getTargetUrlHasChanged());
+        self::assertFalse($tinyUrl->hasCustomUrlKey());
     }
 
     public function testUpdateTinyUrlPreProcessesTinyUrl(): void
     {
-        /** @var MockObject|TinyUrl $tinyUrl */
-        $tinyUrl = $this->createMock(TinyUrl::class);
-        $tinyUrl->method('isNew')->willReturn(false);
-        $tinyUrl->expects(self::once())->method('persistPreProcess');
+        $tinyUrl = TinyUrl::createNew();
+        $tinyUrl->persistPreProcess();
+
+        $tinyUrl->persistPostProcessInsert(34435);
+        $tinyUrl->setCustomUrlKey('custom-key');
+        $tstampOriginal = $tinyUrl->getTstamp();
 
         $this->doctrineRepository->updateTinyUrl($tinyUrl);
+
+        self::assertSame('custom-key', $tinyUrl->getUrlkey());
+        self::assertNotSame($tstampOriginal, $tinyUrl->getTstamp());
     }
 
     public function testUpdateTinyUrlThrowsExceptionForNewTinyUrl(): void
@@ -411,9 +422,7 @@ class TinyUrlDoctrineRepositoryTest extends TestCase
         $tinyUrl = TinyUrl::createNew();
         $tinyUrl->persistPostProcessInsert(238);
 
-        $validUntil = new \DateTime();
-        $validUntil->modify('-1 day');
-        $tinyUrl->setValidUntil($validUntil);
+        $this->initializeTinyUrlValidatorMock(true);
 
         $this->doctrineRepository->updateTinyUrl($tinyUrl);
     }
@@ -434,14 +443,13 @@ class TinyUrlDoctrineRepositoryTest extends TestCase
         ];
     }
 
-    protected function initializeTinyUrlValidatorMock(): void
+    protected function initializeTinyUrlValidatorMock(bool $hasErrors = false): void
     {
         $result = $this->createMock(Result::class);
 
-        /** @var MockObject|TinyUrlValidator $validator */
-        $validator = $this->createMock(TinyUrlValidator::class);
-        $validator->method('validate')->willReturn($result);
-        $this->doctrineRepository->setTinyUrlValidator($validator);
+        $result->method('hasErrors')->willReturn($hasErrors);
+
+        $this->tinyUrlValidatorMock->method('validate')->willReturn($result);
     }
 
     protected function prepareInsertQuery(int $newUid): void
@@ -458,5 +466,17 @@ class TinyUrlDoctrineRepositoryTest extends TestCase
             ->method('lastInsertId')
             ->with(TinyUrlRepository::TABLE_URLS, 'uid')
             ->willReturn((string)$newUid);
+    }
+
+    private function initializeUrlKeyGeneratorMock(TinyUrl $tinyUrl): void
+    {
+        $this->urlUtilsMock->expects(self::once())
+            ->method('regenerateUrlKey')
+            ->with($tinyUrl)
+            ->willReturnCallback(
+                function (TinyUrl $tinyUrl): void {
+                    $tinyUrl->setGeneratedUrlKey('the-generated-key');
+                }
+            );
     }
 }

@@ -23,11 +23,6 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  */
 class UrlUtilsTest extends AbstractFunctionalTestCase
 {
-    /**
-     * @var array
-     */
-    protected $testExtensionsToLoad = ['typo3conf/ext/tinyurls'];
-
     public function testCreateSpeakingTinyUrlReplacesGeneralUtilityMarkers(): void
     {
         $_SERVER['REMOTE_ADDR'] = '127.0.0.1';

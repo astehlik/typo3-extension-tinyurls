@@ -10,6 +10,6 @@ runs:
     - uses: php-actions/composer@v6
       with:
         php_version: ${{ inputs.php_version }}
-        php_extensions: zip
+        php_extensions: intl zip
     - run: sudo chown -R $(id -u):$(id -g) .
       shell: bash

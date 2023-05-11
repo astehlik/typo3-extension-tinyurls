@@ -2,15 +2,12 @@ version: "2"
 
 prepare:
   fetch:
-    - url: "https://raw.githubusercontent.com/astehlik/php-codestyle/master/PhpMd/RulesetTypo3.xml"
+    - url: "https://raw.githubusercontent.com/astehlik/php-codestyle/main/PhpMd/RulesetTypo3.xml"
       path: "PhpMdRulesetTypo3.xml"
 
 plugins:
   phpcodesniffer:
-    enabled: true
-    config:
-      file_extensions: "php"
-      standard: "PSR1,PSR2"
+    enabled: false
   fixme:
     enabled: true
   phpmd:

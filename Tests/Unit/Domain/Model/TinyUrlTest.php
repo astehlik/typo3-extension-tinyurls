@@ -14,11 +14,8 @@ namespace Tx\Tinyurls\Tests\Unit\Domain\Model;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Tx\Tinyurls\Domain\Model\TinyUrl;
-use Tx\Tinyurls\Object\ImplementationManager;
-use Tx\Tinyurls\UrlKeyGenerator\UrlKeyGenerator;
 
 class TinyUrlTest extends TestCase
 {
@@ -102,6 +99,8 @@ class TinyUrlTest extends TestCase
         self::assertFalse($tinyUrl->getDeleteOnUse());
         $tinyUrl->enableDeleteOnUse();
         self::assertTrue($tinyUrl->getDeleteOnUse());
+        $tinyUrl->disableDeleteOnUse();
+        self::assertFalse($tinyUrl->getDeleteOnUse());
     }
 
     public function testEqualsReturnsFalseIfBothTinyUrlsAreNewAndAreNotTheSameObject(): void
@@ -180,6 +179,8 @@ class TinyUrlTest extends TestCase
         $tinyUrl = TinyUrl::createNew();
         $tinyUrl->setValidUntil(new \DateTime());
         self::assertTrue($tinyUrl->hasValidUntil());
+        $tinyUrl->resetValidUntil();
+        self::assertFalse($tinyUrl->hasValidUntil());
     }
 
     public function testIsNewReturnsTrueForNewTinyUrl(): void
@@ -250,26 +251,15 @@ class TinyUrlTest extends TestCase
     {
         $tinyUrl = TinyUrl::createNew();
         $tinyUrl->persistPreProcess();
-        self::assertInstanceOf(\DateTime::class, $tinyUrl->getTstamp());
+        self::assertInstanceOf(\DateTimeInterface::class, $tinyUrl->getTstamp());
     }
 
-    public function testRegenerateUrlKeySetsUrlKeyProperty(): void
+    public function testResetCustomUrlKeySetsCustomUrlKeyToNull(): void
     {
         $tinyUrl = TinyUrl::createNew();
-        $tinyUrl->persistPostProcessInsert(2);
-
-        /** @var MockObject|UrlKeyGenerator $urlGeneratorMock */
-        $urlGeneratorMock = $this->createMock(UrlKeyGenerator::class);
-        $urlGeneratorMock->expects(self::once())
-            ->method('generateTinyurlKeyForTinyUrl')
-            ->with($tinyUrl)
-            ->willReturn('thekey');
-        ImplementationManager::getInstance()->setUrlKeyGenerator($urlGeneratorMock);
-
-        $tinyUrl->regenerateUrlKey();
-        self::assertSame('thekey', $tinyUrl->getUrlkey());
-
-        ImplementationManager::getInstance()->restoreDefaults();
+        $tinyUrl->setCustomUrlKey('custom key');
+        $tinyUrl->resetCustomUrlKey();
+        self::assertNull($tinyUrl->getCustomUrlKey());
     }
 
     public function testSetCommentSetsComment(): void
@@ -284,6 +274,17 @@ class TinyUrlTest extends TestCase
         $this->expectException(\InvalidArgumentException::class);
         $tinyUrl = TinyUrl::createNew();
         $tinyUrl->setCustomUrlKey('');
+    }
+
+    public function testSetGeneratedUrlKeySetsUrlKey(): void
+    {
+        $tinyUrl = TinyUrl::createNew();
+
+        $expectedKey = 'the generated url key';
+
+        $tinyUrl->setGeneratedUrlKey($expectedKey);
+
+        self::assertSame($expectedKey, $tinyUrl->getUrlkey());
     }
 
     public function testSetPidSetsPid(): void

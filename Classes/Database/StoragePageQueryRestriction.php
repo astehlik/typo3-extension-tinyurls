@@ -48,7 +48,7 @@ class StoragePageQueryRestriction implements QueryRestrictionInterface
             $constraints[] = $expressionBuilder->eq($fieldName, $this->storagePageUid);
         }
 
-        return $expressionBuilder->andX(...$constraints);
+        return $expressionBuilder->and(...$constraints);
     }
 
     public function getStoragePageUid(): int

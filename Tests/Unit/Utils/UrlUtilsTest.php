@@ -17,7 +17,7 @@ namespace Tx\Tinyurls\Tests\Unit\Utils;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Tx\Tinyurls\Configuration\ExtensionConfiguration;
-use Tx\Tinyurls\Object\ImplementationManager;
+use Tx\Tinyurls\Domain\Model\TinyUrl;
 use Tx\Tinyurls\UrlKeyGenerator\UrlKeyGenerator;
 use Tx\Tinyurls\Utils\GeneralUtilityWrapper;
 use Tx\Tinyurls\Utils\UrlUtils;
@@ -27,29 +27,25 @@ use Tx\Tinyurls\Utils\UrlUtils;
  */
 class UrlUtilsTest extends TestCase
 {
-    /**
-     * @var ExtensionConfiguration|MockObject
-     */
-    protected $extensionConfigurationMock;
+    private ExtensionConfiguration|MockObject $extensionConfigurationMock;
 
-    /**
-     * @var GeneralUtilityWrapper|MockObject
-     */
-    protected $generalUtilityMock;
+    private GeneralUtilityWrapper|MockObject $generalUtilityMock;
 
-    /**
-     * @var UrlUtils
-     */
-    protected $urlUtils;
+    private UrlKeyGenerator|MockObject $urlKeyGeneratorMock;
+
+    private UrlUtils $urlUtils;
 
     protected function setUp(): void
     {
         $this->extensionConfigurationMock = $this->createMock(ExtensionConfiguration::class);
         $this->generalUtilityMock = $this->createMock(GeneralUtilityWrapper::class);
+        $this->urlKeyGeneratorMock = $this->createMock(UrlKeyGenerator::class);
 
-        $this->urlUtils = new UrlUtils();
-        $this->urlUtils->injectExtensionConfiguration($this->extensionConfigurationMock);
-        $this->urlUtils->injectGeneralUtility($this->generalUtilityMock);
+        $this->urlUtils = new UrlUtils(
+            $this->extensionConfigurationMock,
+            $this->generalUtilityMock,
+            $this->urlKeyGeneratorMock
+        );
     }
 
     /**
@@ -129,15 +125,27 @@ class UrlUtilsTest extends TestCase
 
     public function testGenerateTinyurlKeyForUidGeneratesKey(): void
     {
-        $urlGeneratorMock = $this->createMock(UrlKeyGenerator::class);
-        $urlGeneratorMock->expects(self::once())
+        $this->urlKeyGeneratorMock->expects(self::once())
             ->method('generateTinyurlKeyForUid')
             ->with(132)
             ->willReturn('thekey');
-        ImplementationManager::getInstance()->setUrlKeyGenerator($urlGeneratorMock);
 
         /** @noinspection PhpDeprecationInspection */
         self::assertSame('thekey', $this->urlUtils->generateTinyurlKeyForUid(132));
-        ImplementationManager::getInstance()->restoreDefaults();
+    }
+
+    public function testRegenerateUrlKeyUpdatesKey(): void
+    {
+        $tinyUrl = TinyUrl::createNew();
+
+        $this->urlKeyGeneratorMock->expects(self::once())
+            ->method('generateTinyurlKeyForTinyUrl')
+            ->with($tinyUrl)
+            ->willReturn('thekey');
+
+        $this->urlUtils->regenerateUrlKey($tinyUrl);
+
+        /** @noinspection PhpDeprecationInspection */
+        self::assertSame('thekey', $tinyUrl->getUrlkey());
     }
 }

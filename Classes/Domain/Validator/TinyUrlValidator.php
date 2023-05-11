@@ -7,36 +7,31 @@ namespace Tx\Tinyurls\Domain\Validator;
 use Tx\Tinyurls\Domain\Model\TinyUrl;
 use Tx\Tinyurls\Domain\Repository\TinyUrlRepository;
 use Tx\Tinyurls\Exception\TinyUrlNotFoundException;
-use Tx\Tinyurls\Object\ImplementationManager;
 use TYPO3\CMS\Extbase\Error\Result;
 use TYPO3\CMS\Extbase\Validation\Error;
 use TYPO3\CMS\Extbase\Validation\Validator\ValidatorInterface;
 
 class TinyUrlValidator implements ValidatorInterface
 {
-    /**
-     * @var Result
-     */
-    protected $result;
+    protected Result $result;
 
-    /**
-     * @var TinyUrlRepository
-     */
-    protected $tinyUrlRepository;
+    public function __construct(protected readonly TinyUrlRepository $tinyUrlRepository)
+    {
+    }
 
     /**
      * Returns the options of this validator which can be specified in the constructor.
-     *
-     * @return array
      */
-    public function getOptions()
+    public function getOptions(): array
     {
         return [];
     }
 
-    public function injectTinyUrlRepository(TinyUrlRepository $tinyUrlRepository): void
+    /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
+    public function setOptions(array $options): void
     {
-        $this->tinyUrlRepository = $tinyUrlRepository;
     }
 
     /**
@@ -44,10 +39,8 @@ class TinyUrlValidator implements ValidatorInterface
      * the Error Messages object which occurred.
      *
      * @param TinyUrl $value The value that should be validated
-     *
-     * @return Result
      */
-    public function validate($value)
+    public function validate($value): Result
     {
         $this->result = new Result();
 
@@ -57,28 +50,15 @@ class TinyUrlValidator implements ValidatorInterface
         return $this->result;
     }
 
-    /**
-     * @codeCoverageIgnore
-     */
-    protected function getTinyUrlRepository(): TinyUrlRepository
-    {
-        if ($this->tinyUrlRepository === null) {
-            $this->tinyUrlRepository = ImplementationManager::getInstance()->getTinyUrlRepository();
-        }
-        return $this->tinyUrlRepository;
-    }
-
     protected function validateCustomUrlKey(TinyUrl $tinyUrl): void
     {
         if (!$tinyUrl->hasCustomUrlKey()) {
             return;
         }
 
-        $tinyUrlRepository = $this->getTinyUrlRepository();
-
         try {
-            $existingTinyUrl = $tinyUrlRepository->findTinyUrlByKey($tinyUrl->getCustomUrlKey());
-        } catch (TinyUrlNotFoundException $e) {
+            $existingTinyUrl = $this->tinyUrlRepository->findTinyUrlByKey($tinyUrl->getCustomUrlKey());
+        } catch (TinyUrlNotFoundException) {
             // No matching URL found, the custom key can be used.
             return;
         }

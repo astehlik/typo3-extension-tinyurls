@@ -65,7 +65,7 @@ class StoragePageQueryRestrictionTest extends TestCase
         $andContraintMock = $this->createMock(CompositeExpression::class);
 
         $this->expressionBuilderMock->expects(self::once())
-            ->method('andX')
+            ->method('and')
             ->with(...$constraints)
             ->willReturn($andContraintMock);
 

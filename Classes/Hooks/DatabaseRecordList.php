@@ -16,6 +16,7 @@ namespace Tx\Tinyurls\Hooks;
 
 use Tx\Tinyurls\Domain\Repository\TinyUrlRepository;
 use Tx\Tinyurls\Utils\UrlUtils;
+use TYPO3\CMS\Backend\View\Event\ModifyDatabaseQueryForRecordListingEvent;
 use TYPO3\CMS\Core\Database\Query\QueryBuilder as Typo3QueryBuilder;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -29,45 +30,30 @@ class DatabaseRecordList implements SingletonInterface
 {
     /**
      * Cache for the URL display query.
-     *
-     * @var string
      */
-    protected $urlDisplayQuery;
+    protected ?string $urlDisplayQuery = null;
 
-    /**
-     * @var UrlUtils
-     */
-    protected $urlUtils;
-
-    public function __construct(UrlUtils $urlUtils)
+    public function __construct(private readonly UrlUtils $urlUtils)
     {
-        $this->urlUtils = $urlUtils;
     }
 
-    /** @noinspection PhpUnusedParameterInspection */
-    public function modifyQuery(
-        array $parameters,
-        string $table,
-        int $pageId,
-        array $additionalConstraints,
-        array $fieldList,
-        Typo3QueryBuilder $queryBuilder
-    ): void {
-        if ($table !== TinyUrlRepository::TABLE_URLS) {
+    public function __invoke(ModifyDatabaseQueryForRecordListingEvent $modifyQueryEvent): void
+    {
+        if ($modifyQueryEvent->getTable() !== TinyUrlRepository::TABLE_URLS) {
             return;
         }
 
-        if ($fieldList !== ['*']) {
+        if ($modifyQueryEvent->getFields() !== ['*']) {
             return;
         }
 
-        $this->buildDisplayQuery($queryBuilder);
+        $this->buildDisplayQuery($modifyQueryEvent->getQueryBuilder());
 
         if (!$this->urlDisplayQuery) {
             return;
         }
 
-        $queryBuilder->addSelectLiteral($this->urlDisplayQuery);
+        $modifyQueryEvent->getQueryBuilder()->addSelectLiteral($this->urlDisplayQuery);
     }
 
     protected function buildDisplayQuery(Typo3QueryBuilder $queryBuilder): void
@@ -83,9 +69,7 @@ class DatabaseRecordList implements SingletonInterface
         }
 
         $quotedUrlParts = array_map(
-            function (string $urlPart) use ($queryBuilder) {
-                return $queryBuilder->quote($urlPart);
-            },
+            fn (string $urlPart) => $queryBuilder->quote($urlPart),
             $tinyUrlParts
         );
         $concatParts = [
