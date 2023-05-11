@@ -13,7 +13,7 @@ return [
         'tstamp' => 'tstamp',
         'default_sortby' => 'ORDER BY target_url',
         'enablecolumns' => ['endtime' => 'valid_until'],
-        'iconfile' => 'EXT:tinyurls/ext_icon.gif',
+        'iconfile' => 'EXT:tinyurls/Resources/Public/Icons/Extension.gif',
         'searchFields' => 'urlkey,target_url,target_url_hash',
         'rootLevel' => -1,
     ],
