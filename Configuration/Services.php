@@ -5,6 +5,7 @@ declare(strict_types=1);
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Tx\Tinyurls\Configuration\ExtensionConfiguration;
 use Tx\Tinyurls\Configuration\TypoScriptConfigurator;
+use Tx\Tinyurls\Controller\EidController;
 use Tx\Tinyurls\Domain\Repository\TinyUrlDoctrineRepository;
 use Tx\Tinyurls\Domain\Repository\TinyUrlRepository;
 use Tx\Tinyurls\Hooks\DatabaseRecordList;
@@ -31,6 +32,7 @@ return function (ContainerConfigurator $configurator): void {
         // Configure services.
         ->set(ExtensionConfiguration::class, ExtensionConfiguration::class)
         ->set(TypoScriptConfigurator::class, TypoScriptConfigurator::class)
+        ->set(EidController::class, EidController::class)
         ->set(TceDataMap::class, TceDataMap::class)
         ->set(Api::class, Api::class)
         ->set(TinyUrlGenerator::class, TinyUrlGenerator::class)
