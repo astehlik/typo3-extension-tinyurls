@@ -35,7 +35,7 @@ class TinyUrlValidatorTest extends TestCase
 
     public function testGetOptionsReturnsEmptyArray(): void
     {
-        /** @extensionScannerIgnoreLine */
+        // @extensionScannerIgnoreLine
         self::assertSame([], $this->tinyUrlValidator->getOptions());
     }
 
