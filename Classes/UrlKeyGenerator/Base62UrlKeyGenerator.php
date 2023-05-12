@@ -20,7 +20,14 @@ use Tx\Tinyurls\Utils\GeneralUtilityWrapper;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
- * Contains utilities for creating tiny url keys and url hashes.
+ * Generates a key for a tinyurl using a configured dictionary.
+ *
+ * The dictionary is used as a base for encoding an integer (the UID of the tinyurl recordd)
+ * into a string.
+ *
+ * Opionally, a minimum length for the generated key can be configured. When the key generated from
+ * the dictionary is shorter than the configured minimum length, a random string is appended to the
+ * original key, separated by a dash.
  */
 class Base62UrlKeyGenerator implements UrlKeyGenerator
 {
@@ -85,21 +92,22 @@ class Base62UrlKeyGenerator implements UrlKeyGenerator
      * Thanks to http://jeremygibbs.com/2012/01/16/how-to-make-a-url-shortener
      *
      * @param int $base10Integer The integer that will converted
-     * @param string $base62Dictionary the dictionary for generating the base62 integer
+     * @param string $baseXDictionary the dictionary for generating the baseX integer
      *
      * @return string A base62 encoded integer using a custom dictionary
      */
-    protected function convertIntToBase62(int $base10Integer, string $base62Dictionary): string
+    protected function convertIntToBase62(int $base10Integer, string $baseXDictionary): string
     {
-        $base62Integer = '';
-        $base = 62;
+        $baseXInteger = '';
+        $base = mb_strlen($baseXDictionary);
 
         do {
-            $base62Integer = $base62Dictionary[$base10Integer % $base] . $base62Integer;
+            $dictionaryOffset = $base10Integer % $base;
+            $baseXInteger = mb_substr($baseXDictionary, $dictionaryOffset, 1) . $baseXInteger;
             $base10Integer = floor($base10Integer / $base);
         } while ($base10Integer > 0);
 
-        return $base62Integer;
+        return $baseXInteger;
     }
 
     /**
