@@ -28,9 +28,15 @@ class Base62UrlKeyGeneratorTest extends TestCase
 {
     protected Base62UrlKeyGenerator $base62UrlKeyGenerator;
 
-    protected ExtensionConfiguration|MockObject $extensionConfigurationMock;
+    /**
+     * @var ExtensionConfiguration|MockObject
+     */
+    protected $extensionConfigurationMock;
 
-    protected GeneralUtilityWrapper|MockObject $generalUtilityMock;
+    /**
+     * @var GeneralUtilityWrapper|MockObject
+     */
+    protected $generalUtilityMock;
 
     protected function setUp(): void
     {
