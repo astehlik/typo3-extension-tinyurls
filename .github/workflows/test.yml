@@ -51,7 +51,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: ./.github/workflows/composer
         with:
-          php_version: "8.1"
+          php_version: "${{ env.MAIN_PHP_VERSION }}"
       - run: |
           bash .Build/bin/t3_run_tests.sh -s cgl -n -p ${{ env.MAIN_PHP_VERSION }}
 
