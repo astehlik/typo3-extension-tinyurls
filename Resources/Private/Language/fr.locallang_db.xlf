@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff version="1.0">
+  <file source-language="en" datatype="plaintext" original="messages" product-name="tinyurls" target-language="fr">
+    <header/>
+    <body>
+      <trans-unit id="tx_tinyurls_urls.counter">
+        <source>Counter</source>
+        <target state="needs-translation">Counter</target>
+      </trans-unit>
+      <trans-unit id="tx_tinyurls_urls.comment">
+        <source>Comment</source>
+        <target state="needs-translation">Comment</target>
+      </trans-unit>
+      <trans-unit id="tx_tinyurls_urls.url_key">
+        <source>URL key</source>
+        <target state="needs-translation">URL key</target>
+      </trans-unit>
+      <trans-unit id="tx_tinyurls_urls.tiny_url">
+        <source>Tiny URL</source>
+        <target state="needs-translation">Tiny URL</target>
+      </trans-unit>
+      <trans-unit id="tx_tinyurls_urls.target_url">
+        <source>Target URL</source>
+        <target state="needs-translation">Target URL</target>
+      </trans-unit>
+      <trans-unit id="tx_tinyurls_urls.target_url_hash">
+        <source>Target URL Hash</source>
+        <target state="needs-translation">Target URL Hash</target>
+      </trans-unit>
+      <trans-unit id="tx_tinyurls_urls.delete_on_use">
+        <source>Delete on use</source>
+        <target state="needs-translation">Delete on use</target>
+      </trans-unit>
+      <trans-unit id="tx_tinyurls_urls.valid_until">
+        <source>Valid until</source>
+        <target state="needs-translation">Valid until</target>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>
