@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff version="1.0">
+  <file source-language="en" datatype="plaintext" original="messages" product-name="tinyurls" target-language="nl">
+    <header/>
+    <body>
+      <trans-unit id="tx_tinyurls.copy_to_clipboard.error.title">
+        <source>Error copying value</source>
+        <target state="needs-translation">Error copying value</target>
+      </trans-unit>
+      <trans-unit id="tx_tinyurls.copy_to_clipboard.error.message">
+        <source>The value could not be copied to the clipboard</source>
+        <target state="needs-translation">The value could not be copied to the clipboard</target>
+      </trans-unit>
+      <trans-unit id="tx_tinyurls.copy_to_clipboard.success.title">
+        <source>Copied to clipboard</source>
+        <target state="needs-translation">Copied to clipboard</target>
+      </trans-unit>
+      <trans-unit id="tx_tinyurls.copy_to_clipboard.success.message">
+        <source>The value was successfully copied to the clipboard.</source>
+        <target state="needs-translation">The value was successfully copied to the clipboard.</target>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>
