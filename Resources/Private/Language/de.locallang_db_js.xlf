@@ -3,21 +3,21 @@
   <file source-language="en" datatype="plaintext" original="messages" product-name="tinyurls" target-language="de">
     <header/>
     <body>
-      <trans-unit id="tx_tinyurls.copy_to_clipboard.error.title">
+      <trans-unit id="tx_tinyurls.copy_to_clipboard.error.title" approved="yes">
         <source>Error copying value</source>
-        <target state="needs-translation">Error copying value</target>
+        <target state="final">Fehler beim Kopieren</target>
       </trans-unit>
-      <trans-unit id="tx_tinyurls.copy_to_clipboard.error.message">
+      <trans-unit id="tx_tinyurls.copy_to_clipboard.error.message" approved="yes">
         <source>The value could not be copied to the clipboard</source>
-        <target state="needs-translation">The value could not be copied to the clipboard</target>
+        <target state="final">Beim Kopieren des Wertes in die Zwischenablage ist ein Fehler aufgetreten.</target>
       </trans-unit>
-      <trans-unit id="tx_tinyurls.copy_to_clipboard.success.title">
+      <trans-unit id="tx_tinyurls.copy_to_clipboard.success.title" approved="yes">
         <source>Copied to clipboard</source>
-        <target state="needs-translation">Copied to clipboard</target>
+        <target state="final">Kopieren erfolgreich</target>
       </trans-unit>
-      <trans-unit id="tx_tinyurls.copy_to_clipboard.success.message">
+      <trans-unit id="tx_tinyurls.copy_to_clipboard.success.message" approved="yes">
         <source>The value was successfully copied to the clipboard.</source>
-        <target state="needs-translation">The value was successfully copied to the clipboard.</target>
+        <target state="final">Der Wert wurde erfolgreich in die Zwischenablage kopiert.</target>
       </trans-unit>
     </body>
   </file>
