@@ -3,37 +3,37 @@
   <file source-language="en" datatype="plaintext" original="messages" product-name="tinyurls" target-language="de">
     <header/>
     <body>
-      <trans-unit id="tx_tinyurls_urls.counter">
+      <trans-unit id="tx_tinyurls_urls.counter" approved="yes">
         <source>Counter</source>
-        <target state="needs-translation">Counter</target>
+        <target state="final">Zähler</target>
       </trans-unit>
-      <trans-unit id="tx_tinyurls_urls.comment">
+      <trans-unit id="tx_tinyurls_urls.comment" approved="yes">
         <source>Comment</source>
-        <target state="needs-translation">Comment</target>
+        <target state="final">Kommentar</target>
       </trans-unit>
-      <trans-unit id="tx_tinyurls_urls.url_key">
+      <trans-unit id="tx_tinyurls_urls.url_key" approved="yes">
         <source>URL key</source>
-        <target state="needs-translation">URL key</target>
+        <target state="final">URL Schlüssel</target>
       </trans-unit>
-      <trans-unit id="tx_tinyurls_urls.tiny_url">
+      <trans-unit id="tx_tinyurls_urls.tiny_url" approved="yes">
         <source>Tiny URL</source>
-        <target state="needs-translation">Tiny URL</target>
+        <target state="final">Tiny URL</target>
       </trans-unit>
-      <trans-unit id="tx_tinyurls_urls.target_url">
+      <trans-unit id="tx_tinyurls_urls.target_url" approved="yes">
         <source>Target URL</source>
-        <target state="needs-translation">Target URL</target>
+        <target state="final">Ziel URL</target>
       </trans-unit>
-      <trans-unit id="tx_tinyurls_urls.target_url_hash">
+      <trans-unit id="tx_tinyurls_urls.target_url_hash" approved="yes">
         <source>Target URL Hash</source>
-        <target state="needs-translation">Target URL Hash</target>
+        <target state="final">Ziel URL Hash</target>
       </trans-unit>
-      <trans-unit id="tx_tinyurls_urls.delete_on_use">
+      <trans-unit id="tx_tinyurls_urls.delete_on_use" approved="yes">
         <source>Delete on use</source>
-        <target state="needs-translation">Delete on use</target>
+        <target state="final">Bei Verwendung löschen</target>
       </trans-unit>
-      <trans-unit id="tx_tinyurls_urls.valid_until">
+      <trans-unit id="tx_tinyurls_urls.valid_until" approved="yes">
         <source>Valid until</source>
-        <target state="needs-translation">Valid until</target>
+        <target state="final">Gültig bis</target>
       </trans-unit>
     </body>
   </file>
