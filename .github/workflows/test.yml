@@ -1,7 +1,10 @@
 ---
 on:
   push:
+  pull_request:
   workflow_dispatch:
+  schedule:
+    - cron: '35 8 * * 6'
 
 env:
   TYPO3_EXTENSION_KEY: tinyurls
