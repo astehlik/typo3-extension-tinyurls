@@ -23,6 +23,8 @@ use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\QueryBuilder;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use Closure;
+use PDO;
 
 class TinyUrlDoctrineRepository extends AbstractTinyUrlDatabaseRepository implements TinyUrlRepository
 {
@@ -47,7 +49,7 @@ class TinyUrlDoctrineRepository extends AbstractTinyUrlDatabaseRepository implem
             ->where(
                 $queryBuilder->expr()->eq(
                     'uid',
-                    $queryBuilder->createNamedParameter($tinyUrl->getUid(), \PDO::PARAM_INT)
+                    $queryBuilder->createNamedParameter($tinyUrl->getUid(), PDO::PARAM_INT)
                 )
             )
             ->executeStatement();
@@ -111,7 +113,7 @@ class TinyUrlDoctrineRepository extends AbstractTinyUrlDatabaseRepository implem
         $result = $queryBuilder
             ->select('*')
             ->from(static::TABLE_URLS)
-            ->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter($uid, \PDO::PARAM_INT)))
+            ->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter($uid, PDO::PARAM_INT)))
             ->executeQuery()
             ->fetchAssociative();
 
@@ -137,7 +139,7 @@ class TinyUrlDoctrineRepository extends AbstractTinyUrlDatabaseRepository implem
                     $queryBuilder->expr()->gt('valid_until', 0),
                     $queryBuilder->expr()->lt(
                         'valid_until',
-                        $queryBuilder->createNamedParameter(time(), \PDO::PARAM_INT)
+                        $queryBuilder->createNamedParameter(time(), PDO::PARAM_INT)
                     )
                 )
             )
@@ -189,7 +191,7 @@ class TinyUrlDoctrineRepository extends AbstractTinyUrlDatabaseRepository implem
         return (int)$this->getDatabaseConnection()->lastInsertId(static::TABLE_URLS);
     }
 
-    protected function transactional(\Closure $callback): void
+    protected function transactional(Closure $callback): void
     {
         $this->getDatabaseConnection()->transactional($callback);
     }

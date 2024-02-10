@@ -10,6 +10,7 @@ use Tx\Tinyurls\Exception\TinyUrlNotFoundException;
 use TYPO3\CMS\Extbase\Error\Result;
 use TYPO3\CMS\Extbase\Validation\Error;
 use TYPO3\CMS\Extbase\Validation\Validator\ValidatorInterface;
+use DateTime;
 
 class TinyUrlValidator implements ValidatorInterface
 {
@@ -70,7 +71,7 @@ class TinyUrlValidator implements ValidatorInterface
 
     protected function validateValidUntil(TinyUrl $tinyUrl): void
     {
-        $now = new \DateTime();
+        $now = new DateTime();
         if ($tinyUrl->hasValidUntil() && $now->diff($tinyUrl->getValidUntil())->invert) {
             $error = new Error('The validUntil DateTime must not be in the past.', 1488307858);
             $this->result->forProperty('validUntil')->addError($error);

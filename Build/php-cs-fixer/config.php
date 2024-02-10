@@ -9,7 +9,7 @@ if (PHP_SAPI !== 'cli') {
     exit('This script supports command line usage only. Please check your command.');
 }
 
-$rules = include __DIR__ . '/../../.Build/vendor/de-swebhosting/php-codestyle/PhpCsFixer/Psr12DefaultRules.php';
+$rules = include __DIR__ . '/../../.Build/vendor/de-swebhosting/php-codestyle/PhpCsFixer/PerCsDefaultRules.php';
 
 return (new Config())
     ->setFinder(

@@ -14,7 +14,7 @@
         "typo3/cms-core": "^12.3"
     },
     "require-dev": {
-        "de-swebhosting/php-codestyle": "^4.0",
+        "de-swebhosting/php-codestyle": "^5.2",
         "de-swebhosting/typo3-extension-buildtools": "dev-TYPO3_12",
         "ergebnis/composer-normalize": "^2.28",
         "friendsofphp/php-cs-fixer": "^3.14",

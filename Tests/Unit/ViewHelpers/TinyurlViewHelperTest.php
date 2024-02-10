@@ -39,7 +39,7 @@ class TinyurlViewHelperTest extends UnitTestCase
     {
         $this->tinyUrlGeneratorMock->expects(self::once())
             ->method('generateTinyUrl')
-            ->with(self::callback(static fn (TinyUrl $tinyUrl): bool => $tinyUrl->getCustomUrlKey() === 'theurl-key'));
+            ->with(self::callback(static fn(TinyUrl $tinyUrl): bool => $tinyUrl->getCustomUrlKey() === 'theurl-key'));
 
         $arguments = [
             'url' => 'http://the-url.tld',
@@ -53,7 +53,7 @@ class TinyurlViewHelperTest extends UnitTestCase
     {
         $this->tinyUrlGeneratorMock->expects(self::once())
             ->method('generateTinyUrl')
-            ->with(self::callback(static fn (TinyUrl $tinyUrl): bool => $tinyUrl->getDeleteOnUse() === true));
+            ->with(self::callback(static fn(TinyUrl $tinyUrl): bool => $tinyUrl->getDeleteOnUse() === true));
 
         $arguments = [
             'url' => 'http://www.url.tld',
@@ -69,7 +69,7 @@ class TinyurlViewHelperTest extends UnitTestCase
             ->method('generateTinyUrl')
             ->with(
                 self::callback(
-                    static fn (TinyUrl $tinyUrl): bool => $tinyUrl->getTargetUrl() === 'http://the-children-url.tld'
+                    static fn(TinyUrl $tinyUrl): bool => $tinyUrl->getTargetUrl() === 'http://the-children-url.tld'
                 )
             );
 
@@ -80,7 +80,9 @@ class TinyurlViewHelperTest extends UnitTestCase
     {
         $this->tinyUrlGeneratorMock->expects(self::once())
             ->method('generateTinyUrl')
-            ->with(self::callback(static fn (TinyUrl $tinyUrl): bool => $tinyUrl->getTargetUrl() === 'http://the-url.tld'));
+            ->with(
+                self::callback(static fn(TinyUrl $tinyUrl): bool => $tinyUrl->getTargetUrl() === 'http://the-url.tld')
+            );
 
         $arguments = ['url' => 'http://the-url.tld'];
         $this->callRender($arguments);
@@ -91,7 +93,9 @@ class TinyurlViewHelperTest extends UnitTestCase
         $this->tinyUrlGeneratorMock->expects(self::once())
             ->method('generateTinyUrl')
             ->with(
-                self::callback(static fn (TinyUrl $tinyUrl): bool => $tinyUrl->getValidUntil()->getTimestamp() === 3848909)
+                self::callback(
+                    static fn(TinyUrl $tinyUrl): bool => $tinyUrl->getValidUntil()->getTimestamp() === 3848909
+                )
             );
 
         $arguments = [
@@ -115,7 +119,7 @@ class TinyurlViewHelperTest extends UnitTestCase
 
         $this->tinyUrlViewHelper->setArguments($arguments);
 
-        $this->tinyUrlViewHelper->setRenderChildrenClosure(static fn () => $childrenOutput);
+        $this->tinyUrlViewHelper->setRenderChildrenClosure(static fn() => $childrenOutput);
 
         $this->tinyUrlViewHelper->render();
     }

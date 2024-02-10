@@ -16,6 +16,7 @@ namespace Tx\Tinyurls\Configuration;
 
 use Tx\Tinyurls\Domain\Model\TinyUrl;
 use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
+use DateTimeImmutable;
 
 class TypoScriptConfigurator
 {
@@ -88,7 +89,7 @@ class TypoScriptConfigurator
             return;
         }
 
-        $tinyUrl->setValidUntil(new \DateTimeImmutable('@' . $validUntil));
+        $tinyUrl->setValidUntil(new DateTimeImmutable('@' . $validUntil));
     }
 
     private function getConfigValue(

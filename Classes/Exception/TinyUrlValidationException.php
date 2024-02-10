@@ -16,8 +16,9 @@ namespace Tx\Tinyurls\Exception;
 
 use TYPO3\CMS\Extbase\Error\Error;
 use TYPO3\CMS\Extbase\Error\Result;
+use InvalidArgumentException;
 
-class TinyUrlValidationException extends \InvalidArgumentException
+class TinyUrlValidationException extends InvalidArgumentException
 {
     /**
      * @var Result

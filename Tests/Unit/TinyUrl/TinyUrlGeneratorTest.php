@@ -22,6 +22,7 @@ use Tx\Tinyurls\Domain\Repository\TinyUrlRepository;
 use Tx\Tinyurls\Exception\TinyUrlNotFoundException;
 use Tx\Tinyurls\TinyUrl\TinyUrlGenerator;
 use Tx\Tinyurls\Utils\UrlUtils;
+use DateTime;
 
 class TinyUrlGeneratorTest extends TestCase
 {
@@ -198,7 +199,7 @@ class TinyUrlGeneratorTest extends TestCase
             ->with(
                 self::callback(
                     static function (TinyUrl $theNewTinyUrl) {
-                        return $theNewTinyUrl->getValidUntil()->diff(new \DateTime('2027-12-16 03:51:30'))->s === 0;
+                        return $theNewTinyUrl->getValidUntil()->diff(new DateTime('2027-12-16 03:51:30'))->s === 0;
                     }
                 )
             );

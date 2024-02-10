@@ -20,6 +20,8 @@ use Tx\Tinyurls\Domain\Validator\TinyUrlValidator;
 use Tx\Tinyurls\Exception\TinyUrlValidationException;
 use Tx\Tinyurls\Utils\UrlUtils;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use Closure;
+use InvalidArgumentException;
 
 abstract class AbstractTinyUrlDatabaseRepository
 {
@@ -33,7 +35,7 @@ abstract class AbstractTinyUrlDatabaseRepository
     /**
      * Executes the callback within a transation.
      */
-    abstract protected function transactional(\Closure $callback): void;
+    abstract protected function transactional(Closure $callback): void;
 
     /**
      * Updates the given URL in the database.
@@ -139,7 +141,7 @@ abstract class AbstractTinyUrlDatabaseRepository
     protected function prepareTinyUrlForUpdate(TinyUrl $tinyUrl): void
     {
         if ($tinyUrl->isNew()) {
-            throw new \InvalidArgumentException('Only existing TinyUrl records can be updated.');
+            throw new InvalidArgumentException('Only existing TinyUrl records can be updated.');
         }
 
         $this->validateTinyUrl($tinyUrl);

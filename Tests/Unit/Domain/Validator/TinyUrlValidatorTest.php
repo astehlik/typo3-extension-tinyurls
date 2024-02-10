@@ -20,6 +20,8 @@ use Tx\Tinyurls\Domain\Model\TinyUrl;
 use Tx\Tinyurls\Domain\Repository\TinyUrlRepository;
 use Tx\Tinyurls\Domain\Validator\TinyUrlValidator;
 use Tx\Tinyurls\Exception\TinyUrlNotFoundException;
+use DateInterval;
+use DateTime;
 
 class TinyUrlValidatorTest extends TestCase
 {
@@ -42,7 +44,7 @@ class TinyUrlValidatorTest extends TestCase
     public function testValidateReturnsErrorIdValidUntilIsInThePast(): void
     {
         $tinyUrl = TinyUrl::createNew();
-        $tinyUrl->setValidUntil(new \DateTime('2000-08-10'));
+        $tinyUrl->setValidUntil(new DateTime('2000-08-10'));
         $result = $this->tinyUrlValidator->validate($tinyUrl);
         self::assertSame(1488307858, $result->forProperty('validUntil')->getFirstError()->getCode());
     }
@@ -62,8 +64,8 @@ class TinyUrlValidatorTest extends TestCase
 
     public function testValidateReturnsNoErrorIdValidUntilIsInTheFuture(): void
     {
-        $tomorrow = new \DateTime();
-        $tomorrow->add(\DateInterval::createFromDateString('tomorrow'));
+        $tomorrow = new DateTime();
+        $tomorrow->add(DateInterval::createFromDateString('tomorrow'));
         $tinyUrl = TinyUrl::createNew();
         $tinyUrl->setValidUntil($tomorrow);
         $result = $this->tinyUrlValidator->validate($tinyUrl);

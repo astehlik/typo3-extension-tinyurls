@@ -23,6 +23,7 @@ use TYPO3\CMS\Core\Imaging\Icon;
 use TYPO3\CMS\Core\Imaging\IconFactory;
 use TYPO3\CMS\Core\Page\JavaScriptModuleInstruction;
 use TYPO3\CMS\Fluid\View\StandaloneView;
+use LogicException;
 
 class CopyableFieldElementTest extends TestCase
 {
@@ -63,10 +64,10 @@ class CopyableFieldElementTest extends TestCase
         $this->formFieldViewMock
             ->expects(self::exactly(2))
             ->method('assign')
-            ->willReturnCallback(static fn (string $name, string $value) => match (true) {
+            ->willReturnCallback(static fn(string $name, string $value) => match (true) {
                 $name === 'fieldValue' && $value === 'testval' => 1,
                 $name === 'clipboardIcon' && $value === 'icon html' => 2,
-                default => throw new \LogicException('Unexpected name or value: ' . $name . ' ' . $value),
+                default => throw new LogicException('Unexpected name or value: ' . $name . ' ' . $value),
             });
 
         $this->copyableFieldElement->render();

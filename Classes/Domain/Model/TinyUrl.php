@@ -16,6 +16,9 @@ namespace Tx\Tinyurls\Domain\Model;
 
 use Tx\Tinyurls\Utils\UrlUtils;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use DateTimeImmutable;
+use DateTimeInterface;
+use InvalidArgumentException;
 
 class TinyUrl
 {
@@ -35,13 +38,13 @@ class TinyUrl
 
     protected string $targetUrlHashOriginal = '';
 
-    protected \DateTimeInterface $tstamp;
+    protected DateTimeInterface $tstamp;
 
     protected int $uid = 0;
 
     protected string $urlkey = '';
 
-    protected ?\DateTimeInterface $validUntil = null;
+    protected ?DateTimeInterface $validUntil = null;
 
     public static function createFromDatabaseRow(array $databaseRow): self
     {
@@ -117,7 +120,7 @@ class TinyUrl
         return $this->targetUrlHash;
     }
 
-    public function getTstamp(): \DateTimeInterface
+    public function getTstamp(): DateTimeInterface
     {
         return $this->tstamp;
     }
@@ -132,7 +135,7 @@ class TinyUrl
         return $this->urlkey;
     }
 
-    public function getValidUntil(): \DateTimeInterface
+    public function getValidUntil(): DateTimeInterface
     {
         return $this->validUntil;
     }
@@ -167,7 +170,7 @@ class TinyUrl
     public function persistPostProcessInsert(int $newUid): void
     {
         if ($newUid === 0) {
-            throw new \InvalidArgumentException('The inserted UID must not be zero.');
+            throw new InvalidArgumentException('The inserted UID must not be zero.');
         }
         $this->uid = $newUid;
         $this->persistPostProcess();
@@ -178,7 +181,7 @@ class TinyUrl
         if ($this->hasCustomUrlKey()) {
             $this->urlkey = $this->getCustomUrlKey();
         }
-        $this->tstamp = new \DateTimeImmutable();
+        $this->tstamp = new DateTimeImmutable();
     }
 
     /**
@@ -213,7 +216,7 @@ class TinyUrl
         $customUrlKey = trim($customUrlKey);
 
         if ($customUrlKey === '') {
-            throw new \InvalidArgumentException('Using an empty custom URL key is not allowed.');
+            throw new InvalidArgumentException('Using an empty custom URL key is not allowed.');
         }
 
         $this->customUrlKey = $customUrlKey;
@@ -234,7 +237,7 @@ class TinyUrl
         $this->targetUrl = $targetUrl;
     }
 
-    public function setValidUntil(\DateTimeInterface $validUntil): void
+    public function setValidUntil(DateTimeInterface $validUntil): void
     {
         $this->validUntil = $validUntil;
     }
@@ -243,7 +246,7 @@ class TinyUrl
     {
         $this->uid = (int)$databaseRow['uid'];
         $this->pid = (int)$databaseRow['pid'];
-        $this->tstamp = new \DateTimeImmutable('@' . (int)$databaseRow['tstamp']);
+        $this->tstamp = new DateTimeImmutable('@' . (int)$databaseRow['tstamp']);
         $this->counter = (int)$databaseRow['counter'];
         $this->comment = (string)$databaseRow['comment'];
         $this->urlkey = (string)$databaseRow['urlkey'];
@@ -252,7 +255,7 @@ class TinyUrl
         $this->targetUrlHashOriginal = (string)$databaseRow['target_url_hash'];
         $this->deleteOnUse = (bool)$databaseRow['delete_on_use'];
         $this->validUntil = (int)$databaseRow['valid_until'] !== 0
-            ? new \DateTimeImmutable('@' . (int)$databaseRow['valid_until'])
+            ? new DateTimeImmutable('@' . (int)$databaseRow['valid_until'])
             : null;
     }
 

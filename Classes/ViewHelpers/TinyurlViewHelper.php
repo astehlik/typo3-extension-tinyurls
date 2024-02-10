@@ -17,6 +17,7 @@ namespace Tx\Tinyurls\ViewHelpers;
 use Tx\Tinyurls\Domain\Model\TinyUrl;
 use Tx\Tinyurls\TinyUrl\TinyUrlGenerator;
 use TYPO3Fluid\Fluid\Core\ViewHelper\AbstractViewHelper;
+use DateTimeImmutable;
 
 /**
  * A view helper for shortening URLs.
@@ -72,7 +73,7 @@ class TinyurlViewHelper extends AbstractViewHelper
         }
 
         if ($validUntil > 0) {
-            $tinyUrl->setValidUntil(new \DateTimeImmutable('@' . $validUntil));
+            $tinyUrl->setValidUntil(new DateTimeImmutable('@' . $validUntil));
         }
 
         if ($urlKey !== '') {

@@ -17,6 +17,7 @@ namespace Tx\Tinyurls\TinyUrl;
 use Tx\Tinyurls\Configuration\TypoScriptConfigurator;
 use Tx\Tinyurls\Domain\Model\TinyUrl;
 use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
+use DateTimeImmutable;
 
 /**
  * Use this class for generating tiny URLs in your own extension.
@@ -114,6 +115,6 @@ class Api
      */
     public function setValidUntil(int $validUntil): void
     {
-        $this->tinyUrl->setValidUntil(new \DateTimeImmutable('@' . $validUntil));
+        $this->tinyUrl->setValidUntil(new DateTimeImmutable('@' . $validUntil));
     }
 }

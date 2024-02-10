@@ -19,6 +19,7 @@ use Tx\Tinyurls\Domain\Model\TinyUrl;
 use Tx\Tinyurls\Domain\Repository\TinyUrlRepository;
 use Tx\Tinyurls\Exception\TinyUrlNotFoundException;
 use Tx\Tinyurls\Utils\UrlUtils;
+use InvalidArgumentException;
 
 /**
  * This class is responsible for generating tiny Urls based on configuration
@@ -118,7 +119,7 @@ class TinyUrlGenerator
     private function createOrFetchTinyUrl(TinyUrl $tinyUrl): TinyUrl
     {
         if ($tinyUrl->getTargetUrl() === '') {
-            throw new \InvalidArgumentException('Target URL must not be empty!');
+            throw new InvalidArgumentException('Target URL must not be empty!');
         }
 
         try {

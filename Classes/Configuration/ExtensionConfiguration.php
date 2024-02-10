@@ -18,6 +18,7 @@ use Tx\Tinyurls\TinyUrl\TinyUrlGenerator;
 use TYPO3\CMS\Core\Configuration\ExtensionConfiguration as TYPO3ExtensionConfiguration;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use InvalidArgumentException;
 
 /**
  * Contains utilities for getting configuration.
@@ -103,7 +104,7 @@ class ExtensionConfiguration implements SingletonInterface
         $this->initializeExtensionConfiguration();
 
         if (!array_key_exists($key, $this->extensionConfiguration)) {
-            throw new \InvalidArgumentException('The key ' . $key . ' does not exists in the extension configuration');
+            throw new InvalidArgumentException('The key ' . $key . ' does not exists in the extension configuration');
         }
 
         return $this->extensionConfiguration[$key];

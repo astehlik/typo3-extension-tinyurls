@@ -31,6 +31,8 @@ use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\QueryBuilder;
 use TYPO3\CMS\Core\Database\Query\Restriction\QueryRestrictionContainerInterface;
 use TYPO3\CMS\Extbase\Error\Result;
+use Closure;
+use InvalidArgumentException;
 
 /**
  * @backupGlobals enabled
@@ -370,7 +372,7 @@ class TinyUrlDoctrineRepositoryTest extends TestCase
             ->method('update')
             ->with(
                 TinyUrlRepository::TABLE_URLS,
-                self::callback(static fn (array $databaseRow) => array_diff_assoc($tinyUrlData, $databaseRow) === []),
+                self::callback(static fn(array $databaseRow) => array_diff_assoc($tinyUrlData, $databaseRow) === []),
                 ['uid' => 945]
             );
 
@@ -410,7 +412,7 @@ class TinyUrlDoctrineRepositoryTest extends TestCase
 
     public function testUpdateTinyUrlThrowsExceptionForNewTinyUrl(): void
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Only existing TinyUrl records can be updated.');
         $tinyUrl = TinyUrl::createNew();
         $this->doctrineRepository->updateTinyUrl($tinyUrl);
@@ -457,7 +459,7 @@ class TinyUrlDoctrineRepositoryTest extends TestCase
         $this->databaseConnectionMock->expects(self::once())
             ->method('transactional')
             ->willReturnCallback(
-                static function (\Closure $callback): void {
+                static function (Closure $callback): void {
                     $callback();
                 }
             );
