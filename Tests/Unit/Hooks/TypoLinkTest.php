@@ -14,6 +14,7 @@ namespace Tx\Tinyurls\Tests\Unit\Hooks;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Tx\Tinyurls\Hooks\TypoLink;
 use Tx\Tinyurls\TinyUrl\Api;
@@ -26,7 +27,11 @@ class TypoLinkTest extends TestCase
 {
     private const TARGET_URL = 'https://the-tiny-url.tld';
 
+    private ContentObjectRenderer|MockObject $contentObjectRendererMock;
+
     private array $linkInstructions;
+
+    private Api|MockObject $tinyUrlApiMock;
 
     private TypoLink $typoLinkHook;
 
