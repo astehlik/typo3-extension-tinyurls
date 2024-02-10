@@ -34,7 +34,7 @@ class TypoScriptTest extends AbstractFunctionalTestCase
     {
         $this->setUpFrontendRootPage(
             1,
-            ['EXT:tinyurls/Tests/Functional/Fixtures/TypoScript/SimpleTinyUrlTypolink.setupts']
+            ['EXT:tinyurls/Tests/Functional/Fixtures/TypoScript/SimpleTinyUrlTypolink.typoscript']
         );
         $this->setUpFrontendSite(1);
         $request = (new InternalRequest())->withPageId(1);
