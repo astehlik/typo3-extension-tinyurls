@@ -43,9 +43,7 @@ class ExtensionConfiguration implements SingletonInterface
 
     protected ?TypoScriptConfigurator $typoScriptConfigurator = null;
 
-    public function __construct(protected readonly TYPO3ExtensionConfiguration $typo3extensionConfiguration)
-    {
-    }
+    public function __construct(protected readonly TYPO3ExtensionConfiguration $typo3extensionConfiguration) {}
 
     /**
      * Appends a PID query to the given where statement.

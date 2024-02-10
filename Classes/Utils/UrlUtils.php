@@ -28,8 +28,7 @@ class UrlUtils implements SingletonInterface
         private readonly ExtensionConfiguration $extensionConfiguration,
         private readonly GeneralUtilityWrapper $generalUtility,
         private readonly UrlKeyGenerator $urlKeyGenerator
-    ) {
-    }
+    ) {}
 
     public function buildTinyUrl(string $tinyUrlKey): string
     {

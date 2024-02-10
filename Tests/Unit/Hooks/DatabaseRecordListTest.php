@@ -32,7 +32,7 @@ class DatabaseRecordListTest extends TestCase
 {
     private DatabaseRecordListHooks $databaseRecordListHooks;
 
-    private MockObject|DatabaseRecordList $parentRecordListMock;
+    private DatabaseRecordList|MockObject $parentRecordListMock;
 
     private MockObject|UrlUtils $urlUtilsMock;
 
@@ -145,12 +145,12 @@ class DatabaseRecordListTest extends TestCase
             ->getMock();
 
         $queryBuilder->method('quote')->willReturnCallback(
-            function (string $value) {
+            static function (string $value) {
                 return "'" . $value . "'";
             }
         );
         $queryBuilder->method('quoteIdentifier')->willReturnCallback(
-            function (string $value) {
+            static function (string $value) {
                 return '`' . $value . '`';
             }
         );

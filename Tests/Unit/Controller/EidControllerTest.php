@@ -34,9 +34,9 @@ class EidControllerTest extends TestCase
 {
     private EidController $eidController;
 
-    private MockObject|ErrorController $errorControllerMock;
+    private ErrorController|MockObject $errorControllerMock;
 
-    private TinyUrlRepository|MockObject $tinyUrlRepositoryMock;
+    private MockObject|TinyUrlRepository $tinyUrlRepositoryMock;
 
     protected function setUp(): void
     {
@@ -49,7 +49,7 @@ class EidControllerTest extends TestCase
         $GLOBALS['EXEC_TIME'] = time();
     }
 
-    public static function tinyUrlRedirectSendsNoCacheHeadersDataProvider(): array
+    public static function provideTinyUrlRedirectSendsNoCacheHeadersCases(): iterable
     {
         return [
             [
@@ -180,7 +180,7 @@ class EidControllerTest extends TestCase
     }
 
     /**
-     * @dataProvider tinyUrlRedirectSendsNoCacheHeadersDataProvider
+     * @dataProvider provideTinyUrlRedirectSendsNoCacheHeadersCases
      */
     public function testTinyUrlRedirectSendsNoCacheHeaders(string $headerName, string $expectedValue): void
     {

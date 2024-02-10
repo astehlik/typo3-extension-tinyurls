@@ -31,7 +31,7 @@ class UrlUtilsTest extends TestCase
 
     private GeneralUtilityWrapper|MockObject $generalUtilityMock;
 
-    private UrlKeyGenerator|MockObject $urlKeyGeneratorMock;
+    private MockObject|UrlKeyGenerator $urlKeyGeneratorMock;
 
     private UrlUtils $urlUtils;
 

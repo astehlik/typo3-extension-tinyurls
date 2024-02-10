@@ -31,8 +31,7 @@ class TceDataMap
     public function __construct(
         protected readonly TinyUrlRepository $tinyUrlRepository,
         protected readonly UrlUtils $urlUtils
-    ) {
-    }
+    ) {}
 
     /**
      * When a user stores a tinyurl record in the Backend the urlkey and the target_url_hash will be updated.

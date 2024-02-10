@@ -34,9 +34,7 @@ use TYPO3Fluid\Fluid\Core\ViewHelper\AbstractViewHelper;
  */
 class TinyurlViewHelper extends AbstractViewHelper
 {
-    public function __construct(private readonly TinyUrlGenerator $tinyUrlGenerator)
-    {
-    }
+    public function __construct(private readonly TinyUrlGenerator $tinyUrlGenerator) {}
 
     public function initializeArguments(): void
     {

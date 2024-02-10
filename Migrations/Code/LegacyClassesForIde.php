@@ -16,51 +16,37 @@ namespace {
     /**
      * @deprecated since 1.0.0 will be removed in 3.0.0
      */
-    class Tx_Tinyurls_Hooks_EidProcessor extends EidProcessor
-    {
-    }
+    class Tx_Tinyurls_Hooks_EidProcessor extends EidProcessor {}
 
     /**
      * @deprecated since 1.0.0 will be removed in 3.0.0
      */
-    class Tx_Tinyurls_Hooks_Tce extends TceDataMap
-    {
-    }
+    class Tx_Tinyurls_Hooks_Tce extends TceDataMap {}
 
     /**
      * @deprecated since 1.0.0 will be removed in 3.0.0
      */
-    class Tx_Tinyurls_Hooks_TypoLink extends TypoLink
-    {
-    }
+    class Tx_Tinyurls_Hooks_TypoLink extends TypoLink {}
 
     /**
      * @deprecated since 1.0.0 will be removed in 3.0.0
      */
-    class Tx_Tinyurls_TinyUrl_Api extends Api
-    {
-    }
+    class Tx_Tinyurls_TinyUrl_Api extends Api {}
 
     /**
      * @deprecated since 1.0.0 will be removed in 3.0.0
      */
-    class Tx_Tinyurls_TinyUrl_TinyUrlGenerator extends TinyUrlGenerator
-    {
-    }
+    class Tx_Tinyurls_TinyUrl_TinyUrlGenerator extends TinyUrlGenerator {}
 
     /**
      * @deprecated since 1.0.0 will be removed in 3.0.0
      */
-    class Tx_Tinyurls_Utils_ConfigUtils extends ConfigUtils
-    {
-    }
+    class Tx_Tinyurls_Utils_ConfigUtils extends ConfigUtils {}
 
     /**
      * @deprecated since 1.0.0 will be removed in 3.0.0
      */
-    class Tx_Tinyurls_Utils_UrlUtils extends UrlUtils
-    {
-    }
+    class Tx_Tinyurls_Utils_UrlUtils extends UrlUtils {}
 }
 
 namespace Tx\Tinyurls\Hooks {
@@ -69,9 +55,7 @@ namespace Tx\Tinyurls\Hooks {
     /**
      * @deprecated since 2.0.0 will be removed in 4.0.0
      */
-    class EidProcessor extends EidController
-    {
-    }
+    class EidProcessor extends EidController {}
 }
 
 namespace Tx\Tinyurls\Utils {
@@ -80,7 +64,5 @@ namespace Tx\Tinyurls\Utils {
     /**
      * @deprecated since 2.0.0 will be removed in 4.0.0
      */
-    class ConfigUtils extends ExtensionConfiguration
-    {
-    }
+    class ConfigUtils extends ExtensionConfiguration {}
 }

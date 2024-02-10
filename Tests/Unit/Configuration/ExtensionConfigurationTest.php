@@ -26,7 +26,7 @@ class ExtensionConfigurationTest extends TestCase
 {
     private ExtensionConfiguration $extensionConfiguration;
 
-    private TYPO3ExtensionConfiguration|MockObject $typo3ExtensionConfigurationMock;
+    private MockObject|TYPO3ExtensionConfiguration $typo3ExtensionConfigurationMock;
 
     protected function setUp(): void
     {

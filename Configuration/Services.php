@@ -21,7 +21,7 @@ use Tx\Tinyurls\ViewHelpers\TinyurlViewHelper;
 use TYPO3\CMS\Backend\View\Event\ModifyDatabaseQueryForRecordListingEvent;
 use TYPO3\CMS\Frontend\Event\AfterLinkIsGeneratedEvent;
 
-return function (ContainerConfigurator $configurator): void {
+return static function (ContainerConfigurator $configurator): void {
     $configurator->services()
         ->defaults()->autowire()->autoconfigure()->public()
 

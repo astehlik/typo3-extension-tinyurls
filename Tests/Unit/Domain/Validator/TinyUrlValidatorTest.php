@@ -23,7 +23,7 @@ use Tx\Tinyurls\Exception\TinyUrlNotFoundException;
 
 class TinyUrlValidatorTest extends TestCase
 {
-    private TinyUrlRepository|MockObject $tinyUrlRepositoryMock;
+    private MockObject|TinyUrlRepository $tinyUrlRepositoryMock;
 
     private TinyUrlValidator $tinyUrlValidator;
 

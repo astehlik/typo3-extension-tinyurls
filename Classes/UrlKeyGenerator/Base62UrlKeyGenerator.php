@@ -33,8 +33,7 @@ class Base62UrlKeyGenerator implements UrlKeyGenerator
     public function __construct(
         protected readonly ExtensionConfiguration $extensionConfiguration,
         protected readonly GeneralUtilityWrapper $generalUtility
-    ) {
-    }
+    ) {}
 
     /**
      * Generates a unique tinyurl key for the record with the given UID.

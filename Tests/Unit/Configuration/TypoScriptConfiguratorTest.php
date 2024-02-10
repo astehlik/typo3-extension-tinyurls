@@ -131,7 +131,7 @@ class TypoScriptConfiguratorTest extends TestCase
             ->method('resetValidUntil');
         $this->tinyUrlMock->expects(self::once())
             ->method('setValidUntil')
-            ->with(self::callback(fn (\DateTimeImmutable $dateTime) => $dateTime->getTimestamp() === 2389));
+            ->with(self::callback(static fn (\DateTimeImmutable $dateTime) => $dateTime->getTimestamp() === 2389));
 
         $this->initializeConfigFromTyposcript(
             ['tinyurl.' => ['validUntil' => 2389]],

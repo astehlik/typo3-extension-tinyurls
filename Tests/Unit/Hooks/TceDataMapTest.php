@@ -27,9 +27,9 @@ class TceDataMapTest extends TestCase
 {
     private TceDataMap $tceDataMapHook;
 
-    private TinyUrlRepository|MockObject $tinyUrlRepositoryMock;
+    private MockObject|TinyUrlRepository $tinyUrlRepositoryMock;
 
-    private UrlUtils|MockObject $urlUtilsMock;
+    private MockObject|UrlUtils $urlUtilsMock;
 
     protected function setUp(): void
     {

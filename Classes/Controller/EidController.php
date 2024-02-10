@@ -34,9 +34,7 @@ class EidController
 {
     private ?ErrorController $errorController = null;
 
-    public function __construct(protected readonly TinyUrlRepository $tinyUrlRepository)
-    {
-    }
+    public function __construct(protected readonly TinyUrlRepository $tinyUrlRepository) {}
 
     public function setErrorController(ErrorController $errorController): void
     {

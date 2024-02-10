@@ -15,9 +15,7 @@ class TinyUrlValidator implements ValidatorInterface
 {
     protected Result $result;
 
-    public function __construct(protected readonly TinyUrlRepository $tinyUrlRepository)
-    {
-    }
+    public function __construct(protected readonly TinyUrlRepository $tinyUrlRepository) {}
 
     /**
      * Returns the options of this validator which can be specified in the constructor.
@@ -30,9 +28,7 @@ class TinyUrlValidator implements ValidatorInterface
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
-    public function setOptions(array $options): void
-    {
-    }
+    public function setOptions(array $options): void {}
 
     /**
      * Checks if the given value is valid according to the validator, and returns

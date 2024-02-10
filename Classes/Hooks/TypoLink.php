@@ -25,9 +25,7 @@ use TYPO3\CMS\Frontend\Event\AfterLinkIsGeneratedEvent;
  */
 class TypoLink
 {
-    public function __construct(private readonly Api $tinyUrlApi)
-    {
-    }
+    public function __construct(private readonly Api $tinyUrlApi) {}
 
     public function __invoke(AfterLinkIsGeneratedEvent $afterLinkIsGeneratedEvent): void
     {

@@ -27,9 +27,9 @@ class TinyUrlGeneratorTest extends TestCase
 {
     private TinyUrlGenerator $tinyUrlGenerator;
 
-    private TinyUrlRepository|MockObject $tinyUrlRepositoryMock;
+    private MockObject|TinyUrlRepository $tinyUrlRepositoryMock;
 
-    private UrlUtils|MockObject $urlUtilsMock;
+    private MockObject|UrlUtils $urlUtilsMock;
 
     protected function setUp(): void
     {
@@ -72,7 +72,7 @@ class TinyUrlGeneratorTest extends TestCase
             ->method('insertNewTinyUrl')
             ->with(
                 self::callback(
-                    function (TinyUrl $theNewTinyUrl) {
+                    static function (TinyUrl $theNewTinyUrl) {
                         $theNewTinyUrl->setCustomUrlKey('theKey');
                         $theNewTinyUrl->persistPreProcess();
                         $theNewTinyUrl->persistPostProcessInsert(234);
@@ -117,7 +117,7 @@ class TinyUrlGeneratorTest extends TestCase
             ->method('insertNewTinyUrl')
             ->with(
                 self::callback(
-                    function (TinyUrl $theNewTinyUrl) {
+                    static function (TinyUrl $theNewTinyUrl) {
                         return $theNewTinyUrl->getComment() === 'the comment';
                     }
                 )
@@ -137,7 +137,7 @@ class TinyUrlGeneratorTest extends TestCase
             ->method('insertNewTinyUrl')
             ->with(
                 self::callback(
-                    function (TinyUrl $theNewTinyUrl) {
+                    static function (TinyUrl $theNewTinyUrl) {
                         return $theNewTinyUrl->getDeleteOnUse() === true;
                     }
                 )
@@ -157,7 +157,7 @@ class TinyUrlGeneratorTest extends TestCase
             ->method('insertNewTinyUrl')
             ->with(
                 self::callback(
-                    function (TinyUrl $theNewTinyUrl) {
+                    static function (TinyUrl $theNewTinyUrl) {
                         return $theNewTinyUrl->hasCustomUrlKey() === false;
                     }
                 )
@@ -177,7 +177,7 @@ class TinyUrlGeneratorTest extends TestCase
             ->method('insertNewTinyUrl')
             ->with(
                 self::callback(
-                    function (TinyUrl $theNewTinyUrl) {
+                    static function (TinyUrl $theNewTinyUrl) {
                         return $theNewTinyUrl->getCustomUrlKey() === 'the custom key';
                     }
                 )
@@ -197,7 +197,7 @@ class TinyUrlGeneratorTest extends TestCase
             ->method('insertNewTinyUrl')
             ->with(
                 self::callback(
-                    function (TinyUrl $theNewTinyUrl) {
+                    static function (TinyUrl $theNewTinyUrl) {
                         return $theNewTinyUrl->getValidUntil()->diff(new \DateTime('2027-12-16 03:51:30'))->s === 0;
                     }
                 )
