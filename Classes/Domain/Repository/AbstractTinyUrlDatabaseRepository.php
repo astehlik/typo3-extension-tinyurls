@@ -56,7 +56,7 @@ abstract class AbstractTinyUrlDatabaseRepository
         $this->transactional(
             function () use ($tinyUrl): void {
                 $this->insertNewTinyUrlTransaction($tinyUrl);
-            }
+            },
         );
     }
 

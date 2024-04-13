@@ -49,7 +49,7 @@ class StoragePageQueryRestrictionTest extends TestCase
 
         $expression = $this->storagePageQueryRestriction->buildExpression(
             ['the_table' => 'the_alias'],
-            $this->expressionBuilderMock
+            $this->expressionBuilderMock,
         );
         self::assertSame(0, $expression->count());
     }
@@ -71,7 +71,7 @@ class StoragePageQueryRestrictionTest extends TestCase
 
         $expression = $this->storagePageQueryRestriction->buildExpression(
             [TinyUrlRepository::TABLE_URLS => 'the_alias'],
-            $this->expressionBuilderMock
+            $this->expressionBuilderMock,
         );
 
         self::assertSame($andContraintMock, $expression);
@@ -86,7 +86,7 @@ class StoragePageQueryRestrictionTest extends TestCase
 
         $this->storagePageQueryRestriction->buildExpression(
             [TinyUrlRepository::TABLE_URLS => ''],
-            $this->expressionBuilderMock
+            $this->expressionBuilderMock,
         );
     }
 }

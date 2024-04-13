@@ -36,7 +36,7 @@ class TypoScriptConfigurator
     public function initializeConfigFromTyposcript(
         TinyUrl $tinyUrl,
         array $config,
-        ContentObjectRenderer $contentObjectRenderer
+        ContentObjectRenderer $contentObjectRenderer,
     ): void {
         if (!array_key_exists('tinyurl.', $config)) {
             return;
@@ -95,7 +95,7 @@ class TypoScriptConfigurator
     private function getConfigValue(
         string $configKey,
         array $tinyUrlConfig,
-        ContentObjectRenderer $contentObjectRenderer
+        ContentObjectRenderer $contentObjectRenderer,
     ): mixed {
         $configValue = $this->tinyurlConfigDefaults[$configKey];
 

@@ -47,7 +47,7 @@ return static function (ContainerConfigurator $configurator): void {
             [
                 'event' => AfterLinkIsGeneratedEvent::class,
                 'identifier' => 'tinyurlsAfterLinkIsGeneratedEventListener',
-            ]
+            ],
         )
         ->set(DatabaseRecordList::class, DatabaseRecordList::class)
         ->tag(
@@ -55,6 +55,6 @@ return static function (ContainerConfigurator $configurator): void {
             [
                 'event' => ModifyDatabaseQueryForRecordListingEvent::class,
                 'identifier' => 'tinyurlsModifyDatabaseQueryForRecordListingEventListener',
-            ]
+            ],
         );
 };

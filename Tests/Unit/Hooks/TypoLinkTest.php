@@ -93,7 +93,7 @@ class TypoLinkTest extends TestCase
     protected function getAfterLinkCreatedEvent(
         string $typoLinkType = LinkService::TYPE_URL,
         $tinyUrlEnabled = true,
-        $tinyUrlConfig = []
+        $tinyUrlConfig = [],
     ): AfterLinkIsGeneratedEvent {
         $this->linkInstructions = [
             'tinyurl' => $tinyUrlEnabled,

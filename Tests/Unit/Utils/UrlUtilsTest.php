@@ -44,7 +44,7 @@ class UrlUtilsTest extends TestCase
         $this->urlUtils = new UrlUtils(
             $this->extensionConfigurationMock,
             $this->generalUtilityMock,
-            $this->urlKeyGeneratorMock
+            $this->urlKeyGeneratorMock,
         );
     }
 
@@ -64,7 +64,7 @@ class UrlUtilsTest extends TestCase
 
         self::assertSame(
             'http://the-site.url/?eID=tx_tinyurls&tx_tinyurls[key]=thekey',
-            $this->urlUtils->buildTinyUrl('thekey')
+            $this->urlUtils->buildTinyUrl('thekey'),
         );
     }
 
@@ -119,7 +119,7 @@ class UrlUtilsTest extends TestCase
         /** @noinspection PhpDeprecationInspection */
         self::assertSame(
             'ee85c8ee5b024efa864c06a98ed613286d134aad',
-            $this->urlUtils->generateTinyurlHash('http://the-url.tld')
+            $this->urlUtils->generateTinyurlHash('http://the-url.tld'),
         );
     }
 

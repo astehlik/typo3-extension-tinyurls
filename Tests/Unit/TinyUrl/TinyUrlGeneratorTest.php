@@ -40,7 +40,7 @@ class TinyUrlGeneratorTest extends TestCase
         $this->tinyUrlGenerator = new TinyUrlGenerator(
             $this->tinyUrlRepositoryMock,
             new TypoScriptConfigurator(),
-            $this->urlUtilsMock
+            $this->urlUtilsMock,
         );
     }
 
@@ -78,8 +78,8 @@ class TinyUrlGeneratorTest extends TestCase
                         $theNewTinyUrl->persistPreProcess();
                         $theNewTinyUrl->persistPostProcessInsert(234);
                         return true;
-                    }
-                )
+                    },
+                ),
             );
 
         $this->urlUtilsMock->expects(self::once())
@@ -120,8 +120,8 @@ class TinyUrlGeneratorTest extends TestCase
                 self::callback(
                     static function (TinyUrl $theNewTinyUrl) {
                         return $theNewTinyUrl->getComment() === 'the comment';
-                    }
-                )
+                    },
+                ),
             );
 
         $this->tinyUrlGenerator->setComment('the comment');
@@ -140,8 +140,8 @@ class TinyUrlGeneratorTest extends TestCase
                 self::callback(
                     static function (TinyUrl $theNewTinyUrl) {
                         return $theNewTinyUrl->getDeleteOnUse() === true;
-                    }
-                )
+                    },
+                ),
             );
 
         $this->tinyUrlGenerator->setOptionDeleteOnUse(true);
@@ -160,8 +160,8 @@ class TinyUrlGeneratorTest extends TestCase
                 self::callback(
                     static function (TinyUrl $theNewTinyUrl) {
                         return $theNewTinyUrl->hasCustomUrlKey() === false;
-                    }
-                )
+                    },
+                ),
             );
 
         $this->tinyUrlGenerator->setOptionUrlKey('');
@@ -180,8 +180,8 @@ class TinyUrlGeneratorTest extends TestCase
                 self::callback(
                     static function (TinyUrl $theNewTinyUrl) {
                         return $theNewTinyUrl->getCustomUrlKey() === 'the custom key';
-                    }
-                )
+                    },
+                ),
             );
 
         $this->tinyUrlGenerator->setOptionUrlKey('the custom key');
@@ -200,8 +200,8 @@ class TinyUrlGeneratorTest extends TestCase
                 self::callback(
                     static function (TinyUrl $theNewTinyUrl) {
                         return $theNewTinyUrl->getValidUntil()->diff(new DateTime('2027-12-16 03:51:30'))->s === 0;
-                    }
-                )
+                    },
+                ),
             );
 
         $this->tinyUrlGenerator->setOptionValidUntil(1828929090);

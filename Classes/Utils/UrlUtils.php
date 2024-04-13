@@ -27,7 +27,7 @@ class UrlUtils implements SingletonInterface
     public function __construct(
         private readonly ExtensionConfiguration $extensionConfiguration,
         private readonly GeneralUtilityWrapper $generalUtility,
-        private readonly UrlKeyGenerator $urlKeyGenerator
+        private readonly UrlKeyGenerator $urlKeyGenerator,
     ) {}
 
     public function buildTinyUrl(string $tinyUrlKey): string
@@ -59,7 +59,7 @@ class UrlUtils implements SingletonInterface
             $speakingUrl = str_replace(
                 '###' . $match . '###',
                 $this->generalUtility->getIndpEnv($match),
-                $speakingUrl
+                $speakingUrl,
             );
         }
 

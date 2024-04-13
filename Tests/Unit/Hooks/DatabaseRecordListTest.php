@@ -123,7 +123,7 @@ class DatabaseRecordListTest extends TestCase
     private function callModifyQuery(
         Typo3QueryBuilder $queryBuilder,
         $table = TinyUrlRepository::TABLE_URLS,
-        $fieldList = ['*']
+        $fieldList = ['*'],
     ): void {
         $event = new ModifyDatabaseQueryForRecordListingEvent(
             $queryBuilder,
@@ -132,7 +132,7 @@ class DatabaseRecordListTest extends TestCase
             $fieldList,
             1,
             20,
-            $this->parentRecordListMock
+            $this->parentRecordListMock,
         );
 
         $this->databaseRecordListHooks->__invoke($event);
@@ -147,12 +147,12 @@ class DatabaseRecordListTest extends TestCase
         $queryBuilder->method('quote')->willReturnCallback(
             static function (string $value) {
                 return "'" . $value . "'";
-            }
+            },
         );
         $queryBuilder->method('quoteIdentifier')->willReturnCallback(
             static function (string $value) {
                 return '`' . $value . '`';
-            }
+            },
         );
 
         return $queryBuilder;

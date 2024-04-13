@@ -83,7 +83,7 @@ class ExtensionConfigurationTest extends TestCase
 
         self::assertSame(
             'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789',
-            $this->extensionConfiguration->getBase62Dictionary()
+            $this->extensionConfiguration->getBase62Dictionary(),
         );
     }
 
@@ -123,7 +123,7 @@ class ExtensionConfigurationTest extends TestCase
 
         self::assertSame(
             '###TYPO3_SITE_URL###tinyurl/###TINY_URL_KEY###',
-            $this->extensionConfiguration->getSpeakingUrlTemplate()
+            $this->extensionConfiguration->getSpeakingUrlTemplate(),
         );
     }
 

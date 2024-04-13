@@ -34,14 +34,14 @@ class TypoScriptTest extends AbstractFunctionalTestCase
     {
         $this->setUpFrontendRootPage(
             1,
-            ['EXT:tinyurls/Tests/Functional/Fixtures/TypoScript/SimpleTinyUrlTypolink.typoscript']
+            ['EXT:tinyurls/Tests/Functional/Fixtures/TypoScript/SimpleTinyUrlTypolink.typoscript'],
         );
         $this->setUpFrontendSite(1);
         $request = (new InternalRequest())->withPageId(1);
         $response = $this->executeFrontendSubRequest($request);
         self::assertMatchesRegularExpression(
             '/http:\/\/localhost\/\?eID=tx_tinyurls&amp;tx_tinyurls\[key\]=b-[a-zA-Z0-9]{7}/',
-            (string)$response->getBody()
+            (string)$response->getBody(),
         );
     }
 }

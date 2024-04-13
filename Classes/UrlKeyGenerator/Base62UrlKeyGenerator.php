@@ -32,7 +32,7 @@ class Base62UrlKeyGenerator implements UrlKeyGenerator
 {
     public function __construct(
         protected readonly ExtensionConfiguration $extensionConfiguration,
-        protected readonly GeneralUtilityWrapper $generalUtility
+        protected readonly GeneralUtilityWrapper $generalUtility,
     ) {}
 
     /**
@@ -50,7 +50,7 @@ class Base62UrlKeyGenerator implements UrlKeyGenerator
     {
         $tinyUrlKey = $this->convertIntToBase62(
             $uid,
-            $this->extensionConfiguration->getBase62Dictionary()
+            $this->extensionConfiguration->getBase62Dictionary(),
         );
 
         $numberOfFillupChars =

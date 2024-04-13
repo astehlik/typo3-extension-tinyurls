@@ -57,7 +57,7 @@ class TceDataMapTest extends TestCase
             'tx_tinyurls_urls',
             '99',
             $fieldArray,
-            $this->getDataHandlerMock()
+            $this->getDataHandlerMock(),
         );
 
         self::assertSame($fieldArrayOriginal, $fieldArray);
@@ -83,7 +83,7 @@ class TceDataMapTest extends TestCase
             'tx_tinyurls_urls',
             '99',
             $fieldArray,
-            $this->getDataHandlerMock()
+            $this->getDataHandlerMock(),
         );
 
         self::assertSame('the new hash', $fieldArray['target_url_hash']);
@@ -114,7 +114,7 @@ class TceDataMapTest extends TestCase
             'tx_tinyurls_urls',
             '99',
             $fieldArray,
-            $this->getDataHandlerMock()
+            $this->getDataHandlerMock(),
         );
 
         self::assertSame('the new key', $fieldArray['urlkey']);
@@ -148,7 +148,7 @@ class TceDataMapTest extends TestCase
             'tx_tinyurls_urls',
             'NEW1234',
             $fieldArray,
-            $dataHandlerMock
+            $dataHandlerMock,
         );
 
         self::assertSame('the hash', $fieldArray['target_url_hash']);
@@ -170,7 +170,7 @@ class TceDataMapTest extends TestCase
             'dummyTable',
             'dummyId',
             $fieldArray,
-            $this->getDataHandlerMock()
+            $this->getDataHandlerMock(),
         );
 
         self::assertSame($fieldArrayOriginal, $fieldArray);
@@ -192,7 +192,7 @@ class TceDataMapTest extends TestCase
             'tx_tinyurls_urls',
             55,
             $fieldArray,
-            $this->getDataHandlerMock()
+            $this->getDataHandlerMock(),
         );
 
         self::assertSame($fieldArrayOriginal, $fieldArray);

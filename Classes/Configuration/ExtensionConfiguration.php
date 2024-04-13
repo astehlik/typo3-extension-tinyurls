@@ -118,7 +118,7 @@ class ExtensionConfiguration implements SingletonInterface
         if ($this->typoScriptConfigurator === null) {
             $this->typoScriptConfigurator = GeneralUtility::makeInstance(
                 TypoScriptConfigurator::class,
-                $tinyUrlGenerator
+                $tinyUrlGenerator,
             );
         }
         return $this->typoScriptConfigurator;

@@ -44,7 +44,7 @@ class ImplementationManagerTest extends TestCase
         $this->implementationManager->restoreDefaults();
         self::assertSame(
             TinyUrlDoctrineRepository::class,
-            $this->implementationManager->getTinyUrlRepositoryClass()
+            $this->implementationManager->getTinyUrlRepositoryClass(),
         );
     }
 

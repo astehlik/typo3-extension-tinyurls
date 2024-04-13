@@ -108,7 +108,7 @@ class CopyableFieldElementTest extends TestCase
     {
         self::assertSame(
             ['EXT:tinyurls/Resources/Private/Language/locallang_db_js.xlf'],
-            $this->copyableFieldElement->render()['additionalInlineLanguageLabelFiles']
+            $this->copyableFieldElement->render()['additionalInlineLanguageLabelFiles'],
         );
     }
 

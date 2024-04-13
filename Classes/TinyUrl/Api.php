@@ -30,7 +30,7 @@ class Api
 
     public function __construct(
         private readonly TinyUrlGenerator $tinyUrlGenerator,
-        private readonly TypoScriptConfigurator $typoScriptConfigurator
+        private readonly TypoScriptConfigurator $typoScriptConfigurator,
     ) {
         $this->tinyUrl = TinyUrl::createNew();
     }

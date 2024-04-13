@@ -63,7 +63,7 @@ class CopyableFieldElement extends AbstractNode implements NodeInterface
         $result['html'] = $template->render();
 
         $result['requireJsModules'][] = JavaScriptModuleInstruction::create(
-            '@de-swebhosting/tinyurls/copy-to-clipboard.js'
+            '@de-swebhosting/tinyurls/copy-to-clipboard.js',
         );
 
         $result['additionalInlineLanguageLabelFiles'][] = 'EXT:tinyurls/Resources/Private/Language/locallang_db_js.xlf';
@@ -101,7 +101,7 @@ class CopyableFieldElement extends AbstractNode implements NodeInterface
         return (string)$this->generalUtility->callUserFunction(
             $parameterArray['fieldConf']['config']['valueFunc'],
             $this->data,
-            $this
+            $this,
         );
     }
 
@@ -141,7 +141,7 @@ class CopyableFieldElement extends AbstractNode implements NodeInterface
     protected function initializeFormFieldViewTemplatePath(StandaloneView $template): void
     {
         $template->setTemplatePathAndFilename(
-            $this->getGeneralUtility()->getFileAbsFileName(static::TEMPLATE_PATH)
+            $this->getGeneralUtility()->getFileAbsFileName(static::TEMPLATE_PATH),
         );
     }
 }

@@ -63,7 +63,7 @@ class TinyUrlTest extends TestCase
         $tinyUrl = TinyUrl::createFromDatabaseRow($this->getDummyDatabaseRow());
         self::assertSame(
             (new DateTime('2017-12-10 12:30:00.000000+0000'))->getTimestamp(),
-            $tinyUrl->getTstamp()->getTimestamp()
+            $tinyUrl->getTstamp()->getTimestamp(),
         );
     }
 
@@ -84,7 +84,7 @@ class TinyUrlTest extends TestCase
         $tinyUrl = TinyUrl::createFromDatabaseRow($this->getDummyDatabaseRow());
         self::assertSame(
             (new DateTime('2017-10-10 12:30:00.000000+0000'))->getTimestamp(),
-            $tinyUrl->getValidUntil()->getTimestamp()
+            $tinyUrl->getValidUntil()->getTimestamp(),
         );
     }
 

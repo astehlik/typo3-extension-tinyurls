@@ -65,7 +65,7 @@ class TypoScriptConfiguratorTest extends TestCase
                     'urlKey' => 'asdf',
                     'urlKey.' => ['case' => 'upper'],
                 ],
-            ]
+            ],
         );
     }
 
@@ -144,7 +144,7 @@ class TypoScriptConfiguratorTest extends TestCase
         $this->typoScriptConfigurator->initializeConfigFromTyposcript(
             $this->tinyUrlMock,
             $config,
-            $this->contentObjectRendererMock
+            $this->contentObjectRendererMock,
         );
     }
 }

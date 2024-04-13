@@ -65,7 +65,7 @@ class EidController
         $noCacheResponse = $response->withAddedHeader('Expires', '0');
         $noCacheResponse = $noCacheResponse->withAddedHeader(
             'Last-Modified',
-            gmdate('D, d M Y H:i:s', $GLOBALS['EXEC_TIME']) . ' GMT'
+            gmdate('D, d M Y H:i:s', $GLOBALS['EXEC_TIME']) . ' GMT',
         );
         $noCacheResponse = $noCacheResponse->withAddedHeader('Cache-Control', 'no-cache, must-revalidate');
         return $noCacheResponse->withAddedHeader('Pragma', 'no-cache');
@@ -112,7 +112,7 @@ class EidController
 
     protected function handleTinyUrlNotFoundError(
         ServerRequestInterface $request,
-        TinyUrlNotFoundException $e
+        TinyUrlNotFoundException $e,
     ): ResponseInterface {
         $errorController = $this->getErrorController();
         return $errorController->pageNotFoundAction($request, $e->getMessage());

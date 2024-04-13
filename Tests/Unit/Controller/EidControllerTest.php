@@ -154,7 +154,7 @@ class EidControllerTest extends TestCase
             ->method('pageNotFoundAction')
             ->with(
                 self::isInstanceOf(ServerRequestInterface::class),
-                'The tinyurl with the key thekey was not found.'
+                'The tinyurl with the key thekey was not found.',
             )
             ->willReturn($errorResponse);
 

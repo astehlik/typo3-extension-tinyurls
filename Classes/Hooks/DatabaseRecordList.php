@@ -68,7 +68,7 @@ class DatabaseRecordList implements SingletonInterface
 
         $quotedUrlParts = array_map(
             static fn(string $urlPart) => $queryBuilder->quote($urlPart),
-            $tinyUrlParts
+            $tinyUrlParts,
         );
         $concatParts = [
             $quotedUrlParts[0],

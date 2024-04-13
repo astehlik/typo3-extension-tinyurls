@@ -45,7 +45,7 @@ class TinyurlViewHelper extends AbstractViewHelper
             'boolean',
             'If this is is true, the tiny URL is deleted from the database on the first hit.',
             false,
-            false
+            false,
         );
         $this->registerArgument('validUntil', 'int', 'Timestamp until generated link is valid', false, 0);
         $this->registerArgument('urlKey', 'string', 'Custom url key', false, '');

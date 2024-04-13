@@ -17,7 +17,7 @@ return (new Config())
             ->ignoreVCSIgnored(true)
             ->in(realpath(__DIR__ . '/../../'))
             ->exclude(['.Build'])
-            ->notName(['ext_emconf.php', 'ext_localconf.php', 'ext_tables.php'])
+            ->notName(['ext_emconf.php', 'ext_localconf.php', 'ext_tables.php']),
     )
     ->setRiskyAllowed(true)
     ->setRules($rules);

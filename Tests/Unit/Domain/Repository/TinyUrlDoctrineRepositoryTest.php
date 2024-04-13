@@ -77,10 +77,10 @@ class TinyUrlDoctrineRepositoryTest extends TestCase
                                 'update',
                                 'where',
                             ],
-                            true
+                            true,
                         );
-                    }
-                )
+                    },
+                ),
             )
             ->willReturnSelf();
         $this->databaseQueryBuilderMock->method('getRestrictions')
@@ -96,7 +96,7 @@ class TinyUrlDoctrineRepositoryTest extends TestCase
         $this->doctrineRepository = new TinyUrlDoctrineRepository(
             $databaseConnectionPoolMock,
             $this->extensionConfiugrationMock,
-            $this->urlUtilsMock
+            $this->urlUtilsMock,
         );
 
         $this->tinyUrlValidatorMock = $this->createMock(TinyUrlValidator::class);
@@ -229,8 +229,8 @@ class TinyUrlDoctrineRepositoryTest extends TestCase
                 self::callback(
                     static function (StoragePageQueryRestriction $queryRestriction) {
                         return $queryRestriction->getStoragePageUid() === 389484;
-                    }
-                )
+                    },
+                ),
             );
         $this->doctrineRepository->deleteTinyUrlByKey('key');
     }
@@ -327,8 +327,8 @@ class TinyUrlDoctrineRepositoryTest extends TestCase
                 self::callback(
                     static function (array $databaseRow) {
                         return $databaseRow['urlkey'] === 'the-generated-key';
-                    }
-                )
+                    },
+                ),
             );
 
         $this->doctrineRepository->insertNewTinyUrl($tinyUrl);
@@ -373,7 +373,7 @@ class TinyUrlDoctrineRepositoryTest extends TestCase
             ->with(
                 TinyUrlRepository::TABLE_URLS,
                 self::callback(static fn(array $databaseRow) => array_diff_assoc($tinyUrlData, $databaseRow) === []),
-                ['uid' => 945]
+                ['uid' => 945],
             );
 
         $this->doctrineRepository->updateTinyUrl($tinyUrl);
@@ -461,7 +461,7 @@ class TinyUrlDoctrineRepositoryTest extends TestCase
             ->willReturnCallback(
                 static function (Closure $callback): void {
                     $callback();
-                }
+                },
             );
 
         $this->databaseConnectionMock->expects(self::once())
@@ -478,7 +478,7 @@ class TinyUrlDoctrineRepositoryTest extends TestCase
             ->willReturnCallback(
                 static function (TinyUrl $tinyUrl): void {
                     $tinyUrl->setGeneratedUrlKey('the-generated-key');
-                }
+                },
             );
     }
 }

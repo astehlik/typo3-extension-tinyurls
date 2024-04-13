@@ -32,7 +32,7 @@ class TinyUrlGenerator
     public function __construct(
         private readonly TinyUrlRepository $tinyUrlRepository,
         private readonly TypoScriptConfigurator $typoScriptConfigurator,
-        private readonly UrlUtils $urlUtils
+        private readonly UrlUtils $urlUtils,
     ) {
         $this->tinyurl = TinyUrl::createNew();
     }
