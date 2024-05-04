@@ -22,7 +22,7 @@ use DateTimeImmutable;
 /**
  * Use this class for generating tiny URLs in your own extension.
  *
- * @api
+ * @deprecated Will be removed with next major version, use TinyUrl entity together with TinyUrlGenerator instead.
  */
 class Api
 {
@@ -42,7 +42,7 @@ class Api
      *
      * @return string the tiny URL
      *
-     * @api
+     * @deprecated Will be removed with next major version, use generateTinyUrl() instead.
      */
     public function getTinyUrl(string $targetUrl): string
     {
@@ -68,13 +68,16 @@ class Api
      *                      the tinyurl. namespace
      * @param ContentObjectRenderer $contentObject The parent content object (used for running stdWrap)
      *
-     * @api
+     * @deprecated Will be removed with next major version, use TypoScriptConfigurator directly instead.
      */
     public function initializeConfigFromTyposcript(array $config, ContentObjectRenderer $contentObject): void
     {
         $this->typoScriptConfigurator->initializeConfigFromTyposcript($this->tinyUrl, $config, $contentObject);
     }
 
+    /**
+     * @deprecated Will be removed with next major version.
+     */
     public function reset(): void
     {
         $this->tinyUrl = TinyUrl::createNew();
@@ -82,6 +85,8 @@ class Api
 
     /**
      * Sets the comment for the created tiny URL.
+     *
+     * @deprecated Will be removed with next major version, create a TinyUrl instance and set the comment directly.
      */
     public function setComment(string $comment): void
     {
@@ -91,6 +96,8 @@ class Api
     /**
      * Sets the deleteOnUse option, if TRUE the URL will be deleted from
      * the database on the first hit.
+     *
+     * @deprecated Will be removed with next major version, create a TinyUrl instance and set delete on use directly.
      */
     public function setDeleteOnUse(bool $deleteOnUse): void
     {
@@ -104,6 +111,8 @@ class Api
 
     /**
      * Sets a custom URL key, must be unique.
+     *
+     * @deprecated Will be removed with next major version, create a TinyUrl instance and set URL key directly.
      */
     public function setUrlKey(string $urlKey): void
     {
@@ -112,6 +121,8 @@ class Api
 
     /**
      * Sets the timestamp until the generated URL is valid.
+     *
+     * @deprecated Will be removed with next major version, create a TinyUrl instance and set valid until directly.
      */
     public function setValidUntil(int $validUntil): void
     {
