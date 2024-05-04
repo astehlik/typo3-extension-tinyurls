@@ -3,6 +3,9 @@
     <file source-language="en" datatype="plaintext" original="messages" product-name="tinyurls">
         <header />
         <body>
+            <trans-unit id="tx_tinyurls_urls.copy_to_clipboard_button_label">
+                <source>Copy to clipboard</source>
+            </trans-unit>
             <trans-unit id="tx_tinyurls_urls.counter">
                 <source>Counter</source>
             </trans-unit>
