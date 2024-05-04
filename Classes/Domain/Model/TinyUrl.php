@@ -184,18 +184,6 @@ class TinyUrl
         $this->tstamp = new DateTimeImmutable();
     }
 
-    /**
-     * @codeCoverageIgnore
-     *
-     * @deprecated Will be removed in the next major version. Use UrlKeyGenerator instance directly instead.
-     */
-    public function regenerateUrlKey(): void
-    {
-        /** @var UrlUtils $urlUtils */
-        $urlUtils = GeneralUtility::makeInstance(UrlUtils::class);
-        $urlUtils->regenerateUrlKey($this);
-    }
-
     public function resetCustomUrlKey(): void
     {
         $this->customUrlKey = null;

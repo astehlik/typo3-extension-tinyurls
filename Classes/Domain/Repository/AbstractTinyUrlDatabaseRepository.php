@@ -73,16 +73,6 @@ abstract class AbstractTinyUrlDatabaseRepository
         return TinyUrl::createFromDatabaseRow($databaseRow);
     }
 
-    /**
-     * @codeCoverageIgnore
-     *
-     * @deprecated Will be removed in next major version, use class variable instead
-     */
-    protected function getExtensionConfiguration(): ExtensionConfiguration
-    {
-        return $this->extensionConfiguration;
-    }
-
     protected function getTargetUrlHash(string $targetUrl): string
     {
         $tinyUrl = new TinyUrl();
@@ -103,16 +93,6 @@ abstract class AbstractTinyUrlDatabaseRepository
             'delete_on_use' => (int)$tinyUrl->getDeleteOnUse(),
             'valid_until' => $tinyUrl->hasValidUntil() ? $tinyUrl->getValidUntil()->getTimestamp() : 0,
         ];
-    }
-
-    /**
-     * @codeCoverageIgnore
-     *
-     * @deprecated will be removed in next major version, class variable instead
-     */
-    protected function getTinyUrlValidator(): TinyUrlValidator
-    {
-        return $this->tinyUrlValidator;
     }
 
     protected function insertNewTinyUrlTransaction(TinyUrl $tinyUrl): void

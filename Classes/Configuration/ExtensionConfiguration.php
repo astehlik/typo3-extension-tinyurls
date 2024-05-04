@@ -111,20 +111,6 @@ class ExtensionConfiguration implements SingletonInterface
     }
 
     /**
-     * @codeCoverageIgnore
-     */
-    protected function getTypoScriptConfigurator(TinyUrlGenerator $tinyUrlGenerator): TypoScriptConfigurator
-    {
-        if ($this->typoScriptConfigurator === null) {
-            $this->typoScriptConfigurator = GeneralUtility::makeInstance(
-                TypoScriptConfigurator::class,
-                $tinyUrlGenerator,
-            );
-        }
-        return $this->typoScriptConfigurator;
-    }
-
-    /**
      * Initializes the extension configuration array, merging the default config and the config
      * defined by the user.
      */
