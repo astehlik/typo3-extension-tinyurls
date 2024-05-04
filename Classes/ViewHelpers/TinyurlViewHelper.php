@@ -39,7 +39,7 @@ class TinyurlViewHelper extends AbstractViewHelper
 
     public function initializeArguments(): void
     {
-        $this->registerArgument('url', 'string', 'The Url to be shortened', false, null);
+        $this->registerArgument('url', 'string', 'The Url to be shortened');
         $this->registerArgument(
             'onlyOneTimeValid',
             'boolean',

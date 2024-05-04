@@ -18,7 +18,6 @@ use Tx\Tinyurls\Domain\Repository\TinyUrlRepository;
 use Tx\Tinyurls\Utils\UrlUtils;
 use TYPO3\CMS\Backend\View\Event\ModifyDatabaseQueryForRecordListingEvent;
 use TYPO3\CMS\Core\Database\Query\QueryBuilder as Typo3QueryBuilder;
-use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
@@ -26,14 +25,16 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  *
  * We make this a singleton to improve the performance. We can cache the urldisplay query.
  */
-class DatabaseRecordList implements SingletonInterface
+class DatabaseRecordList
 {
     /**
      * Cache for the URL display query.
      */
     protected ?string $urlDisplayQuery = null;
 
-    public function __construct(private readonly UrlUtils $urlUtils) {}
+    public function __construct(
+        private readonly UrlUtils $urlUtils
+    ) {}
 
     public function __invoke(ModifyDatabaseQueryForRecordListingEvent $modifyQueryEvent): void
     {

@@ -26,11 +26,11 @@ use TYPO3\CMS\Core\DataHandling\DataHandler;
  * @author Alexander Stehlik <alexander.stehlik.deleteme@gmail.com>
  * @author Sebastian Lemke <s.lemke.deleteme@infoworxx.de>
  */
-class TceDataMap
+readonly class TceDataMap
 {
     public function __construct(
-        protected readonly TinyUrlRepository $tinyUrlRepository,
-        protected readonly UrlUtils $urlUtils,
+        protected TinyUrlRepository $tinyUrlRepository,
+        protected UrlUtils $urlUtils,
     ) {}
 
     /**

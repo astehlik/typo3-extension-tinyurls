@@ -19,13 +19,11 @@ use TYPO3\CMS\Core\Database\Query\Expression\CompositeExpression;
 use TYPO3\CMS\Core\Database\Query\Expression\ExpressionBuilder;
 use TYPO3\CMS\Core\Database\Query\Restriction\QueryRestrictionInterface;
 
-class StoragePageQueryRestriction implements QueryRestrictionInterface
+readonly class StoragePageQueryRestriction implements QueryRestrictionInterface
 {
-    protected int $storagePageUid;
-
-    public function __construct(int $storagePageUid)
-    {
-        $this->storagePageUid = $storagePageUid;
+    public function __construct(
+        protected int $storagePageUid,
+    ) {
     }
 
     /**
@@ -39,6 +37,7 @@ class StoragePageQueryRestriction implements QueryRestrictionInterface
     public function buildExpression(array $queriedTables, ExpressionBuilder $expressionBuilder): CompositeExpression
     {
         $constraints = [];
+
         foreach ($queriedTables as $tableName => $tableAlias) {
             if ($tableName !== TinyUrlRepository::TABLE_URLS) {
                 continue;

@@ -24,11 +24,11 @@ use InvalidArgumentException;
  * This class is responsible for generating tiny Urls based on configuration
  * options and extension configuration.
  */
-class TinyUrlGenerator
+readonly class TinyUrlGenerator
 {
     public function __construct(
-        private readonly TinyUrlRepository $tinyUrlRepository,
-        private readonly UrlUtils $urlUtils,
+        private TinyUrlRepository $tinyUrlRepository,
+        private UrlUtils $urlUtils,
     ) {
     }
 
