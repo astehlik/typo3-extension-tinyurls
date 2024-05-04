@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Tx\Tinyurls\Tests\Functional;
 
+use Doctrine\DBAL\ParameterType;
 use Symfony\Component\Yaml\Yaml;
 use TYPO3\CMS\Core\Cache\CacheManager;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\TestingFramework\Core\Functional\FunctionalTestCase;
-use PDO;
 
 abstract class AbstractFunctionalTestCase extends FunctionalTestCase
 {
@@ -19,7 +19,7 @@ abstract class AbstractFunctionalTestCase extends FunctionalTestCase
         $builder = $this->getConnectionPool()->getQueryBuilderForTable('tx_tinyurls_urls');
         $builder->select('*')
             ->from('tx_tinyurls_urls')
-            ->where($builder->expr()->eq('uid', $builder->createNamedParameter(1, PDO::PARAM_INT)));
+            ->where($builder->expr()->eq('uid', $builder->createNamedParameter(1, ParameterType::INTEGER)));
         return $builder->executeQuery()->fetchAssociative();
     }
 
@@ -60,7 +60,7 @@ abstract class AbstractFunctionalTestCase extends FunctionalTestCase
         $languages = array_merge($languages, $additionalLanguages);
         $configuration = [
             'rootPageId' => $pageId,
-            'base' => '/',
+            'base' => 'http://localhost/',
             'languages' => $languages,
             'errorHandling' => [],
             'routes' => [],

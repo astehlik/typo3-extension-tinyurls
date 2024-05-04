@@ -465,7 +465,6 @@ class TinyUrlDoctrineRepositoryTest extends TestCase
 
         $this->databaseConnectionMock->expects(self::once())
             ->method('lastInsertId')
-            ->with(TinyUrlRepository::TABLE_URLS, 'uid')
             ->willReturn((string)$newUid);
     }
 
