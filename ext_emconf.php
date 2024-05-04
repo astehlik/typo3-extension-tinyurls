@@ -12,11 +12,11 @@ $EM_CONF[$_EXTKEY] = [
     'author' => 'Alexander Stehlik',
     'author_email' => 'alexander.stehlik.deleteme@gmail.com',
     'author_company' => '',
-    'version' => '12.1.0',
+    'version' => '13.0.0-dev',
     'constraints' => [
         'depends' => [
-            'php' => '8.1.0-8.2.99',
-            'typo3' => '12.3.0-12.4.99',
+            'php' => '8.2.0-8.3.99',
+            'typo3' => '13.1.0-13.1.99',
         ],
         'conflicts' => [],
         'suggests' => [],
