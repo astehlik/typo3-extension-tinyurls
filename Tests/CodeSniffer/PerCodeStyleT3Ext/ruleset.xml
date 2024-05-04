@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<ruleset name="PSRTinyurls">
+<ruleset name="PerCodeStyleT3Ext">
 
 	<description>Includes all PSR coding standard and some additional checks.</description>
 

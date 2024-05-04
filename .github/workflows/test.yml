@@ -47,7 +47,7 @@ jobs:
         with:
           php-version: "${{ env.MAIN_PHP_VERSION }}"
       - run: |
-          bash .Build/bin/t3_check_codestyle.sh PSRTinyurls
+          bash .Build/bin/t3_check_codestyle.sh PerCodeStyleT3Ext
 
   "check-codestyle-php-cs-fixer":
     name: "PHP CS Fixer check"
