@@ -14,6 +14,7 @@ namespace Tx\Tinyurls\Tests\Unit\Domain\Repository;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
+use PHPUnit\Framework\Attributes\BackupGlobals;
 use PHPUnit\Framework\Constraint\Callback;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -34,9 +35,7 @@ use TYPO3\CMS\Extbase\Error\Result;
 use Closure;
 use InvalidArgumentException;
 
-/**
- * @backupGlobals enabled
- */
+#[BackupGlobals(true)]
 class TinyUrlDoctrineRepositoryTest extends TestCase
 {
     private Connection|MockObject $databaseConnectionMock;

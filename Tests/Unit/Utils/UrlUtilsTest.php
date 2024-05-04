@@ -14,6 +14,7 @@ namespace Tx\Tinyurls\Tests\Unit\Utils;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
+use PHPUnit\Framework\Attributes\BackupGlobals;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Tx\Tinyurls\Configuration\ExtensionConfiguration;
@@ -48,9 +49,7 @@ class UrlUtilsTest extends TestCase
         );
     }
 
-    /**
-     * @backupGlobals enabled
-     */
+    #[BackupGlobals(true)]
     public function testBuildTinyUrlCreatesEidUrlIfSpeakingUrlsAreDisabled(): void
     {
         $this->generalUtilityMock->expects(self::once())
@@ -100,7 +99,7 @@ class UrlUtilsTest extends TestCase
             ->willReturn('###MY_ENV_MARKER1###/###MY_ENV_MARKER2###');
         $this->generalUtilityMock->expects(self::exactly(2))
             ->method('getIndpEnv')
-            ->will(self::onConsecutiveCalls('myenvvalue1', 'myenvvalue2'));
+            ->willReturnOnConsecutiveCalls('myenvvalue1', 'myenvvalue2');
         $speakingUrl = $this->urlUtils->createSpeakingTinyUrl('testkey');
         self::assertSame('myenvvalue1/myenvvalue2', $speakingUrl);
     }

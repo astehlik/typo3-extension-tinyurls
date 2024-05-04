@@ -14,14 +14,13 @@ namespace Tx\Tinyurls\Tests\Unit\Configuration;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
+use PHPUnit\Framework\Attributes\BackupGlobals;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Tx\Tinyurls\Configuration\ExtensionConfiguration;
 use TYPO3\CMS\Core\Configuration\ExtensionConfiguration as TYPO3ExtensionConfiguration;
 
-/**
- * @backupGlobals enabled
- */
+#[BackupGlobals(true)]
 class ExtensionConfigurationTest extends TestCase
 {
     private ExtensionConfiguration $extensionConfiguration;

@@ -14,6 +14,8 @@ namespace Tx\Tinyurls\Tests\Unit\Controller;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
+use PHPUnit\Framework\Attributes\BackupGlobals;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
@@ -27,9 +29,7 @@ use TYPO3\CMS\Core\Error\Http\BadRequestException;
 use TYPO3\CMS\Core\Http\ServerRequest;
 use TYPO3\CMS\Frontend\Controller\ErrorController;
 
-/**
- * @backupGlobals enabled
- */
+#[BackupGlobals(true)]
 class EidControllerTest extends TestCase
 {
     private EidController $eidController;
@@ -179,9 +179,7 @@ class EidControllerTest extends TestCase
         self::assertSame('http://the-target.url', $response->getHeaderLine('Location'));
     }
 
-    /**
-     * @dataProvider provideTinyUrlRedirectSendsNoCacheHeadersCases
-     */
+    #[DataProvider('provideTinyUrlRedirectSendsNoCacheHeadersCases')]
     public function testTinyUrlRedirectSendsNoCacheHeaders(string $headerName, string $expectedValue): void
     {
         $_GET['tx_tinyurls']['key'] = 'thekey';
