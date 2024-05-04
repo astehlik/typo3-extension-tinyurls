@@ -10,6 +10,6 @@ CREATE TABLE tx_tinyurls_urls (
 	target_url_hash varchar(40) DEFAULT '' NOT NULL,
 	delete_on_use tinyint(4) unsigned DEFAULT '0' NOT NULL,
 	valid_until int(11) unsigned DEFAULT '0' NOT NULL,
-	KEY target_url_hash (target_url_hash),
+	KEY target_url_hash (pid, target_url_hash),
 	UNIQUE KEY tinyurl (pid, urlkey)
 );
