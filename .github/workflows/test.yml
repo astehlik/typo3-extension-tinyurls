@@ -22,7 +22,7 @@ jobs:
         with:
           php_version: "${{ env.MAIN_PHP_VERSION }}"
       - run: |
-          bash .Build/bin/t3_run_tests.sh -s composerValidate -p ${{ env.MAIN_PHP_VERSION }}
+          bash bin/t3_run_tests.sh -s composerValidate -p ${{ env.MAIN_PHP_VERSION }}
 
   "composer-normalize":
     name: "Composer normalize"
@@ -33,7 +33,7 @@ jobs:
         with:
           php_version: "${{ env.MAIN_PHP_VERSION }}"
       - run: |
-          bash .Build/bin/t3_run_tests.sh -s composerNormalize -n -p ${{ env.MAIN_PHP_VERSION }}
+          bash bin/t3_run_tests.sh -s composerNormalize -n -p ${{ env.MAIN_PHP_VERSION }}
 
   "check-codestyle-codesniffer":
     name: "PHP_CodeSniffer check"
@@ -47,7 +47,7 @@ jobs:
         with:
           php-version: "${{ env.MAIN_PHP_VERSION }}"
       - run: |
-          bash .Build/bin/t3_check_codestyle.sh PerCodeStyleT3Ext
+          bash bin/t3_check_codestyle.sh PerCodeStyleT3Ext
 
   "check-codestyle-php-cs-fixer":
     name: "PHP CS Fixer check"
@@ -58,7 +58,7 @@ jobs:
         with:
           php_version: "${{ env.MAIN_PHP_VERSION }}"
       - run: |
-          bash .Build/bin/t3_run_tests.sh -s cgl -n -p ${{ env.MAIN_PHP_VERSION }}
+          bash bin/t3_run_tests.sh -s cgl -n -p ${{ env.MAIN_PHP_VERSION }}
 
   "php-unit-tests":
     name: "PHP Unit tests"
@@ -72,7 +72,7 @@ jobs:
         with:
           php_version: ${{ matrix.php_version }}
       - run: |
-          bash .Build/bin/t3_run_tests.sh -s unit -p ${{ matrix.php_version }}
+          bash bin/t3_run_tests.sh -s unit -p ${{ matrix.php_version }}
 
   "php-functional-tests-sqlite-82":
     name: "Functional tests on SQLite"
@@ -83,7 +83,7 @@ jobs:
         with:
           php_version: "${{ env.MAIN_PHP_VERSION }}"
       - run: |
-          bash .Build/bin/t3_run_tests.sh -s functional -d sqlite -p ${{ env.MAIN_PHP_VERSION }}
+          bash bin/t3_run_tests.sh -s functional -d sqlite -p ${{ env.MAIN_PHP_VERSION }}
 
   "php-functional-tests-mariadb-main":
     name: "Functional tests on MariaDB"
@@ -94,7 +94,7 @@ jobs:
         with:
           php_version: ${{ env.MAIN_PHP_VERSION }}
       - run: |
-          bash .Build/bin/t3_run_tests.sh -s functional -d mariadb -p ${{ env.MAIN_PHP_VERSION }}
+          bash bin/t3_run_tests.sh -s functional -d mariadb -p ${{ env.MAIN_PHP_VERSION }}
 
   "php-lint":
     name: "PHP linting"
@@ -108,7 +108,7 @@ jobs:
         with:
           php_version: ${{ matrix.php_version }}
       - run: |
-          bash .Build/bin/t3_run_tests.sh -s lintPhp -p ${{ matrix.php_version }}
+          bash bin/t3_run_tests.sh -s lintPhp -p ${{ matrix.php_version }}
 
   "coverage-phpunit":
     name: "Test coverage by Unit Tests"
@@ -120,7 +120,7 @@ jobs:
         with:
           php_version: ${{ env.MAIN_PHP_VERSION }}
       - run: |
-          bash .Build/bin/t3_run_tests.sh -s unit -p ${{ env.MAIN_PHP_VERSION }} -x -z coverage -e "--coverage-clover Logs/clover-unit.xml --coverage-filter ../Classes"
+          bash bin/t3_run_tests.sh -s unit -p ${{ env.MAIN_PHP_VERSION }} -x -z coverage -e "--coverage-clover Logs/clover-unit.xml --coverage-filter ../Classes"
       - uses: actions/upload-artifact@v3
         with:
           name: coverage-phpunit
@@ -137,7 +137,7 @@ jobs:
         with:
           php_version: ${{ env.MAIN_PHP_VERSION }}
       - run: |
-          bash .Build/bin/t3_run_tests.sh -s functional -d mariadb -p ${{ env.MAIN_PHP_VERSION }} -x -z coverage -e "--coverage-clover Logs/clover-functional.xml --coverage-filter ../Classes"
+          bash bin/t3_run_tests.sh -s functional -d mariadb -p ${{ env.MAIN_PHP_VERSION }} -x -z coverage -e "--coverage-clover Logs/clover-functional.xml --coverage-filter ../Classes"
       - uses: actions/upload-artifact@v3
         with:
           name: coverage-functional
@@ -184,4 +184,4 @@ jobs:
       - uses: shivammathur/setup-php@v2
         with:
           php-version: "${{ env.MAIN_PHP_VERSION }}"
-      - run: php .Build/bin/typo3scan scan .
+      - run: php bin/typo3scan scan .
