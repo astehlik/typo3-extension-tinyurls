@@ -22,6 +22,7 @@ use Tx\Tinyurls\Domain\Model\TinyUrl;
 use Tx\Tinyurls\UrlKeyGenerator\UrlKeyGenerator;
 use Tx\Tinyurls\Utils\GeneralUtilityWrapper;
 use Tx\Tinyurls\Utils\UrlUtils;
+use TYPO3\CMS\Core\Site\SiteFinder;
 
 /**
  * Tests for the tinyurls API.
@@ -32,6 +33,8 @@ class UrlUtilsTest extends TestCase
 
     private GeneralUtilityWrapper|MockObject $generalUtilityMock;
 
+    private MockObject|SiteFinder $siteFinderMock;
+
     private MockObject|UrlKeyGenerator $urlKeyGeneratorMock;
 
     private UrlUtils $urlUtils;
@@ -40,11 +43,13 @@ class UrlUtilsTest extends TestCase
     {
         $this->extensionConfigurationMock = $this->createMock(ExtensionConfiguration::class);
         $this->generalUtilityMock = $this->createMock(GeneralUtilityWrapper::class);
+        $this->siteFinderMock = $this->createMock(SiteFinder::class);
         $this->urlKeyGeneratorMock = $this->createMock(UrlKeyGenerator::class);
 
         $this->urlUtils = new UrlUtils(
             $this->extensionConfigurationMock,
             $this->generalUtilityMock,
+            $this->siteFinderMock,
             $this->urlKeyGeneratorMock,
         );
     }

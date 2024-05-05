@@ -26,7 +26,7 @@ use Tx\Tinyurls\Domain\Repository\TinyUrlRepository;
 use Tx\Tinyurls\Domain\Validator\TinyUrlValidator;
 use Tx\Tinyurls\Exception\TinyUrlNotFoundException;
 use Tx\Tinyurls\Exception\TinyUrlValidationException;
-use Tx\Tinyurls\Utils\UrlUtils;
+use Tx\Tinyurls\Utils\UrlUtilsInterface;
 use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\QueryBuilder;
@@ -50,7 +50,7 @@ class TinyUrlDoctrineRepositoryTest extends TestCase
 
     private MockObject|TinyUrlValidator $tinyUrlValidatorMock;
 
-    private MockObject|UrlUtils $urlUtilsMock;
+    private MockObject|UrlUtilsInterface $urlUtilsMock;
 
     protected function setUp(): void
     {
@@ -90,7 +90,7 @@ class TinyUrlDoctrineRepositoryTest extends TestCase
         $databaseConnectionPoolMock->method('getConnectionForTable')
             ->willReturn($this->databaseConnectionMock);
 
-        $this->urlUtilsMock = $this->createMock(UrlUtils::class);
+        $this->urlUtilsMock = $this->createMock(UrlUtilsInterface::class);
 
         $this->doctrineRepository = new TinyUrlDoctrineRepository(
             $databaseConnectionPoolMock,

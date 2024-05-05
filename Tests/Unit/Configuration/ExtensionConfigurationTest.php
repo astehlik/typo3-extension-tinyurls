@@ -17,26 +17,34 @@ namespace Tx\Tinyurls\Tests\Unit\Configuration;
 use PHPUnit\Framework\Attributes\BackupGlobals;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Tx\Tinyurls\Configuration\ConfigKeys;
 use Tx\Tinyurls\Configuration\ExtensionConfiguration;
 use TYPO3\CMS\Core\Configuration\ExtensionConfiguration as TYPO3ExtensionConfiguration;
+use TYPO3\CMS\Core\Site\SiteFinder;
 
 #[BackupGlobals(true)]
 class ExtensionConfigurationTest extends TestCase
 {
     private ExtensionConfiguration $extensionConfiguration;
 
+    private MockObject|SiteFinder $siteFinderMock;
+
     private MockObject|TYPO3ExtensionConfiguration $typo3ExtensionConfigurationMock;
 
     protected function setUp(): void
     {
+        $this->siteFinderMock = $this->createMock(SiteFinder::class);
         $this->typo3ExtensionConfigurationMock = $this->createMock(TYPO3ExtensionConfiguration::class);
 
-        $this->extensionConfiguration = new ExtensionConfiguration($this->typo3ExtensionConfigurationMock);
+        $this->extensionConfiguration = new ExtensionConfiguration(
+            $this->siteFinderMock,
+            $this->typo3ExtensionConfigurationMock,
+        );
     }
 
     public function testAppendPidQueryAppendsAndStatementForNonEmptyQuery(): void
     {
-        $this->initConfig(['urlRecordStoragePID' => 0]);
+        $this->initConfig([ConfigKeys::URL_RECORD_STORAGE_PID => 0]);
         self::assertSame('a=1 AND pid=0', $this->extensionConfiguration->appendPidQuery('a=1'));
     }
 
@@ -48,7 +56,7 @@ class ExtensionConfigurationTest extends TestCase
 
     public function testAppendPidQueryAppendsDefaultPid(): void
     {
-        $this->initConfig(['urlRecordStoragePID' => 999]);
+        $this->initConfig([ConfigKeys::URL_RECORD_STORAGE_PID => 999]);
         self::assertSame('pid=999', $this->extensionConfiguration->appendPidQuery(''));
     }
 
@@ -60,19 +68,19 @@ class ExtensionConfigurationTest extends TestCase
 
     public function testAreSpeakingUrlsEnabledReturnsFalseIfConfigured(): void
     {
-        $this->initConfig(['createSpeakingURLs' => 0]);
+        $this->initConfig([ConfigKeys::CREATE_SPEAKING_URLS => 0]);
         self::assertFalse($this->extensionConfiguration->areSpeakingUrlsEnabled());
     }
 
     public function testAreSpeakingUrlsEnabledReturnsTrueIfConfigured(): void
     {
-        $this->initConfig(['createSpeakingURLs' => 1]);
+        $this->initConfig([ConfigKeys::CREATE_SPEAKING_URLS => 1]);
         self::assertTrue($this->extensionConfiguration->areSpeakingUrlsEnabled());
     }
 
     public function testGetBase62DictionaryReturnsConfiguredValue(): void
     {
-        $this->initConfig(['base62Dictionary' => 'asfduew']);
+        $this->initConfig([ConfigKeys::BASE62_DICTIONARY => 'asfduew']);
         self::assertSame('asfduew', $this->extensionConfiguration->getBase62Dictionary());
     }
 
@@ -88,7 +96,7 @@ class ExtensionConfigurationTest extends TestCase
 
     public function testGetMinimalRandomKeyLengthReturnsConfiguredValue(): void
     {
-        $this->initConfig(['minimalRandomKeyLength' => 56]);
+        $this->initConfig([ConfigKeys::MINIMAL_RANDOM_KEY_LENGTH => 56]);
         self::assertSame(56, $this->extensionConfiguration->getMinimalRandomKeyLength());
     }
 
@@ -100,7 +108,7 @@ class ExtensionConfigurationTest extends TestCase
 
     public function testGetMinimalTinyurlKeyLengthReturnsConfiguredValue(): void
     {
-        $this->initConfig(['minimalTinyurlKeyLength' => 75]);
+        $this->initConfig([ConfigKeys::MINIMAL_TINYURL_KEY_LENGTH => 75]);
         self::assertSame(75, $this->extensionConfiguration->getMinimalTinyurlKeyLength());
     }
 
@@ -112,7 +120,7 @@ class ExtensionConfigurationTest extends TestCase
 
     public function testGetSpeakingUrlTemplateReturnsConfiguredValue(): void
     {
-        $this->initConfig(['speakingUrlTemplate' => 'koaidp']);
+        $this->initConfig([ConfigKeys::SPEAKING_URL_TEMPLATE => 'koaidp']);
         self::assertSame('koaidp', $this->extensionConfiguration->getSpeakingUrlTemplate());
     }
 

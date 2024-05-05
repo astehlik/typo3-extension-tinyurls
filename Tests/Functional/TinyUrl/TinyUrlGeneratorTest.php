@@ -14,6 +14,7 @@ namespace Tx\Tinyurls\Tests\Functional\TinyUrl;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
+use Tx\Tinyurls\Domain\Model\TinyUrl;
 use Tx\Tinyurls\Tests\Functional\AbstractFunctionalTestCase;
 use Tx\Tinyurls\TinyUrl\TinyUrlGenerator;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -23,10 +24,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  */
 class TinyUrlGeneratorTest extends AbstractFunctionalTestCase
 {
-    /**
-     * @var TinyUrlGenerator
-     */
-    protected $tinyUrlGenerator;
+    protected TinyUrlGenerator $tinyUrlGenerator;
 
     /**
      * Initializes the test subject.
@@ -34,12 +32,13 @@ class TinyUrlGeneratorTest extends AbstractFunctionalTestCase
     protected function setUp(): void
     {
         parent::setUp();
+
         $this->tinyUrlGenerator = GeneralUtility::makeInstance(TinyUrlGenerator::class);
     }
 
     public function testGetTinyUrlSetsTstampOfNewTinyUrl(): void
     {
-        $this->tinyUrlGenerator->getTinyUrl('http://mydomain.tld');
+        $this->tinyUrlGenerator->generateTinyUrl(TinyUrl::createForUrl('http://mydomain.tld'));
         $tinyUrlRow = $this->getTinyUrlRow();
         self::assertGreaterThanOrEqual($GLOBALS['EXEC_TIME'], $tinyUrlRow['tstamp']);
     }

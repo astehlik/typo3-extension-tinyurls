@@ -18,14 +18,19 @@ use Tx\Tinyurls\Configuration\ExtensionConfiguration;
 use Tx\Tinyurls\Domain\Model\TinyUrl;
 use Tx\Tinyurls\Domain\Validator\TinyUrlValidator;
 use Tx\Tinyurls\Exception\TinyUrlValidationException;
-use Tx\Tinyurls\Utils\UrlUtils;
+use Tx\Tinyurls\Utils\UrlUtilsInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use Closure;
 use InvalidArgumentException;
 
-abstract class AbstractTinyUrlDatabaseRepository
+abstract class AbstractTinyUrlDatabaseRepository implements TinyUrlRepository
 {
     private TinyUrlValidator $tinyUrlValidator;
+
+    /**
+     * Updates the given URL in the database.
+     */
+    abstract public function updateTinyUrl(TinyUrl $tinyUrl): void;
 
     /**
      * Stores the given URL in the database, returns the inserted UID.
@@ -37,14 +42,9 @@ abstract class AbstractTinyUrlDatabaseRepository
      */
     abstract protected function transactional(Closure $callback): void;
 
-    /**
-     * Updates the given URL in the database.
-     */
-    abstract protected function updateTinyUrl(TinyUrl $tinyUrl): void;
-
     public function __construct(
         protected readonly ExtensionConfiguration $extensionConfiguration,
-        protected readonly UrlUtils $urlUtils,
+        protected readonly UrlUtilsInterface $urlUtils,
     ) {
         $this->tinyUrlValidator = new TinyUrlValidator($this);
     }

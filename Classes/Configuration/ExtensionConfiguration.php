@@ -14,37 +14,31 @@ namespace Tx\Tinyurls\Configuration;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
-use Tx\Tinyurls\TinyUrl\TinyUrlGenerator;
+use Psr\Http\Message\UriInterface;
+use Symfony\Contracts\Service\ResetInterface;
+use Tx\Tinyurls\Exception\InvalidConfigurationException;
 use TYPO3\CMS\Core\Configuration\ExtensionConfiguration as TYPO3ExtensionConfiguration;
-use TYPO3\CMS\Core\SingletonInterface;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
-use InvalidArgumentException;
+use TYPO3\CMS\Core\Http\Uri;
+use TYPO3\CMS\Core\Site\Entity\Site;
+use TYPO3\CMS\Core\Site\Entity\SiteInterface;
+use TYPO3\CMS\Core\Site\SiteFinder;
 
 /**
  * Contains utilities for getting configuration.
  */
-class ExtensionConfiguration implements SingletonInterface
+class ExtensionConfiguration implements ResetInterface
 {
     /**
      * The initialized extension configuration.
      */
-    protected ?array $extensionConfiguration = null;
+    protected ?ExtensionConfigurationData $extensionConfiguration = null;
 
-    /**
-     * Contains the default values for the extension configuration.
-     */
-    protected array $extensionConfigurationDefaults = [
-        'createSpeakingURLs' => false,
-        'speakingUrlTemplate' => '###TYPO3_SITE_URL###tinyurl/###TINY_URL_KEY###',
-        'base62Dictionary' => 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789',
-        'minimalRandomKeyLength' => 2,
-        'minimalTinyurlKeyLength' => 8,
-        'urlRecordStoragePID' => 0,
-    ];
+    private ?SiteInterface $site = null;
 
-    protected ?TypoScriptConfigurator $typoScriptConfigurator = null;
-
-    public function __construct(protected readonly TYPO3ExtensionConfiguration $typo3extensionConfiguration) {}
+    public function __construct(
+        protected readonly SiteFinder $siteFinder,
+        protected readonly TYPO3ExtensionConfiguration $typo3extensionConfiguration,
+    ) {}
 
     /**
      * Appends a PID query to the given where statement.
@@ -52,6 +46,8 @@ class ExtensionConfiguration implements SingletonInterface
      * @param string $whereStatement The where statement where the PID query should be appended to
      *
      * @return string The where statement with the appended PID query
+     *
+     * @deprecated method is not used any more and will be removed in next major version
      */
     public function appendPidQuery(string $whereStatement): string
     {
@@ -66,77 +62,121 @@ class ExtensionConfiguration implements SingletonInterface
 
     public function areSpeakingUrlsEnabled(): bool
     {
-        return (bool)$this->getExtensionConfigurationValueInternal('createSpeakingURLs');
+        return $this->getExtensionConfigurationData()->createSpeakingUrls;
     }
 
     public function getBase62Dictionary(): string
     {
-        return (string)$this->getExtensionConfigurationValueInternal('base62Dictionary');
+        return $this->getExtensionConfigurationData()->base62Dictionary;
+    }
+
+    public function getBaseUrl(): ?UriInterface
+    {
+        if (
+            $this->extensionConfiguration->baseUrlFromSiteBase
+            && $this->site instanceof Site
+        ) {
+            return $this->site->getBase();
+        }
+
+        // @extensionScannerIgnoreLine
+        if ($this->getExtensionConfigurationData()->baseUrl === '') {
+            return null;
+        }
+
+        // @extensionScannerIgnoreLine
+        return new Uri($this->getExtensionConfigurationData()->baseUrl);
     }
 
     public function getMinimalRandomKeyLength(): int
     {
-        return (int)$this->getExtensionConfigurationValueInternal('minimalRandomKeyLength');
+        return $this->getExtensionConfigurationData()->minimalRandomKeyLength;
     }
 
     public function getMinimalTinyurlKeyLength(): int
     {
-        return (int)$this->getExtensionConfigurationValueInternal('minimalTinyurlKeyLength');
+        return $this->getExtensionConfigurationData()->minimalTinyurlKeyLength;
     }
 
     public function getSpeakingUrlTemplate(): string
     {
-        return (string)$this->getExtensionConfigurationValueInternal('speakingUrlTemplate');
+        return $this->getExtensionConfigurationData()->speakingUrlTemplate;
     }
 
     public function getUrlRecordStoragePid(): int
     {
-        return (int)$this->getExtensionConfigurationValueInternal('urlRecordStoragePID');
+        return $this->getExtensionConfigurationData()->urlRecordStoragePid;
     }
 
-    public function setTypoScriptConfigurator(TypoScriptConfigurator $typoScriptConfigurator): void
+    public function reset(): void
     {
-        $this->typoScriptConfigurator = $typoScriptConfigurator;
+        $this->setSite(null);
     }
 
-    protected function getExtensionConfigurationValueInternal(string $key)
+    public function setSite(?SiteInterface $site): void
     {
-        $this->initializeExtensionConfiguration();
+        $this->site = $site;
 
-        if (!array_key_exists($key, $this->extensionConfiguration)) {
-            throw new InvalidArgumentException('The key ' . $key . ' does not exists in the extension configuration');
-        }
-
-        return $this->extensionConfiguration[$key];
+        $this->extensionConfiguration = null;
     }
 
-    /**
-     * Initializes the extension configuration array, merging the default config and the config
-     * defined by the user.
-     */
-    protected function initializeExtensionConfiguration(): void
+    protected function getExtensionConfigurationData(): ExtensionConfigurationData
     {
         if ($this->extensionConfiguration !== null) {
-            return;
+            return $this->extensionConfiguration;
         }
 
-        $extensionConfiguration = $this->loadExtensionConfiguration();
-        $finalConfiguration = [];
+        $extensionConfiguration = array_merge($this->loadExtensionConfiguration(), $this->loadSiteConfiguration());
 
-        foreach ($this->extensionConfigurationDefaults as $configKey => $defaultValue) {
-            if (!array_key_exists($configKey, $extensionConfiguration)) {
-                $finalConfiguration[$configKey] = $defaultValue;
-                continue;
-            }
+        $this->extensionConfiguration = ExtensionConfigurationData::fromArray($extensionConfiguration);
 
-            $finalConfiguration[$configKey] = $extensionConfiguration[$configKey];
-        }
-
-        $this->extensionConfiguration = $finalConfiguration;
+        return $this->extensionConfiguration;
     }
 
     private function loadExtensionConfiguration(): array
     {
         return $this->typo3extensionConfiguration->get('tinyurls');
+    }
+
+    private function loadSiteConfiguration(): array
+    {
+        $site = $this->site;
+
+        if (!$site instanceof Site) {
+            return [];
+        }
+
+        $siteConfig = $site->getConfiguration();
+
+        $tinyUrlConfig =  $siteConfig['tinyurls'] ?? [];
+
+        $this->validateSiteConfiguration($tinyUrlConfig);
+
+        return $tinyUrlConfig;
+    }
+
+    private function validateSiteConfiguration(array $config): void
+    {
+        $storagePid = (int)($config[ConfigKeys::URL_RECORD_STORAGE_PID] ?? 0);
+
+        if ($storagePid <= 0) {
+            return;
+        }
+
+        $expectedSite = $this->siteFinder->getSiteByPageId($storagePid);
+
+        if ($expectedSite->getIdentifier() === $this->site->getIdentifier()) {
+            return;
+        }
+
+        throw new InvalidConfigurationException(
+            sprintf(
+                'The site configuration for site "%s" is invalid. The configured %s %d'
+                . ' does not belong to the site.',
+                $this->site->getIdentifier(),
+                ConfigKeys::URL_RECORD_STORAGE_PID,
+                $storagePid,
+            ),
+        );
     }
 }

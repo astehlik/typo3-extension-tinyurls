@@ -6,12 +6,16 @@ namespace Tx\Tinyurls\Tests\Functional;
 
 use Doctrine\DBAL\ParameterType;
 use Symfony\Component\Yaml\Yaml;
+use Tx\Tinyurls\Configuration\ConfigKeys;
 use TYPO3\CMS\Core\Cache\CacheManager;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\TestingFramework\Core\Functional\FunctionalTestCase;
 
 abstract class AbstractFunctionalTestCase extends FunctionalTestCase
 {
+    protected array $configurationToUseInTestInstance =
+        ['EXTENSIONS' => ['tinyurls' => [ConfigKeys::BASE_URL => 'http://localhost/']]];
+
     protected array $testExtensionsToLoad = ['typo3conf/ext/tinyurls'];
 
     protected function getTinyUrlRow(): array

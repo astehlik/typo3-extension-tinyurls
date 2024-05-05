@@ -44,6 +44,22 @@ class TinyUrl
 
     protected ?DateTimeInterface $validUntil = null;
 
+    /**
+     * The consturctor is final because new static() is used
+     * and we want to prevent changes to the method signature.
+     */
+    final public function __construct() {}
+
+    /**
+     * @param non-empty-string $url
+     */
+    public static function createForUrl(string $url): self
+    {
+        $tinyUrl = new static();
+        $tinyUrl->setTargetUrl($url);
+        return $tinyUrl;
+    }
+
     public static function createFromDatabaseRow(array $databaseRow): self
     {
         $tinyUrl = new static();

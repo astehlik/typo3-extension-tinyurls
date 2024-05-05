@@ -16,8 +16,10 @@ namespace Tx\Tinyurls\Tests\Unit\Hooks;
 
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Tx\Tinyurls\Configuration\TypoScriptConfigurator;
+use Tx\Tinyurls\Domain\Model\TinyUrl;
 use Tx\Tinyurls\Hooks\TypoLink;
-use Tx\Tinyurls\TinyUrl\Api;
+use Tx\Tinyurls\TinyUrl\TinyUrlGeneratorInterface;
 use TYPO3\CMS\Core\LinkHandling\LinkService;
 use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
 use TYPO3\CMS\Frontend\Event\AfterLinkIsGeneratedEvent;
@@ -31,23 +33,32 @@ class TypoLinkTest extends TestCase
 
     private array $linkInstructions;
 
-    private Api|MockObject $tinyUrlApiMock;
+    private MockObject|TinyUrlGeneratorInterface $tinyUrlGeneratorMock;
 
     private TypoLink $typoLinkHook;
 
+    private MockObject|TypoScriptConfigurator $typoScriptConfigurator;
+
     protected function setUp(): void
     {
-        $this->tinyUrlApiMock = $this->createMock(Api::class);
+        $this->tinyUrlGeneratorMock = $this->createMock(TinyUrlGeneratorInterface::class);
+        $this->typoScriptConfigurator = $this->createMock(TypoScriptConfigurator::class);
         $this->contentObjectRendererMock = $this->createMock(ContentObjectRenderer::class);
 
-        $this->typoLinkHook = new TypoLink($this->tinyUrlApiMock);
+        $this->typoLinkHook = new TypoLink(
+            $this->tinyUrlGeneratorMock,
+            $this->typoScriptConfigurator,
+        );
     }
 
     public function testApiGetTinyUrlIsCalledWithOriginalUrl(): void
     {
-        $this->tinyUrlApiMock->expects(self::once())
-            ->method('getTinyUrl')
-            ->with(self::TARGET_URL)
+        $this->tinyUrlGeneratorMock->expects(self::once())
+            ->method('generateTinyUrlForSite')
+            ->with(
+                self::callback(static fn(TinyUrl $tinyUrl) => $tinyUrl->getTargetUrl() === self::TARGET_URL),
+                null,
+            )
             ->willReturn('the tiny url');
 
         $this->typoLinkHook->__invoke($this->getAfterLinkCreatedEvent());
@@ -55,34 +66,38 @@ class TypoLinkTest extends TestCase
 
     public function testApiIsInitializedWithLinkConfig(): void
     {
-        $this->tinyUrlApiMock->method('getTinyUrl')->willReturn('the url');
+        $this->tinyUrlGeneratorMock->method('generateTinyUrlForSite')->willReturn('the url');
 
         $event = $this->getAfterLinkCreatedEvent(tinyUrlConfig: ['the' => 'config']);
 
-        $this->tinyUrlApiMock->expects(self::once())
+        $this->typoScriptConfigurator->expects(self::once())
             ->method('initializeConfigFromTyposcript')
-            ->with($this->linkInstructions, $this->contentObjectRendererMock);
+            ->with(
+                self::isInstanceOf(TinyUrl::class),
+                $this->linkInstructions,
+                $this->contentObjectRendererMock,
+            );
 
         $this->typoLinkHook->__invoke($event);
     }
 
     public function testSkipsProcessingForMailtoUrl(): void
     {
-        $this->tinyUrlApiMock->expects(self::never())->method('getTinyUrl');
+        $this->tinyUrlGeneratorMock->expects(self::never())->method('generateTinyUrlForSite');
 
         $this->typoLinkHook->__invoke($this->getAfterLinkCreatedEvent(LinkService::TYPE_EMAIL));
     }
 
     public function testSkipsProcessingIfDisabled(): void
     {
-        $this->tinyUrlApiMock->expects(self::never())->method('getTinyUrl');
+        $this->tinyUrlGeneratorMock->expects(self::never())->method('generateTinyUrlForSite');
 
         $this->typoLinkHook->__invoke($this->getAfterLinkCreatedEvent(tinyUrlEnabled: false));
     }
 
     public function testUrlIsReplacedWithTinyUrl(): void
     {
-        $this->tinyUrlApiMock->method('getTinyUrl')->willReturn('http://the-tiny-url');
+        $this->tinyUrlGeneratorMock->method('generateTinyUrlForSite')->willReturn('http://the-tiny-url');
 
         $event = $this->getAfterLinkCreatedEvent();
         $this->typoLinkHook->__invoke($event);

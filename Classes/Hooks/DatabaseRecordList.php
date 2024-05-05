@@ -15,9 +15,8 @@ namespace Tx\Tinyurls\Hooks;
  *                                                                        */
 
 use Tx\Tinyurls\Domain\Repository\TinyUrlRepository;
-use Tx\Tinyurls\Utils\UrlUtils;
+use Tx\Tinyurls\Utils\UrlUtilsInterface;
 use TYPO3\CMS\Backend\View\Event\ModifyDatabaseQueryForRecordListingEvent;
-use TYPO3\CMS\Core\Database\Query\QueryBuilder as Typo3QueryBuilder;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
@@ -33,7 +32,7 @@ class DatabaseRecordList
     protected ?string $urlDisplayQuery = null;
 
     public function __construct(
-        private readonly UrlUtils $urlUtils
+        private readonly UrlUtilsInterface $urlUtils,
     ) {}
 
     public function __invoke(ModifyDatabaseQueryForRecordListingEvent $modifyQueryEvent): void
@@ -42,11 +41,14 @@ class DatabaseRecordList
             return;
         }
 
-        if ($modifyQueryEvent->getFields() !== ['*']) {
+        if (
+            $modifyQueryEvent->getFields() !== ['*']
+            && !in_array('urldisplay', $modifyQueryEvent->getFields(), true)
+        ) {
             return;
         }
 
-        $this->buildDisplayQuery($modifyQueryEvent->getQueryBuilder());
+        $this->buildDisplayQuery($modifyQueryEvent);
 
         if (!$this->urlDisplayQuery) {
             return;
@@ -55,13 +57,16 @@ class DatabaseRecordList
         $modifyQueryEvent->getQueryBuilder()->addSelectLiteral($this->urlDisplayQuery);
     }
 
-    protected function buildDisplayQuery(Typo3QueryBuilder $queryBuilder): void
+    protected function buildDisplayQuery(ModifyDatabaseQueryForRecordListingEvent $modifyQueryEvent): void
     {
         if ($this->urlDisplayQuery !== null) {
             return;
         }
 
-        $tinyUrl = $this->urlUtils->buildTinyUrl('###urlkey###');
+        $queryBuilder = $modifyQueryEvent->getQueryBuilder();
+
+        $tinyUrl = $this->urlUtils->buildTinyUrlForPid('###urlkey###', $modifyQueryEvent->getPageId());
+
         $tinyUrlParts = GeneralUtility::trimExplode('###urlkey###', $tinyUrl, true, 2);
         if (count($tinyUrlParts) === 0) {
             return;

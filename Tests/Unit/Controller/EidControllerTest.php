@@ -20,6 +20,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Tx\Tinyurls\Configuration\ExtensionConfiguration;
 use Tx\Tinyurls\Controller\EidController;
 use Tx\Tinyurls\Domain\Model\TinyUrl;
 use Tx\Tinyurls\Domain\Repository\TinyUrlRepository;
@@ -27,6 +28,7 @@ use Tx\Tinyurls\Exception\NoTinyUrlKeySubmittedException;
 use Tx\Tinyurls\Exception\TinyUrlNotFoundException;
 use TYPO3\CMS\Core\Error\Http\BadRequestException;
 use TYPO3\CMS\Core\Http\ServerRequest;
+use TYPO3\CMS\Core\Routing\SiteMatcher;
 use TYPO3\CMS\Frontend\Controller\ErrorController;
 
 #[BackupGlobals(true)]
@@ -36,14 +38,24 @@ class EidControllerTest extends TestCase
 
     private ErrorController|MockObject $errorControllerMock;
 
+    private ExtensionConfiguration|MockObject $extensionConfigurationMock;
+
+    private MockObject|SiteMatcher $siteMatcherMock;
+
     private MockObject|TinyUrlRepository $tinyUrlRepositoryMock;
 
     protected function setUp(): void
     {
         $this->errorControllerMock = $this->createMock(ErrorController::class);
+        $this->extensionConfigurationMock = $this->createMock(ExtensionConfiguration::class);
+        $this->siteMatcherMock = $this->createMock(SiteMatcher::class);
         $this->tinyUrlRepositoryMock = $this->createMock(TinyUrlRepository::class);
 
-        $this->eidController = new EidController($this->tinyUrlRepositoryMock);
+        $this->eidController = new EidController(
+            $this->extensionConfigurationMock,
+            $this->siteMatcherMock,
+            $this->tinyUrlRepositoryMock,
+        );
         $this->eidController->setErrorController($this->errorControllerMock);
 
         $GLOBALS['EXEC_TIME'] = time();

@@ -16,11 +16,15 @@ namespace Tx\Tinyurls\Controller;
 
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Tx\Tinyurls\Configuration\ExtensionConfiguration;
 use Tx\Tinyurls\Domain\Model\TinyUrl;
 use Tx\Tinyurls\Domain\Repository\TinyUrlRepository;
 use Tx\Tinyurls\Exception\NoTinyUrlKeySubmittedException;
 use Tx\Tinyurls\Exception\TinyUrlNotFoundException;
 use TYPO3\CMS\Core\Http\Response;
+use TYPO3\CMS\Core\Routing\SiteMatcher;
+use TYPO3\CMS\Core\Routing\SiteRouteResult;
+use TYPO3\CMS\Core\Site\Entity\SiteInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Frontend\Controller\ErrorController;
 
@@ -34,7 +38,11 @@ class EidController
 {
     private ?ErrorController $errorController = null;
 
-    public function __construct(protected readonly TinyUrlRepository $tinyUrlRepository) {}
+    public function __construct(
+        protected readonly ExtensionConfiguration $extensionConfiguration,
+        protected readonly SiteMatcher $siteMatcher,
+        protected readonly TinyUrlRepository $tinyUrlRepository,
+    ) {}
 
     public function setErrorController(ErrorController $errorController): void
     {
@@ -43,6 +51,8 @@ class EidController
 
     public function tinyUrlRedirect(ServerRequestInterface $request): ResponseInterface
     {
+        $this->extensionConfiguration->setSite($this->getSiteFromRequest($request));
+
         $this->tinyUrlRepository->purgeInvalidUrls();
 
         try {
@@ -52,6 +62,8 @@ class EidController
         }
 
         $this->processUrlHit($tinyUrl);
+
+        $this->extensionConfiguration->reset();
 
         $response = new Response();
         $noCacheResponse = $this->addNoCacheHeaders($response);
@@ -126,5 +138,17 @@ class EidController
         }
 
         $this->countUrlHit($tinyUrl);
+    }
+
+    private function getSiteFromRequest(ServerRequestInterface $request): ?SiteInterface
+    {
+        $result =  $this->siteMatcher->matchRequest($request);
+
+        if (!$result instanceof SiteRouteResult) {
+            return null;
+        }
+
+        // @extensionScannerIgnoreLine
+        return $result->getSite();
     }
 }

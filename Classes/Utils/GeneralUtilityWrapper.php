@@ -16,6 +16,7 @@ namespace Tx\Tinyurls\Utils;
 
 use TYPO3\CMS\Core\Crypto\Random;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use Closure;
 
 /**
  * A wrapper class for GeneralUtility calls. This allows us better mocking in the Unit tests.
@@ -24,7 +25,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  */
 class GeneralUtilityWrapper
 {
-    public function callUserFunction(string|\Closure $funcName, mixed &$params, ?object $ref = null): mixed
+    public function callUserFunction(Closure|string $funcName, mixed &$params, ?object $ref = null): mixed
     {
         return GeneralUtility::callUserFunction($funcName, $params, $ref);
     }
@@ -34,7 +35,7 @@ class GeneralUtilityWrapper
         return GeneralUtility::getFileAbsFileName($fileName);
     }
 
-    public function getIndpEnv(string $getEnvName): string|bool|array|null
+    public function getIndpEnv(string $getEnvName): null|array|bool|string
     {
         return GeneralUtility::getIndpEnv($getEnvName);
     }

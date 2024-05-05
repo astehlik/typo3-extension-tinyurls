@@ -18,7 +18,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Tx\Tinyurls\Domain\Repository\TinyUrlRepository;
 use Tx\Tinyurls\Hooks\DatabaseRecordList as DatabaseRecordListHooks;
-use Tx\Tinyurls\Utils\UrlUtils;
+use Tx\Tinyurls\Utils\UrlUtilsInterface;
 use TYPO3\CMS\Backend\RecordList\DatabaseRecordList;
 use TYPO3\CMS\Backend\View\Event\ModifyDatabaseQueryForRecordListingEvent;
 use TYPO3\CMS\Core\Database\Query\QueryBuilder as Typo3QueryBuilder;
@@ -34,12 +34,12 @@ class DatabaseRecordListTest extends TestCase
 
     private DatabaseRecordList|MockObject $parentRecordListMock;
 
-    private MockObject|UrlUtils $urlUtilsMock;
+    private MockObject|UrlUtilsInterface $urlUtilsMock;
 
     protected function setUp(): void
     {
         $this->parentRecordListMock = $this->createMock(DatabaseRecordList::class);
-        $this->urlUtilsMock = $this->createMock(UrlUtils::class);
+        $this->urlUtilsMock = $this->createMock(UrlUtilsInterface::class);
         $this->databaseRecordListHooks = new DatabaseRecordListHooks($this->urlUtilsMock);
     }
 
@@ -161,8 +161,8 @@ class DatabaseRecordListTest extends TestCase
     private function expectBuildTinyUrlCall(string $returnValue = 'https://myurl.tld/goto/###urlkey###'): void
     {
         $this->urlUtilsMock->expects(self::once())
-            ->method('buildTinyUrl')
-            ->with('###urlkey###')
+            ->method('buildTinyUrlForPid')
+            ->with('###urlkey###', 12)
             ->willReturn($returnValue);
     }
 }

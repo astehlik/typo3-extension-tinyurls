@@ -14,33 +14,46 @@ namespace Tx\Tinyurls\TinyUrl;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
+use Tx\Tinyurls\Configuration\ExtensionConfiguration;
 use Tx\Tinyurls\Domain\Model\TinyUrl;
 use Tx\Tinyurls\Domain\Repository\TinyUrlRepository;
 use Tx\Tinyurls\Exception\TinyUrlNotFoundException;
-use Tx\Tinyurls\Utils\UrlUtils;
 use InvalidArgumentException;
+use Tx\Tinyurls\Utils\UrlUtilsInterface;
+use TYPO3\CMS\Core\Site\Entity\SiteInterface;
 
 /**
  * This class is responsible for generating tiny Urls based on configuration
  * options and extension configuration.
  */
-readonly class TinyUrlGenerator
+readonly class TinyUrlGenerator implements TinyUrlGeneratorInterface
 {
     public function __construct(
+        private ExtensionConfiguration $extensionConfiguration,
         private TinyUrlRepository $tinyUrlRepository,
-        private UrlUtils $urlUtils,
-    ) {
-    }
+        private UrlUtilsInterface $urlUtils,
+    ) {}
 
     public function generateTinyUrl(TinyUrl $tinyUrl): string
+    {
+        return $this->generateTinyUrlForSite($tinyUrl, null);
+    }
+
+    public function generateTinyUrlForSite(TinyUrl $tinyUrl, ?SiteInterface $site): string
     {
         if ($tinyUrl->getTargetUrl() === '') {
             return '';
         }
 
+        $this->extensionConfiguration->setSite($site);
+
         $tinyUrl = $this->createOrFetchTinyUrl($tinyUrl);
 
-        return $this->urlUtils->buildTinyUrl($tinyUrl->getUrlkey());
+        $tinyUrl = $this->urlUtils->buildTinyUrl($tinyUrl->getUrlkey());
+
+        $this->extensionConfiguration->reset();
+
+        return $tinyUrl;
     }
 
     private function createOrFetchTinyUrl(TinyUrl $tinyUrl): TinyUrl

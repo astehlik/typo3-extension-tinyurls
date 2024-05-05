@@ -17,4 +17,12 @@
 	<rule ref="Squiz.NamingConventions.ValidVariableName.NotCamelCaps">
 		<exclude-pattern>ext_emconf.php</exclude-pattern>
 	</rule>
+
+	<!-- Exceptions for classes with empty body -->
+	<rule ref="PSR2.Classes.ClassDeclaration">
+		<exclude-pattern>Classes/Exception/InvalidConfigurationException.php</exclude-pattern>
+	</rule>
+	<rule ref="Squiz.WhiteSpace.ScopeClosingBrace">
+		<exclude-pattern>Classes/Exception/InvalidConfigurationException.php</exclude-pattern>
+	</rule>
 </ruleset>

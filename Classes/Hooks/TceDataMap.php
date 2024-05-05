@@ -17,7 +17,7 @@ namespace Tx\Tinyurls\Hooks;
 use Tx\Tinyurls\Domain\Model\TinyUrl;
 use Tx\Tinyurls\Domain\Repository\TinyUrlRepository;
 use Tx\Tinyurls\Exception\TinyUrlNotFoundException;
-use Tx\Tinyurls\Utils\UrlUtils;
+use Tx\Tinyurls\Utils\UrlUtilsInterface;
 use TYPO3\CMS\Core\DataHandling\DataHandler;
 
 /**
@@ -30,7 +30,7 @@ readonly class TceDataMap
 {
     public function __construct(
         protected TinyUrlRepository $tinyUrlRepository,
-        protected UrlUtils $urlUtils,
+        protected UrlUtilsInterface $urlUtils,
     ) {}
 
     /**

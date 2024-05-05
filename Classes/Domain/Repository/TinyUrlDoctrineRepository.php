@@ -19,7 +19,7 @@ use Tx\Tinyurls\Configuration\ExtensionConfiguration;
 use Tx\Tinyurls\Database\StoragePageQueryRestriction;
 use Tx\Tinyurls\Domain\Model\TinyUrl;
 use Tx\Tinyurls\Exception\TinyUrlNotFoundException;
-use Tx\Tinyurls\Utils\UrlUtils;
+use Tx\Tinyurls\Utils\UrlUtilsInterface;
 use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\QueryBuilder;
@@ -31,7 +31,7 @@ class TinyUrlDoctrineRepository extends AbstractTinyUrlDatabaseRepository implem
     public function __construct(
         private readonly ConnectionPool $databaseConnectionPool,
         ExtensionConfiguration $extensionConfiguration,
-        UrlUtils $urlUtils,
+        UrlUtilsInterface $urlUtils,
     ) {
         parent::__construct($extensionConfiguration, $urlUtils);
     }

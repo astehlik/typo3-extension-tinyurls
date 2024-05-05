@@ -22,6 +22,8 @@ class TypoScriptConfigurator
 {
     /**
      * Contains the default values for the tinyurl configuration.
+     *
+     * @var array<'deleteOnUse'|'urlKey'|'validUntil', bool|int>
      */
     protected array $tinyurlConfigDefaults = [
         'deleteOnUse' => 0,
@@ -38,12 +40,14 @@ class TypoScriptConfigurator
         array $config,
         ContentObjectRenderer $contentObjectRenderer,
     ): void {
-        if (!array_key_exists('tinyurl.', $config)) {
+        $tinyUrlConfig = $config['tinyurl.'] ?? [];
+
+        if (!is_array($tinyUrlConfig) || $tinyUrlConfig === []) {
             return;
         }
 
         foreach (array_keys($this->tinyurlConfigDefaults) as $configKey) {
-            $configValue = $this->getConfigValue($configKey, $config['tinyurl.'], $contentObjectRenderer);
+            $configValue = $this->getConfigValue($configKey, $tinyUrlConfig, $contentObjectRenderer);
 
             match ($configKey) {
                 'deleteOnUse' => $this->setOptionDeleteOnUse($tinyUrl, (bool)$configValue),
