@@ -14,8 +14,6 @@ namespace Tx\Tinyurls\Domain\Model;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
-use Tx\Tinyurls\Utils\UrlUtils;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 use DateTimeImmutable;
 use DateTimeInterface;
 use InvalidArgumentException;

@@ -31,6 +31,7 @@ use TYPO3\CMS\Fluid\View\StandaloneView;
 class CopyableFieldElement extends AbstractNode implements NodeInterface
 {
     public const TEMPLATE_PATH = 'EXT:tinyurls/Resources/Private/Templates/FormEngine/CopyableField.html';
+
     private const LLL_DB_PREFIX = 'LLL:EXT:tinyurls/Resources/Private/Language/locallang_db.xlf:tx_tinyurls_urls.';
 
     protected ?StandaloneView $formFieldView = null;
@@ -153,7 +154,7 @@ class CopyableFieldElement extends AbstractNode implements NodeInterface
     private function getClipboardButtonLabel(): string
     {
         return $this->getLanguageService()
-            ->sL(self:: LLL_DB_PREFIX . 'copy_to_clipboard_button_label');
+            ->sL(self::LLL_DB_PREFIX . 'copy_to_clipboard_button_label');
     }
 
     private function getLanguageService(): LanguageService

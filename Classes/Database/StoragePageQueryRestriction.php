@@ -23,8 +23,7 @@ readonly class StoragePageQueryRestriction implements QueryRestrictionInterface
 {
     public function __construct(
         protected int $storagePageUid,
-    ) {
-    }
+    ) {}
 
     /**
      * Main method to build expressions for given tables.
