@@ -107,6 +107,7 @@ class ExtensionConfigurationTest extends TestCase
 
         $this->extensionConfiguration->setSite($siteMock);
 
+        // @extensionScannerIgnoreLine
         self::assertSame('https://base.url.from.site', (string)$this->extensionConfiguration->getBaseUrl());
     }
 
@@ -114,6 +115,7 @@ class ExtensionConfigurationTest extends TestCase
     {
         $this->initConfig([]);
 
+        // @extensionScannerIgnoreLine
         self::assertNull($this->extensionConfiguration->getBaseUrl());
     }
 
@@ -164,6 +166,7 @@ class ExtensionConfigurationTest extends TestCase
         $this->siteConfigurationMock->method('loadSiteConfiguration')
             ->willReturn([ConfigKeys::BASE_URL => 'https://base.url.from.site']);
 
+        // @extensionScannerIgnoreLine
         self::assertSame('https://base.url.from.site', (string)$this->extensionConfiguration->getBaseUrl());
     }
 
