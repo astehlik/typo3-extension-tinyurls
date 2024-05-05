@@ -110,6 +110,7 @@ class TinyUrlTest extends TestCase
     {
         $tinyUrl = TinyUrl::createNew();
         $tinyUrl2 = TinyUrl::createNew();
+        // @extensionScannerIgnoreLine
         self::assertFalse($tinyUrl->equals($tinyUrl2));
     }
 
@@ -119,6 +120,7 @@ class TinyUrlTest extends TestCase
         $tinyUrl->persistPostProcessInsert(3);
         $tinyUrl2 = TinyUrl::createNew();
         $tinyUrl2->persistPostProcessInsert(4);
+        // @extensionScannerIgnoreLine
         self::assertFalse($tinyUrl->equals($tinyUrl2));
     }
 
@@ -127,6 +129,7 @@ class TinyUrlTest extends TestCase
         $tinyUrl = TinyUrl::createNew();
         $tinyUrl2 = TinyUrl::createNew();
         $tinyUrl2->persistPostProcessInsert(3);
+        // @extensionScannerIgnoreLine
         self::assertFalse($tinyUrl->equals($tinyUrl2));
     }
 
@@ -142,6 +145,7 @@ class TinyUrlTest extends TestCase
         $tinyUrl->persistPostProcessInsert(3);
         $tinyUrl2 = TinyUrl::createNew();
         $tinyUrl2->persistPostProcessInsert(3);
+        // @extensionScannerIgnoreLine
         self::assertTrue($tinyUrl->equals($tinyUrl2));
     }
 

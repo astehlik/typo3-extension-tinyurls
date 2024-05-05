@@ -60,6 +60,7 @@ class TinyUrlValidator implements ValidatorInterface
             return;
         }
 
+        // @extensionScannerIgnoreLine
         if ($tinyUrl->equals($existingTinyUrl)) {
             // The existing key belongs to the TinyUrl record that is validated.
             return;
