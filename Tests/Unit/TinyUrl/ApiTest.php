@@ -60,6 +60,15 @@ class ApiTest extends TestCase
         $this->tinyUrlApi->initializeConfigFromTyposcript($config, $contentObjectRendererMock);
     }
 
+    public function testResetInitializesNewTinyUrlInstance(): void
+    {
+        $instance = $this->tinyUrlApi->getTinyUrlInstance();
+
+        $this->tinyUrlApi->reset();
+
+        self::assertNotSame($instance, $this->tinyUrlApi->getTinyUrlInstance());
+    }
+
     public function testSetCommentSetsCommentInUrlGenerator(): void
     {
         $this->tinyUrlApi->setComment('the comment');
@@ -67,7 +76,14 @@ class ApiTest extends TestCase
         self::assertSame('the comment', $this->tinyUrlApi->getTinyUrlInstance()->getComment());
     }
 
-    public function testSetDeleteOnUseSetsDeleteOnUseOptionInUrlGenerator(): void
+    public function testSetDeleteOnUseSetsDeleteOnUseOptionToFalse(): void
+    {
+        $this->tinyUrlApi->setDeleteOnUse(false);
+
+        self::assertFalse($this->tinyUrlApi->getTinyUrlInstance()->getDeleteOnUse());
+    }
+
+    public function testSetDeleteOnUseSetsDeleteOnUseOptionToTrue(): void
     {
         $this->tinyUrlApi->setDeleteOnUse(true);
 
