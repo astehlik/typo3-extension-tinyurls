@@ -14,16 +14,12 @@ namespace Tx\Tinyurls\Exception;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
-use TYPO3\CMS\Extbase\Error\Error;
 use TYPO3\CMS\Extbase\Error\Result;
 use InvalidArgumentException;
 
 class TinyUrlValidationException extends InvalidArgumentException
 {
-    /**
-     * @var Result
-     */
-    protected $result;
+    protected Result $result;
 
     public function __construct()
     {
@@ -41,7 +37,6 @@ class TinyUrlValidationException extends InvalidArgumentException
 
         $errorMessages = [];
         foreach ($result->getFlattenedErrors() as $errors) {
-            /** @var Error $error */
             foreach ($errors as $error) {
                 $errorMessages[] = $error->getMessage();
             }

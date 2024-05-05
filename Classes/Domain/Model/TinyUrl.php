@@ -14,8 +14,6 @@ namespace Tx\Tinyurls\Domain\Model;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
-use Tx\Tinyurls\Utils\UrlUtils;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 use DateTimeImmutable;
 use DateTimeInterface;
 use InvalidArgumentException;
@@ -45,6 +43,22 @@ class TinyUrl
     protected string $urlkey = '';
 
     protected ?DateTimeInterface $validUntil = null;
+
+    /**
+     * The consturctor is final because new static() is used
+     * and we want to prevent changes to the method signature.
+     */
+    final public function __construct() {}
+
+    /**
+     * @param non-empty-string $url
+     */
+    public static function createForUrl(string $url): self
+    {
+        $tinyUrl = new static();
+        $tinyUrl->setTargetUrl($url);
+        return $tinyUrl;
+    }
 
     public static function createFromDatabaseRow(array $databaseRow): self
     {
@@ -182,18 +196,6 @@ class TinyUrl
             $this->urlkey = $this->getCustomUrlKey();
         }
         $this->tstamp = new DateTimeImmutable();
-    }
-
-    /**
-     * @codeCoverageIgnore
-     *
-     * @deprecated Will be removed in the next major version. Use UrlKeyGenerator instance directly instead.
-     */
-    public function regenerateUrlKey(): void
-    {
-        /** @var UrlUtils $urlUtils */
-        $urlUtils = GeneralUtility::makeInstance(UrlUtils::class);
-        $urlUtils->regenerateUrlKey($this);
     }
 
     public function resetCustomUrlKey(): void

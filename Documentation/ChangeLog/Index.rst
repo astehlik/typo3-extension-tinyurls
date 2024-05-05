@@ -7,4 +7,4 @@ ChangeLog
 
 You can find the current problems, TODOs and changelogs on GitHub:
 
-https://github.com/astehlik/typo3-extension-tinyurls/issues
+https://github.com/astehlik/typo3-extension-tinyurls/

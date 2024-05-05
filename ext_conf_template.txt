@@ -1,3 +1,8 @@
+# cat=basic/config; type=string; label=Base URL for TinyURLs: Overrides the value of the TYPO3_SITE_URL placeholder (by default read from GeneralUtility::getIndpEnv())
+baseUrl =
+
+# cat=basic/config; type=boolean; label=Use Site Base as Base URL: If enabled the Base of the detected Site overrides the value of the TYPO3_SITE_URL placeholder.
+baseUrlFromSiteBase = 0
 
 # cat=basic/config; type=boolean; label=Create speaking URLs: If enable the tiny URL will be generated depending on the speakingUrlTemplate. Hint! If you enable this you might need to add a rewrite rule to you webserver!
 createSpeakingURLs = 0

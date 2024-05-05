@@ -69,7 +69,7 @@ class TypoScriptConfiguratorTest extends TestCase
         );
     }
 
-    public function testSetsOptionDeleteOnUseDefaultVlaue(): void
+    public function testSetsOptionDeleteOnUseDefaultValue(): void
     {
         $this->tinyUrlMock->expects(self::once())
             ->method('disableDeleteOnUse');
@@ -77,7 +77,7 @@ class TypoScriptConfiguratorTest extends TestCase
             ->method('enableDeleteOnUse');
 
         $this->initializeConfigFromTyposcript(
-            ['tinyurl.' => []],
+            ['tinyurl.' => ['dummy' => 'value']],
         );
     }
 
@@ -99,7 +99,7 @@ class TypoScriptConfiguratorTest extends TestCase
             ->method('resetCustomUrlKey');
 
         $this->initializeConfigFromTyposcript(
-            ['tinyurl.' => []],
+            ['tinyurl.' => ['dummy' => 'value']],
         );
     }
 
@@ -122,7 +122,7 @@ class TypoScriptConfiguratorTest extends TestCase
             ->method('setValidUntil');
 
         $this->initializeConfigFromTyposcript(
-            ['tinyurl.' => []],
+            ['tinyurl.' => ['dummy' => 'value']],
         );
     }
 

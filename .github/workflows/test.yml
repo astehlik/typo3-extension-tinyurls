@@ -3,6 +3,9 @@ name: Testing and linting
 
 on:
   push:
+    branches:
+      - main
+      - develop
   pull_request:
   workflow_dispatch:
   schedule:
@@ -17,29 +20,27 @@ jobs:
     name: "Composer validate"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: ./.github/workflows/composer
         with:
           php_version: "${{ env.MAIN_PHP_VERSION }}"
-      - run: |
-          bash .Build/bin/t3_run_tests.sh -s composerValidate -p ${{ env.MAIN_PHP_VERSION }}
+      - run: composer validate
 
   "composer-normalize":
     name: "Composer normalize"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: ./.github/workflows/composer
         with:
           php_version: "${{ env.MAIN_PHP_VERSION }}"
-      - run: |
-          bash .Build/bin/t3_run_tests.sh -s composerNormalize -n -p ${{ env.MAIN_PHP_VERSION }}
+      - run: composer normalize --dry-run --diff
 
   "check-codestyle-codesniffer":
     name: "PHP_CodeSniffer check"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: ./.github/workflows/composer
         with:
           php_version: "${{ env.MAIN_PHP_VERSION }}"
@@ -47,80 +48,91 @@ jobs:
         with:
           php-version: "${{ env.MAIN_PHP_VERSION }}"
       - run: |
-          bash .Build/bin/t3_check_codestyle.sh PSRTinyurls
+          bash bin/t3_check_codestyle.sh PerCodeStyleT3Ext
 
   "check-codestyle-php-cs-fixer":
     name: "PHP CS Fixer check"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: ./.github/workflows/composer
         with:
           php_version: "${{ env.MAIN_PHP_VERSION }}"
       - run: |
-          bash .Build/bin/t3_run_tests.sh -s cgl -n -p ${{ env.MAIN_PHP_VERSION }}
+          bash bin/t3_run_tests.sh -s cgl -n -p ${{ env.MAIN_PHP_VERSION }}
 
   "php-unit-tests":
     name: "PHP Unit tests"
     strategy:
       matrix:
-        php_version: ["8.1", "8.3"]
+        php_version: ["8.2", "8.3"]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: ./.github/workflows/composer
         with:
           php_version: ${{ matrix.php_version }}
       - run: |
-          bash .Build/bin/t3_run_tests.sh -s unit -p ${{ matrix.php_version }}
+          bash bin/t3_run_tests.sh -s unit -p ${{ matrix.php_version }}
 
   "php-functional-tests-sqlite-82":
     name: "Functional tests on SQLite"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: ./.github/workflows/composer
         with:
           php_version: "${{ env.MAIN_PHP_VERSION }}"
       - run: |
-          bash .Build/bin/t3_run_tests.sh -s functional -d sqlite -p ${{ env.MAIN_PHP_VERSION }}
+          bash bin/t3_run_tests.sh -s functional -d sqlite -p ${{ env.MAIN_PHP_VERSION }}
 
   "php-functional-tests-mariadb-main":
     name: "Functional tests on MariaDB"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: ./.github/workflows/composer
         with:
           php_version: ${{ env.MAIN_PHP_VERSION }}
       - run: |
-          bash .Build/bin/t3_run_tests.sh -s functional -d mariadb -p ${{ env.MAIN_PHP_VERSION }}
+          bash bin/t3_run_tests.sh -s functional -d mariadb -p ${{ env.MAIN_PHP_VERSION }}
 
   "php-lint":
     name: "PHP linting"
     strategy:
       matrix:
-        php_version: ["8.1", "8.3"]
+        php_version: ["8.2", "8.3"]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: ./.github/workflows/composer
         with:
           php_version: ${{ matrix.php_version }}
       - run: |
-          bash .Build/bin/t3_run_tests.sh -s lintPhp -p ${{ matrix.php_version }}
+          bash bin/t3_run_tests.sh -s lintPhp -p ${{ matrix.php_version }}
+
+  "phpstan":
+    name: "PHPStan"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/workflows/composer
+        with:
+          php_version: "${{ env.MAIN_PHP_VERSION }}"
+      - run: |
+          bash bin/t3_run_tests.sh -s phpstan -p ${{ env.MAIN_PHP_VERSION }}
 
   "coverage-phpunit":
     name: "Test coverage by Unit Tests"
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/develop'
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: ./.github/workflows/composer
         with:
           php_version: ${{ env.MAIN_PHP_VERSION }}
       - run: |
-          bash .Build/bin/t3_run_tests.sh -s unit -p ${{ env.MAIN_PHP_VERSION }} -x -z coverage -e "--coverage-clover Logs/clover-unit.xml --coverage-filter ../Classes"
+          bash bin/t3_run_tests.sh -s unit -p ${{ env.MAIN_PHP_VERSION }} -x -z coverage -e "--coverage-clover Logs/clover-unit.xml --coverage-filter ../Classes"
       - uses: actions/upload-artifact@v3
         with:
           name: coverage-phpunit
@@ -132,12 +144,12 @@ jobs:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/develop'
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: ./.github/workflows/composer
         with:
           php_version: ${{ env.MAIN_PHP_VERSION }}
       - run: |
-          bash .Build/bin/t3_run_tests.sh -s functional -d mariadb -p ${{ env.MAIN_PHP_VERSION }} -x -z coverage -e "--coverage-clover Logs/clover-functional.xml --coverage-filter ../Classes"
+          bash bin/t3_run_tests.sh -s functional -d mariadb -p ${{ env.MAIN_PHP_VERSION }} -x -z coverage -e "--coverage-clover Logs/clover-functional.xml --coverage-filter ../Classes"
       - uses: actions/upload-artifact@v3
         with:
           name: coverage-functional
@@ -154,7 +166,7 @@ jobs:
     env:
       CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: actions/download-artifact@v3
         with:
           name: coverage-phpunit
@@ -177,11 +189,11 @@ jobs:
     name: "Scan for deprecated and breaking code using typo3scan"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: ./.github/workflows/composer
         with:
           php_version: "${{ env.MAIN_PHP_VERSION }}"
       - uses: shivammathur/setup-php@v2
         with:
           php-version: "${{ env.MAIN_PHP_VERSION }}"
-      - run: php .Build/bin/typo3scan scan --target 12 .
+      - run: php bin/typo3scan scan .

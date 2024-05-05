@@ -14,6 +14,7 @@ namespace Tx\Tinyurls\Tests\Unit\Domain\Repository;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
+use PHPUnit\Framework\Attributes\BackupGlobals;
 use PHPUnit\Framework\Constraint\Callback;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -25,7 +26,7 @@ use Tx\Tinyurls\Domain\Repository\TinyUrlRepository;
 use Tx\Tinyurls\Domain\Validator\TinyUrlValidator;
 use Tx\Tinyurls\Exception\TinyUrlNotFoundException;
 use Tx\Tinyurls\Exception\TinyUrlValidationException;
-use Tx\Tinyurls\Utils\UrlUtils;
+use Tx\Tinyurls\Utils\UrlUtilsInterface;
 use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\QueryBuilder;
@@ -34,9 +35,7 @@ use TYPO3\CMS\Extbase\Error\Result;
 use Closure;
 use InvalidArgumentException;
 
-/**
- * @backupGlobals enabled
- */
+#[BackupGlobals(true)]
 class TinyUrlDoctrineRepositoryTest extends TestCase
 {
     private Connection|MockObject $databaseConnectionMock;
@@ -51,7 +50,7 @@ class TinyUrlDoctrineRepositoryTest extends TestCase
 
     private MockObject|TinyUrlValidator $tinyUrlValidatorMock;
 
-    private MockObject|UrlUtils $urlUtilsMock;
+    private MockObject|UrlUtilsInterface $urlUtilsMock;
 
     protected function setUp(): void
     {
@@ -91,7 +90,7 @@ class TinyUrlDoctrineRepositoryTest extends TestCase
         $databaseConnectionPoolMock->method('getConnectionForTable')
             ->willReturn($this->databaseConnectionMock);
 
-        $this->urlUtilsMock = $this->createMock(UrlUtils::class);
+        $this->urlUtilsMock = $this->createMock(UrlUtilsInterface::class);
 
         $this->doctrineRepository = new TinyUrlDoctrineRepository(
             $databaseConnectionPoolMock,
@@ -466,7 +465,6 @@ class TinyUrlDoctrineRepositoryTest extends TestCase
 
         $this->databaseConnectionMock->expects(self::once())
             ->method('lastInsertId')
-            ->with(TinyUrlRepository::TABLE_URLS, 'uid')
             ->willReturn((string)$newUid);
     }
 

@@ -15,7 +15,8 @@ namespace Tx\Tinyurls\ViewHelpers;
  *                                                                        */
 
 use Tx\Tinyurls\Domain\Model\TinyUrl;
-use Tx\Tinyurls\TinyUrl\TinyUrlGenerator;
+use Tx\Tinyurls\TinyUrl\TinyUrlGeneratorInterface;
+use TYPO3\CMS\Core\Site\Entity\SiteInterface;
 use TYPO3Fluid\Fluid\Core\ViewHelper\AbstractViewHelper;
 use DateTimeImmutable;
 
@@ -35,11 +36,11 @@ use DateTimeImmutable;
  */
 class TinyurlViewHelper extends AbstractViewHelper
 {
-    public function __construct(private readonly TinyUrlGenerator $tinyUrlGenerator) {}
+    public function __construct(private readonly TinyUrlGeneratorInterface $tinyUrlGenerator) {}
 
     public function initializeArguments(): void
     {
-        $this->registerArgument('url', 'string', 'The Url to be shortened', false, null);
+        $this->registerArgument('url', 'string', 'The Url to be shortened');
         $this->registerArgument(
             'onlyOneTimeValid',
             'boolean',
@@ -49,6 +50,7 @@ class TinyurlViewHelper extends AbstractViewHelper
         );
         $this->registerArgument('validUntil', 'int', 'Timestamp until generated link is valid', false, 0);
         $this->registerArgument('urlKey', 'string', 'Custom url key', false, '');
+        $this->registerArgument('site', SiteInterface::class, 'The Site from which the configuration should be loaded');
     }
 
     /**
@@ -60,26 +62,33 @@ class TinyurlViewHelper extends AbstractViewHelper
         $onlyOneTimeValid = $this->arguments['onlyOneTimeValid'];
         $validUntil = $this->arguments['validUntil'];
         $urlKey = $this->arguments['urlKey'];
+        $site = $this->arguments['site'];
 
         if ($url === null) {
             $url = $this->renderChildren();
         }
 
+        if (!is_string($url) || $url === '') {
+            return '';
+        }
+
         $tinyUrl = TinyUrl::createNew();
         $tinyUrl->setTargetUrl($url);
 
-        if ($onlyOneTimeValid) {
+        if ($onlyOneTimeValid === true) {
             $tinyUrl->enableDeleteOnUse();
         }
 
-        if ($validUntil > 0) {
+        if (is_int($validUntil) && $validUntil > 0) {
             $tinyUrl->setValidUntil(new DateTimeImmutable('@' . $validUntil));
         }
 
-        if ($urlKey !== '') {
+        if (is_string($urlKey) && $urlKey !== '') {
             $tinyUrl->setCustomUrlKey($urlKey);
         }
 
-        return $this->tinyUrlGenerator->generateTinyUrl($tinyUrl);
+        $site = $site instanceof SiteInterface ? $site : null;
+
+        return $this->tinyUrlGenerator->generateTinyUrlForSite($tinyUrl, $site);
     }
 }

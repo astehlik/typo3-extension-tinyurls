@@ -14,10 +14,13 @@ namespace Tx\Tinyurls\Tests\Unit\Controller;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
+use PHPUnit\Framework\Attributes\BackupGlobals;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Tx\Tinyurls\Configuration\ExtensionConfiguration;
 use Tx\Tinyurls\Controller\EidController;
 use Tx\Tinyurls\Domain\Model\TinyUrl;
 use Tx\Tinyurls\Domain\Repository\TinyUrlRepository;
@@ -25,25 +28,36 @@ use Tx\Tinyurls\Exception\NoTinyUrlKeySubmittedException;
 use Tx\Tinyurls\Exception\TinyUrlNotFoundException;
 use TYPO3\CMS\Core\Error\Http\BadRequestException;
 use TYPO3\CMS\Core\Http\ServerRequest;
+use TYPO3\CMS\Core\Routing\SiteMatcher;
+use TYPO3\CMS\Core\Routing\SiteRouteResult;
+use TYPO3\CMS\Core\Site\Entity\SiteInterface;
 use TYPO3\CMS\Frontend\Controller\ErrorController;
 
-/**
- * @backupGlobals enabled
- */
+#[BackupGlobals(true)]
 class EidControllerTest extends TestCase
 {
     private EidController $eidController;
 
     private ErrorController|MockObject $errorControllerMock;
 
+    private ExtensionConfiguration|MockObject $extensionConfigurationMock;
+
+    private MockObject|SiteMatcher $siteMatcherMock;
+
     private MockObject|TinyUrlRepository $tinyUrlRepositoryMock;
 
     protected function setUp(): void
     {
         $this->errorControllerMock = $this->createMock(ErrorController::class);
+        $this->extensionConfigurationMock = $this->createMock(ExtensionConfiguration::class);
+        $this->siteMatcherMock = $this->createMock(SiteMatcher::class);
         $this->tinyUrlRepositoryMock = $this->createMock(TinyUrlRepository::class);
 
-        $this->eidController = new EidController($this->tinyUrlRepositoryMock);
+        $this->eidController = new EidController(
+            $this->extensionConfigurationMock,
+            $this->siteMatcherMock,
+            $this->tinyUrlRepositoryMock,
+        );
         $this->eidController->setErrorController($this->errorControllerMock);
 
         $GLOBALS['EXEC_TIME'] = time();
@@ -150,6 +164,8 @@ class EidControllerTest extends TestCase
             ->willThrowException(new TinyUrlNotFoundException('thekey'));
 
         $errorResponse = $this->getMockBuilder(ResponseInterface::class)->getMock();
+        $errorResponse->method('getStatusCode')->willReturn(404);
+
         $this->errorControllerMock->expects(self::once())
             ->method('pageNotFoundAction')
             ->with(
@@ -158,7 +174,7 @@ class EidControllerTest extends TestCase
             )
             ->willReturn($errorResponse);
 
-        self::assertSame($errorResponse, $this->processRequest());
+        self::assertSame($errorResponse, $this->processRequest(404));
     }
 
     public function testRedirectsToTargetUrl(): void
@@ -179,9 +195,30 @@ class EidControllerTest extends TestCase
         self::assertSame('http://the-target.url', $response->getHeaderLine('Location'));
     }
 
-    /**
-     * @dataProvider provideTinyUrlRedirectSendsNoCacheHeadersCases
-     */
+    public function testSiteIsSetAndResetInExtensionConfiguration(): void
+    {
+        $_GET['tx_tinyurls']['key'] = 'thekey';
+
+        $siteMock = $this->createMock(SiteInterface::class);
+
+        $siteMatchResultMock = $this->createMock(SiteRouteResult::class);
+        $siteMatchResultMock->method('getSite')->willReturn($siteMock);
+
+        $this->siteMatcherMock->expects(self::once())
+            ->method('matchRequest')
+            ->willReturn($siteMatchResultMock);
+
+        $this->extensionConfigurationMock->expects(self::once())
+            ->method('setSite')
+            ->with($siteMock);
+
+        $this->extensionConfigurationMock->expects(self::once())
+            ->method('reset');
+
+        $this->processRequest();
+    }
+
+    #[DataProvider('provideTinyUrlRedirectSendsNoCacheHeadersCases')]
     public function testTinyUrlRedirectSendsNoCacheHeaders(string $headerName, string $expectedValue): void
     {
         $_GET['tx_tinyurls']['key'] = 'thekey';
@@ -201,10 +238,12 @@ class EidControllerTest extends TestCase
         self::assertSame($expectedValue, $response->getHeaderLine($headerName));
     }
 
-    private function processRequest(): ResponseInterface
+    private function processRequest(int $expectedStatus = 301): ResponseInterface
     {
         $request = new ServerRequest();
         $request = $request->withQueryParams($_GET);
-        return $this->eidController->tinyUrlRedirect($request);
+        $response =  $this->eidController->tinyUrlRedirect($request);
+        self::assertSame($expectedStatus, $response->getStatusCode());
+        return $response;
     }
 }

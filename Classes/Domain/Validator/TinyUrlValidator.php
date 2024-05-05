@@ -27,6 +27,8 @@ class TinyUrlValidator implements ValidatorInterface
     }
 
     /**
+     * @codeCoverageIgnore
+     *
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     public function setOptions(array $options): void {}
@@ -41,6 +43,7 @@ class TinyUrlValidator implements ValidatorInterface
     {
         $this->result = new Result();
 
+        $this->validateTargetUrl($value);
         $this->validateValidUntil($value);
         $this->validateCustomUrlKey($value);
 
@@ -60,6 +63,7 @@ class TinyUrlValidator implements ValidatorInterface
             return;
         }
 
+        // @extensionScannerIgnoreLine
         if ($tinyUrl->equals($existingTinyUrl)) {
             // The existing key belongs to the TinyUrl record that is validated.
             return;
@@ -76,5 +80,15 @@ class TinyUrlValidator implements ValidatorInterface
             $error = new Error('The validUntil DateTime must not be in the past.', 1488307858);
             $this->result->forProperty('validUntil')->addError($error);
         }
+    }
+
+    private function validateTargetUrl(TinyUrl $value): void
+    {
+        if ($value->getTargetUrl() !== '') {
+            return;
+        }
+
+        $error = new Error('The target URL must not be empty.', 1714916406);
+        $this->result->forProperty('targetUrl')->addError($error);
     }
 }

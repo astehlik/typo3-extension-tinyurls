@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Tx\Tinyurls\FormEngine;
+namespace Tx\Tinyurls\Configuration;
 
 /*                                                                        *
  * This script belongs to the TYPO3 extension "tinyurls".                 *
@@ -14,27 +14,19 @@ namespace Tx\Tinyurls\FormEngine;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
-use Tx\Tinyurls\Utils\UrlUtilsInterface;
-
-/**
- * Builds the tiny URL for displaying it within Backend forms.
- */
-readonly class TinyUrlDisplay
+readonly class ExtensionConfigurationDefaults extends ExtensionConfigurationData
 {
-    public function __construct(
-        private UrlUtilsInterface $urlUtils,
-    ) {}
-
-    /**
-     * Renders a full tiny URL based on the given form element data.
-     *
-     * This method is called as a valueFunc by the TYPO3 form engine.
-     */
-    public function buildTinyUrlFormFormElementData(array $formElementData): string
+    public function __construct()
     {
-        return $this->urlUtils->buildTinyUrlForPid(
-            $formElementData['databaseRow']['urlkey'],
-            (int)$formElementData['databaseRow']['pid'],
+        parent::__construct(
+            '',
+            false,
+            false,
+            'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789',
+            2,
+            8,
+            '###TYPO3_SITE_URL###tinyurl/###TINY_URL_KEY###',
+            0,
         );
     }
 }

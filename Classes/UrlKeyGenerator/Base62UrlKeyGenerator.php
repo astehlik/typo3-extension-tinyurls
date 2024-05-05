@@ -28,11 +28,11 @@ use Tx\Tinyurls\Utils\GeneralUtilityWrapper;
  * the dictionary is shorter than the configured minimum length, a random string is appended to the
  * original key, separated by a dash.
  */
-class Base62UrlKeyGenerator implements UrlKeyGenerator
+readonly class Base62UrlKeyGenerator implements UrlKeyGenerator
 {
     public function __construct(
-        protected readonly ExtensionConfiguration $extensionConfiguration,
-        protected readonly GeneralUtilityWrapper $generalUtility,
+        protected ExtensionConfiguration $extensionConfiguration,
+        protected GeneralUtilityWrapper $generalUtility,
     ) {}
 
     /**

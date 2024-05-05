@@ -4,14 +4,18 @@ declare(strict_types=1);
 
 namespace Tx\Tinyurls\Tests\Functional;
 
+use Doctrine\DBAL\ParameterType;
 use Symfony\Component\Yaml\Yaml;
+use Tx\Tinyurls\Configuration\ConfigKeys;
 use TYPO3\CMS\Core\Cache\CacheManager;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\TestingFramework\Core\Functional\FunctionalTestCase;
-use PDO;
 
 abstract class AbstractFunctionalTestCase extends FunctionalTestCase
 {
+    protected array $configurationToUseInTestInstance =
+        ['EXTENSIONS' => ['tinyurls' => [ConfigKeys::BASE_URL => 'http://localhost/']]];
+
     protected array $testExtensionsToLoad = ['typo3conf/ext/tinyurls'];
 
     protected function getTinyUrlRow(): array
@@ -19,7 +23,7 @@ abstract class AbstractFunctionalTestCase extends FunctionalTestCase
         $builder = $this->getConnectionPool()->getQueryBuilderForTable('tx_tinyurls_urls');
         $builder->select('*')
             ->from('tx_tinyurls_urls')
-            ->where($builder->expr()->eq('uid', $builder->createNamedParameter(1, PDO::PARAM_INT)));
+            ->where($builder->expr()->eq('uid', $builder->createNamedParameter(1, ParameterType::INTEGER)));
         return $builder->executeQuery()->fetchAssociative();
     }
 
@@ -27,8 +31,11 @@ abstract class AbstractFunctionalTestCase extends FunctionalTestCase
      * Create a simple site config for the tests that
      * call a frontend page.
      */
-    protected function setUpFrontendSite(int $pageId, array $additionalLanguages = []): void
-    {
+    protected function setUpFrontendSite(
+        int $pageId,
+        array $additionalLanguages = [],
+        array $additionalConfiguration = [],
+    ): void {
         $languages = [
             [
                 'title' => 'English',
@@ -60,11 +67,13 @@ abstract class AbstractFunctionalTestCase extends FunctionalTestCase
         $languages = array_merge($languages, $additionalLanguages);
         $configuration = [
             'rootPageId' => $pageId,
-            'base' => '/',
+            'base' => 'http://localhost/',
             'languages' => $languages,
             'errorHandling' => [],
             'routes' => [],
+            'tinyurls' => [ConfigKeys::URL_RECORD_STORAGE_PID => 1],
         ];
+        $configuration = array_merge_recursive($configuration, $additionalConfiguration);
         GeneralUtility::mkdir_deep($this->instancePath . '/typo3conf/sites/testing/');
         $yamlFileContents = Yaml::dump($configuration, 99, 2);
         $fileName = $this->instancePath . '/typo3conf/sites/testing/config.yaml';

@@ -1,9 +1,15 @@
 <div class="form-control-wrap tx-tinyurls-copyable-field-wrap">
-    <div class="input-group">
-        <span class="input-group-addon tx-tinyurls-copyable-field-copy-button" style="cursor: pointer">
-            <f:format.raw>{clipboardIcon}</f:format.raw>
-        </span>
-        <input type="text" class="form-control form-control-static tx-tinyurls-copyable-field-value"
-               value="{fieldValue}" readonly="readonly"/>
+    <div class="form-wizards-wrap">
+        <div class="form-wizards-element">
+            <div class="input-group">
+                <button class="btn btn-default tx-tinyurls-copyable-field-copy-button"
+                        aria-label="{clipboardButtonLabel}" title="{clipboardButtonLabel}" type="button">
+                    <f:format.raw>{clipboardIcon}</f:format.raw>
+                </button>
+
+                <input type="text" class="form-control form-control-static tx-tinyurls-copyable-field-value"
+                       value="{fieldValue}" readonly="readonly"/>
+            </div>
+        </div>
     </div>
 </div>
