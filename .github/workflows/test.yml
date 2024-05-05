@@ -21,8 +21,10 @@ jobs:
       - uses: ./.github/workflows/composer
         with:
           php_version: "${{ env.MAIN_PHP_VERSION }}"
-      - run: |
-          bash bin/t3_run_tests.sh -s composerValidate -p ${{ env.MAIN_PHP_VERSION }}
+      - uses: ./.github/workflows/composer
+        with:
+          php_version: "${{ env.MAIN_PHP_VERSION }}"
+          command: validate
 
   "composer-normalize":
     name: "Composer normalize"
@@ -32,8 +34,11 @@ jobs:
       - uses: ./.github/workflows/composer
         with:
           php_version: "${{ env.MAIN_PHP_VERSION }}"
-      - run: |
-          bash bin/t3_run_tests.sh -s composerNormalize -n -p ${{ env.MAIN_PHP_VERSION }}
+      - uses: ./.github/workflows/composer
+        with:
+          php_version: "${{ env.MAIN_PHP_VERSION }}"
+          command: normalize
+          args: "--dry-run"
 
   "check-codestyle-codesniffer":
     name: "PHP_CodeSniffer check"
