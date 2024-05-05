@@ -35,6 +35,19 @@ class SiteConfigurationTest extends TestCase
         $this->siteConfiguration = new SiteConfiguration($this->siteFinderMock);
     }
 
+    public function testLoadSiteConfigurationDoesNotValidateStoragePidIfZero(): void
+    {
+        $siteMock = $this->createSiteMock(0);
+
+        $this->siteFinderMock->expects(self::never())
+            ->method('getSiteByPageId');
+
+        self::assertSame(
+            [ConfigKeys::URL_RECORD_STORAGE_PID => 0],
+            $this->siteConfiguration->loadSiteConfiguration($siteMock),
+        );
+    }
+
     public function testLoadSiteConfigurationReturnsValidStoragePid(): void
     {
         $siteMock = $this->createSiteMock();
@@ -58,12 +71,12 @@ class SiteConfigurationTest extends TestCase
         $this->siteConfiguration->loadSiteConfiguration($siteMock);
     }
 
-    private function createSiteMock(): MockObject|Site
+    private function createSiteMock(int $storagePid = 123): MockObject|Site
     {
         $siteMock = $this->createMock(Site::class);
 
         $siteMock->method('getConfiguration')
-            ->willReturn(['tinyurls' => [ConfigKeys::URL_RECORD_STORAGE_PID => 123]]);
+            ->willReturn(['tinyurls' => [ConfigKeys::URL_RECORD_STORAGE_PID => $storagePid]]);
 
         $siteMock->method('getIdentifier')->willReturn('site-identifier');
         return $siteMock;

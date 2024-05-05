@@ -31,8 +31,11 @@ abstract class AbstractFunctionalTestCase extends FunctionalTestCase
      * Create a simple site config for the tests that
      * call a frontend page.
      */
-    protected function setUpFrontendSite(int $pageId, array $additionalLanguages = []): void
-    {
+    protected function setUpFrontendSite(
+        int $pageId,
+        array $additionalLanguages = [],
+        array $additionalConfiguration = [],
+    ): void {
         $languages = [
             [
                 'title' => 'English',
@@ -68,7 +71,9 @@ abstract class AbstractFunctionalTestCase extends FunctionalTestCase
             'languages' => $languages,
             'errorHandling' => [],
             'routes' => [],
+            'tinyurls' => [ConfigKeys::URL_RECORD_STORAGE_PID => 1],
         ];
+        $configuration = array_merge_recursive($configuration, $additionalConfiguration);
         GeneralUtility::mkdir_deep($this->instancePath . '/typo3conf/sites/testing/');
         $yamlFileContents = Yaml::dump($configuration, 99, 2);
         $fileName = $this->instancePath . '/typo3conf/sites/testing/config.yaml';
