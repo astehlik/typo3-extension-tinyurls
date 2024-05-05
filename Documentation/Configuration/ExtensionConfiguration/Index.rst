@@ -10,6 +10,36 @@ Extension configuration
 .. container:: table-row
 
    Property
+         baseUrl
+
+   Data type
+         string
+
+   Description
+         This URL will be used as prefix for non speaking URLs and will also override the TYPO3_SITE_URL
+         placeholder in the speakingUrlTemplate.
+
+   Default
+         :code:`<Empty string>`
+
+.. container:: table-row
+
+   Property
+         baseUrlFromSiteBase
+
+   Data type
+         boolean
+
+   Description
+         If this enabled the prefix for non speaking URLs and the value of the TYPO3_SITE_URL placeholder in
+         speaking URLs will be taken from "base" setting of the active site configuration.
+
+   Default
+         :code:`0`
+
+.. container:: table-row
+
+   Property
          createSpeakingURLs
 
    Data type
@@ -20,7 +50,7 @@ Extension configuration
          Hint! If you enable this you might need to add a rewrite rule to you webserver!
 
    Default
-         0
+         :code:`0`
 
 .. container:: table-row
 
@@ -52,7 +82,7 @@ Extension configuration
          use random string to increase security (e.g. http://textmechanic.com /String-Randomizer.html)
 
    Default
-         abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789
+         :code:`abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789`
 
 .. container:: table-row
 
@@ -66,7 +96,7 @@ Extension configuration
          The minimum length that the random part of the tiny URL must have.
 
    Default
-         2
+         :code:`2`
 
 .. container:: table-row
 
@@ -80,7 +110,7 @@ Extension configuration
          The minimum length that the whole tiny URL key must have.
 
    Default
-         8
+         :code:`8`
 
 .. container:: table-row
 
