@@ -1,4 +1,6 @@
-name: publish
+---
+name: Publish to TER
+
 on:
   push:
     tags:

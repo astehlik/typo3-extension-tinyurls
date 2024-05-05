@@ -1,4 +1,6 @@
 ---
+name: Testing and linting
+
 on:
   push:
   pull_request:
