@@ -23,7 +23,7 @@ class TinyUrlNotFoundException extends PageNotFoundException
         parent::__construct($this->buildMessage($tinyUrlKey));
     }
 
-    private function buildMessage(string $tinyUrlKey)
+    private function buildMessage(string $tinyUrlKey): string
     {
         if ($tinyUrlKey !== '') {
             return sprintf('The tinyurl with the key %s was not found.', $tinyUrlKey);

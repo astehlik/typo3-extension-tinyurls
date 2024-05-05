@@ -1,4 +1,6 @@
-name: publish
+---
+name: Publish to TER
+
 on:
   push:
     tags:
@@ -40,7 +42,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: 8.2
+          php-version: 8.3
           extensions: intl, mbstring, json, zip, curl
           tools: composer:v2
 

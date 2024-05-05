@@ -18,20 +18,20 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Tx\Tinyurls\Configuration\TypoScriptConfigurator;
 use Tx\Tinyurls\TinyUrl\Api;
-use Tx\Tinyurls\TinyUrl\TinyUrlGenerator;
+use Tx\Tinyurls\TinyUrl\TinyUrlGeneratorInterface;
 use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
 
 class ApiTest extends TestCase
 {
     private Api $tinyUrlApi;
 
-    private MockObject|TinyUrlGenerator $tinyUrlGeneratorMock;
+    private MockObject|TinyUrlGeneratorInterface $tinyUrlGeneratorMock;
 
     private MockObject|TypoScriptConfigurator $typoScriptConfiguratorMock;
 
     protected function setUp(): void
     {
-        $this->tinyUrlGeneratorMock = $this->createMock(TinyUrlGenerator::class);
+        $this->tinyUrlGeneratorMock = $this->createMock(TinyUrlGeneratorInterface::class);
         $this->typoScriptConfiguratorMock = $this->createMock(TypoScriptConfigurator::class);
 
         $this->tinyUrlApi = new Api($this->tinyUrlGeneratorMock, $this->typoScriptConfiguratorMock);
@@ -60,6 +60,15 @@ class ApiTest extends TestCase
         $this->tinyUrlApi->initializeConfigFromTyposcript($config, $contentObjectRendererMock);
     }
 
+    public function testResetInitializesNewTinyUrlInstance(): void
+    {
+        $instance = $this->tinyUrlApi->getTinyUrlInstance();
+
+        $this->tinyUrlApi->reset();
+
+        self::assertNotSame($instance, $this->tinyUrlApi->getTinyUrlInstance());
+    }
+
     public function testSetCommentSetsCommentInUrlGenerator(): void
     {
         $this->tinyUrlApi->setComment('the comment');
@@ -67,7 +76,14 @@ class ApiTest extends TestCase
         self::assertSame('the comment', $this->tinyUrlApi->getTinyUrlInstance()->getComment());
     }
 
-    public function testSetDeleteOnUseSetsDeleteOnUseOptionInUrlGenerator(): void
+    public function testSetDeleteOnUseSetsDeleteOnUseOptionToFalse(): void
+    {
+        $this->tinyUrlApi->setDeleteOnUse(false);
+
+        self::assertFalse($this->tinyUrlApi->getTinyUrlInstance()->getDeleteOnUse());
+    }
+
+    public function testSetDeleteOnUseSetsDeleteOnUseOptionToTrue(): void
     {
         $this->tinyUrlApi->setDeleteOnUse(true);
 

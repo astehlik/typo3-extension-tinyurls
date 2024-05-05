@@ -17,7 +17,7 @@ namespace Tx\Tinyurls\Hooks;
 use Tx\Tinyurls\Domain\Model\TinyUrl;
 use Tx\Tinyurls\Domain\Repository\TinyUrlRepository;
 use Tx\Tinyurls\Exception\TinyUrlNotFoundException;
-use Tx\Tinyurls\Utils\UrlUtils;
+use Tx\Tinyurls\Utils\UrlUtilsInterface;
 use TYPO3\CMS\Core\DataHandling\DataHandler;
 
 /**
@@ -26,13 +26,12 @@ use TYPO3\CMS\Core\DataHandling\DataHandler;
  * @author Alexander Stehlik <alexander.stehlik.deleteme@gmail.com>
  * @author Sebastian Lemke <s.lemke.deleteme@infoworxx.de>
  */
-class TceDataMap
+readonly class TceDataMap
 {
     public function __construct(
-        protected readonly TinyUrlRepository $tinyUrlRepository,
-        protected readonly UrlUtils $urlUtils
-    ) {
-    }
+        protected TinyUrlRepository $tinyUrlRepository,
+        protected UrlUtilsInterface $urlUtils,
+    ) {}
 
     /**
      * When a user stores a tinyurl record in the Backend the urlkey and the target_url_hash will be updated.
@@ -54,7 +53,7 @@ class TceDataMap
         string $table,
         int|string $recordId,
         array &$fieldArray,
-        DataHandler $tcemain
+        DataHandler $tcemain,
     ): void {
         if ($table !== TinyUrlRepository::TABLE_URLS) {
             return;

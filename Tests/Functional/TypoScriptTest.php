@@ -14,6 +14,7 @@ namespace Tx\Tinyurls\Tests\Functional;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
+use Tx\Tinyurls\Configuration\ConfigKeys;
 use TYPO3\TestingFramework\Core\Functional\Framework\Frontend\InternalRequest;
 
 /**
@@ -34,14 +35,18 @@ class TypoScriptTest extends AbstractFunctionalTestCase
     {
         $this->setUpFrontendRootPage(
             1,
-            ['EXT:tinyurls/Tests/Functional/Fixtures/TypoScript/SimpleTinyUrlTypolink.setupts']
+            ['EXT:tinyurls/Tests/Functional/Fixtures/TypoScript/SimpleTinyUrlTypolink.typoscript'],
         );
-        $this->setUpFrontendSite(1);
+        $this->setUpFrontendSite(
+            1,
+            additionalConfiguration: ['tinyurls' => [ConfigKeys::BASE_URL => 'https://my-custom-base.tld/']],
+        );
         $request = (new InternalRequest())->withPageId(1);
         $response = $this->executeFrontendSubRequest($request);
+        $urlPrefix = 'https://my-custom-base.tld/?eID=tx_tinyurls&amp;tx_tinyurls[key]=b-';
         self::assertMatchesRegularExpression(
-            '/http:\/\/localhost\/\?eID=tx_tinyurls&amp;tx_tinyurls\[key\]=b-[a-zA-Z0-9]{7}/',
-            (string)$response->getBody()
+            '/' . preg_quote($urlPrefix, '/') . '[a-zA-Z0-9]{7}/',
+            (string)$response->getBody(),
         );
     }
 }

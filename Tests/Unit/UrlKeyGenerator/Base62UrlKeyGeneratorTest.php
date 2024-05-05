@@ -39,7 +39,7 @@ class Base62UrlKeyGeneratorTest extends TestCase
 
         $this->base62UrlKeyGenerator = new Base62UrlKeyGenerator(
             $this->extensionConfigurationMock,
-            $this->generalUtilityMock
+            $this->generalUtilityMock,
         );
     }
 

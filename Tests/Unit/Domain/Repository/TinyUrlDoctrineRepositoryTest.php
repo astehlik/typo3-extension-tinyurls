@@ -14,6 +14,7 @@ namespace Tx\Tinyurls\Tests\Unit\Domain\Repository;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
+use PHPUnit\Framework\Attributes\BackupGlobals;
 use PHPUnit\Framework\Constraint\Callback;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -25,31 +26,31 @@ use Tx\Tinyurls\Domain\Repository\TinyUrlRepository;
 use Tx\Tinyurls\Domain\Validator\TinyUrlValidator;
 use Tx\Tinyurls\Exception\TinyUrlNotFoundException;
 use Tx\Tinyurls\Exception\TinyUrlValidationException;
-use Tx\Tinyurls\Utils\UrlUtils;
+use Tx\Tinyurls\Utils\UrlUtilsInterface;
 use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\QueryBuilder;
 use TYPO3\CMS\Core\Database\Query\Restriction\QueryRestrictionContainerInterface;
 use TYPO3\CMS\Extbase\Error\Result;
+use Closure;
+use InvalidArgumentException;
 
-/**
- * @backupGlobals enabled
- */
+#[BackupGlobals(true)]
 class TinyUrlDoctrineRepositoryTest extends TestCase
 {
     private Connection|MockObject $databaseConnectionMock;
 
-    private QueryBuilder|MockObject $databaseQueryBuilderMock;
+    private MockObject|QueryBuilder $databaseQueryBuilderMock;
 
-    private QueryRestrictionContainerInterface|MockObject $databaseQueryRestrictionsContainerMock;
+    private MockObject|QueryRestrictionContainerInterface $databaseQueryRestrictionsContainerMock;
 
     private TinyUrlDoctrineRepository $doctrineRepository;
 
     private ExtensionConfiguration|MockObject $extensionConfiugrationMock;
 
-    private TinyUrlValidator|MockObject $tinyUrlValidatorMock;
+    private MockObject|TinyUrlValidator $tinyUrlValidatorMock;
 
-    private UrlUtils|MockObject $urlUtilsMock;
+    private MockObject|UrlUtilsInterface $urlUtilsMock;
 
     protected function setUp(): void
     {
@@ -64,7 +65,7 @@ class TinyUrlDoctrineRepositoryTest extends TestCase
         $this->databaseQueryBuilderMock->expects(self::any())
             ->method(
                 new Callback(
-                    function (string $methodName) {
+                    static function (string $methodName) {
                         return in_array(
                             $methodName,
                             [
@@ -75,10 +76,10 @@ class TinyUrlDoctrineRepositoryTest extends TestCase
                                 'update',
                                 'where',
                             ],
-                            true
+                            true,
                         );
-                    }
-                )
+                    },
+                ),
             )
             ->willReturnSelf();
         $this->databaseQueryBuilderMock->method('getRestrictions')
@@ -89,12 +90,12 @@ class TinyUrlDoctrineRepositoryTest extends TestCase
         $databaseConnectionPoolMock->method('getConnectionForTable')
             ->willReturn($this->databaseConnectionMock);
 
-        $this->urlUtilsMock = $this->createMock(UrlUtils::class);
+        $this->urlUtilsMock = $this->createMock(UrlUtilsInterface::class);
 
         $this->doctrineRepository = new TinyUrlDoctrineRepository(
             $databaseConnectionPoolMock,
             $this->extensionConfiugrationMock,
-            $this->urlUtilsMock
+            $this->urlUtilsMock,
         );
 
         $this->tinyUrlValidatorMock = $this->createMock(TinyUrlValidator::class);
@@ -225,10 +226,10 @@ class TinyUrlDoctrineRepositoryTest extends TestCase
             ->method('add')
             ->with(
                 self::callback(
-                    function (StoragePageQueryRestriction $queryRestriction) {
+                    static function (StoragePageQueryRestriction $queryRestriction) {
                         return $queryRestriction->getStoragePageUid() === 389484;
-                    }
-                )
+                    },
+                ),
             );
         $this->doctrineRepository->deleteTinyUrlByKey('key');
     }
@@ -323,10 +324,10 @@ class TinyUrlDoctrineRepositoryTest extends TestCase
             ->with(
                 TinyUrlRepository::TABLE_URLS,
                 self::callback(
-                    function (array $databaseRow) {
+                    static function (array $databaseRow) {
                         return $databaseRow['urlkey'] === 'the-generated-key';
-                    }
-                )
+                    },
+                ),
             );
 
         $this->doctrineRepository->insertNewTinyUrl($tinyUrl);
@@ -370,8 +371,8 @@ class TinyUrlDoctrineRepositoryTest extends TestCase
             ->method('update')
             ->with(
                 TinyUrlRepository::TABLE_URLS,
-                self::callback(fn (array $databaseRow) => array_diff_assoc($tinyUrlData, $databaseRow) === []),
-                ['uid' => 945]
+                self::callback(static fn(array $databaseRow) => array_diff_assoc($tinyUrlData, $databaseRow) === []),
+                ['uid' => 945],
             );
 
         $this->doctrineRepository->updateTinyUrl($tinyUrl);
@@ -410,7 +411,7 @@ class TinyUrlDoctrineRepositoryTest extends TestCase
 
     public function testUpdateTinyUrlThrowsExceptionForNewTinyUrl(): void
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Only existing TinyUrl records can be updated.');
         $tinyUrl = TinyUrl::createNew();
         $this->doctrineRepository->updateTinyUrl($tinyUrl);
@@ -457,14 +458,13 @@ class TinyUrlDoctrineRepositoryTest extends TestCase
         $this->databaseConnectionMock->expects(self::once())
             ->method('transactional')
             ->willReturnCallback(
-                function (\Closure $callback): void {
+                static function (Closure $callback): void {
                     $callback();
-                }
+                },
             );
 
         $this->databaseConnectionMock->expects(self::once())
             ->method('lastInsertId')
-            ->with(TinyUrlRepository::TABLE_URLS, 'uid')
             ->willReturn((string)$newUid);
     }
 
@@ -474,9 +474,9 @@ class TinyUrlDoctrineRepositoryTest extends TestCase
             ->method('regenerateUrlKey')
             ->with($tinyUrl)
             ->willReturnCallback(
-                function (TinyUrl $tinyUrl): void {
+                static function (TinyUrl $tinyUrl): void {
                     $tinyUrl->setGeneratedUrlKey('the-generated-key');
-                }
+                },
             );
     }
 }

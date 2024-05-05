@@ -10,14 +10,13 @@ use Tx\Tinyurls\Exception\TinyUrlNotFoundException;
 use TYPO3\CMS\Extbase\Error\Result;
 use TYPO3\CMS\Extbase\Validation\Error;
 use TYPO3\CMS\Extbase\Validation\Validator\ValidatorInterface;
+use DateTime;
 
 class TinyUrlValidator implements ValidatorInterface
 {
     protected Result $result;
 
-    public function __construct(protected readonly TinyUrlRepository $tinyUrlRepository)
-    {
-    }
+    public function __construct(protected readonly TinyUrlRepository $tinyUrlRepository) {}
 
     /**
      * Returns the options of this validator which can be specified in the constructor.
@@ -28,11 +27,11 @@ class TinyUrlValidator implements ValidatorInterface
     }
 
     /**
+     * @codeCoverageIgnore
+     *
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
-    public function setOptions(array $options): void
-    {
-    }
+    public function setOptions(array $options): void {}
 
     /**
      * Checks if the given value is valid according to the validator, and returns
@@ -44,6 +43,7 @@ class TinyUrlValidator implements ValidatorInterface
     {
         $this->result = new Result();
 
+        $this->validateTargetUrl($value);
         $this->validateValidUntil($value);
         $this->validateCustomUrlKey($value);
 
@@ -63,6 +63,7 @@ class TinyUrlValidator implements ValidatorInterface
             return;
         }
 
+        // @extensionScannerIgnoreLine
         if ($tinyUrl->equals($existingTinyUrl)) {
             // The existing key belongs to the TinyUrl record that is validated.
             return;
@@ -74,10 +75,20 @@ class TinyUrlValidator implements ValidatorInterface
 
     protected function validateValidUntil(TinyUrl $tinyUrl): void
     {
-        $now = new \DateTime();
+        $now = new DateTime();
         if ($tinyUrl->hasValidUntil() && $now->diff($tinyUrl->getValidUntil())->invert) {
             $error = new Error('The validUntil DateTime must not be in the past.', 1488307858);
             $this->result->forProperty('validUntil')->addError($error);
         }
+    }
+
+    private function validateTargetUrl(TinyUrl $value): void
+    {
+        if ($value->getTargetUrl() !== '') {
+            return;
+        }
+
+        $error = new Error('The target URL must not be empty.', 1714916406);
+        $this->result->forProperty('targetUrl')->addError($error);
     }
 }

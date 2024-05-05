@@ -14,7 +14,9 @@ namespace Tx\Tinyurls\Hooks;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
-use Tx\Tinyurls\TinyUrl\Api;
+use Tx\Tinyurls\Configuration\TypoScriptConfigurator;
+use Tx\Tinyurls\Domain\Model\TinyUrl;
+use Tx\Tinyurls\TinyUrl\TinyUrlGeneratorInterface;
 use TYPO3\CMS\Core\LinkHandling\LinkService;
 use TYPO3\CMS\Frontend\Event\AfterLinkIsGeneratedEvent;
 
@@ -23,11 +25,12 @@ use TYPO3\CMS\Frontend\Event\AfterLinkIsGeneratedEvent;
  * in a tinyurl. Additionally, it contains a public api for generating
  * a tinyurl in another extension.
  */
-class TypoLink
+readonly class TypoLink
 {
-    public function __construct(private readonly Api $tinyUrlApi)
-    {
-    }
+    public function __construct(
+        private TinyUrlGeneratorInterface $tinyUrlGenerator,
+        private TypoScriptConfigurator $typoScriptConfigurator,
+    ) {}
 
     public function __invoke(AfterLinkIsGeneratedEvent $afterLinkIsGeneratedEvent): void
     {
@@ -43,8 +46,15 @@ class TypoLink
             return;
         }
 
-        $this->tinyUrlApi->initializeConfigFromTyposcript($config, $contentObject);
-        $tinyUrl = $this->tinyUrlApi->getTinyUrl($linkResult->getUrl());
+        $tinyUrl = TinyUrl::createNew();
+        $tinyUrl->setTargetUrl($linkResult->getUrl());
+
+        $this->typoScriptConfigurator->initializeConfigFromTyposcript($tinyUrl, $config, $contentObject);
+
+        $tinyUrl = $this->tinyUrlGenerator->generateTinyUrlForSite(
+            $tinyUrl,
+            $contentObject->getRequest()->getAttribute('site'),
+        );
 
         $newResult = $linkResult->withAttributes(['href' => $tinyUrl]);
         $afterLinkIsGeneratedEvent->setLinkResult($newResult);

@@ -17,8 +17,9 @@ namespace Tx\Tinyurls\FormEngine;
 use Tx\Tinyurls\Utils\GeneralUtilityWrapper;
 use TYPO3\CMS\Backend\Form\AbstractNode;
 use TYPO3\CMS\Backend\Form\NodeInterface;
-use TYPO3\CMS\Core\Imaging\Icon;
 use TYPO3\CMS\Core\Imaging\IconFactory;
+use TYPO3\CMS\Core\Imaging\IconSize;
+use TYPO3\CMS\Core\Localization\LanguageService;
 use TYPO3\CMS\Core\Page\JavaScriptModuleInstruction;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Fluid\View\StandaloneView;
@@ -30,6 +31,8 @@ use TYPO3\CMS\Fluid\View\StandaloneView;
 class CopyableFieldElement extends AbstractNode implements NodeInterface
 {
     public const TEMPLATE_PATH = 'EXT:tinyurls/Resources/Private/Templates/FormEngine/CopyableField.html';
+
+    private const LLL_DB_PREFIX = 'LLL:EXT:tinyurls/Resources/Private/Language/locallang_db.xlf:tx_tinyurls_urls.';
 
     protected ?StandaloneView $formFieldView = null;
 
@@ -59,11 +62,12 @@ class CopyableFieldElement extends AbstractNode implements NodeInterface
         $template = $this->getFormFieldView();
         $this->initializeFormFieldViewTemplatePath($template);
         $template->assign('fieldValue', $this->getFieldValue());
+        $template->assign('clipboardButtonLabel', $this->getClipboardButtonLabel());
         $template->assign('clipboardIcon', $this->getClipboardIcon());
         $result['html'] = $template->render();
 
-        $result['requireJsModules'][] = JavaScriptModuleInstruction::create(
-            '@de-swebhosting/tinyurls/copy-to-clipboard.js'
+        $result['javaScriptModules'][] = JavaScriptModuleInstruction::create(
+            '@de-swebhosting/tinyurls/copy-to-clipboard.js',
         );
 
         $result['additionalInlineLanguageLabelFiles'][] = 'EXT:tinyurls/Resources/Private/Language/locallang_db_js.xlf';
@@ -83,7 +87,7 @@ class CopyableFieldElement extends AbstractNode implements NodeInterface
     {
         /** @extensionScannerIgnoreLine */
         $iconFactory = $this->getIconFactory();
-        return $iconFactory->getIcon('actions-edit-copy', Icon::SIZE_SMALL)->render();
+        return $iconFactory->getIcon('actions-edit-copy', IconSize::SMALL)->render();
     }
 
     /**
@@ -95,13 +99,15 @@ class CopyableFieldElement extends AbstractNode implements NodeInterface
     protected function getFieldValue(): string
     {
         $parameterArray = $this->data['parameterArray'];
+
         if (empty($parameterArray['fieldConf']['config']['valueFunc'])) {
             return $parameterArray['itemFormElValue'];
         }
+
         return (string)$this->generalUtility->callUserFunction(
             $parameterArray['fieldConf']['config']['valueFunc'],
             $this->data,
-            $this
+            $this,
         );
     }
 
@@ -141,7 +147,18 @@ class CopyableFieldElement extends AbstractNode implements NodeInterface
     protected function initializeFormFieldViewTemplatePath(StandaloneView $template): void
     {
         $template->setTemplatePathAndFilename(
-            $this->getGeneralUtility()->getFileAbsFileName(static::TEMPLATE_PATH)
+            $this->getGeneralUtility()->getFileAbsFileName(static::TEMPLATE_PATH),
         );
+    }
+
+    private function getClipboardButtonLabel(): string
+    {
+        return $this->getLanguageService()
+            ->sL(self::LLL_DB_PREFIX . 'copy_to_clipboard_button_label');
+    }
+
+    private function getLanguageService(): LanguageService
+    {
+        return $GLOBALS['LANG'];
     }
 }

@@ -16,11 +16,14 @@ namespace Tx\Tinyurls\Configuration;
 
 use Tx\Tinyurls\Domain\Model\TinyUrl;
 use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
+use DateTimeImmutable;
 
 class TypoScriptConfigurator
 {
     /**
      * Contains the default values for the tinyurl configuration.
+     *
+     * @var array<'deleteOnUse'|'urlKey'|'validUntil', bool|int>
      */
     protected array $tinyurlConfigDefaults = [
         'deleteOnUse' => 0,
@@ -35,14 +38,16 @@ class TypoScriptConfigurator
     public function initializeConfigFromTyposcript(
         TinyUrl $tinyUrl,
         array $config,
-        ContentObjectRenderer $contentObjectRenderer
+        ContentObjectRenderer $contentObjectRenderer,
     ): void {
-        if (!array_key_exists('tinyurl.', $config)) {
+        $tinyUrlConfig = $config['tinyurl.'] ?? [];
+
+        if (!is_array($tinyUrlConfig) || $tinyUrlConfig === []) {
             return;
         }
 
         foreach (array_keys($this->tinyurlConfigDefaults) as $configKey) {
-            $configValue = $this->getConfigValue($configKey, $config['tinyurl.'], $contentObjectRenderer);
+            $configValue = $this->getConfigValue($configKey, $tinyUrlConfig, $contentObjectRenderer);
 
             match ($configKey) {
                 'deleteOnUse' => $this->setOptionDeleteOnUse($tinyUrl, (bool)$configValue),
@@ -88,13 +93,13 @@ class TypoScriptConfigurator
             return;
         }
 
-        $tinyUrl->setValidUntil(new \DateTimeImmutable('@' . $validUntil));
+        $tinyUrl->setValidUntil(new DateTimeImmutable('@' . $validUntil));
     }
 
     private function getConfigValue(
         string $configKey,
         array $tinyUrlConfig,
-        ContentObjectRenderer $contentObjectRenderer
+        ContentObjectRenderer $contentObjectRenderer,
     ): mixed {
         $configValue = $this->tinyurlConfigDefaults[$configKey];
 

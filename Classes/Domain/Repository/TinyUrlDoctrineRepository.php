@@ -14,22 +14,24 @@ namespace Tx\Tinyurls\Domain\Repository;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
+use Doctrine\DBAL\ParameterType;
 use Tx\Tinyurls\Configuration\ExtensionConfiguration;
 use Tx\Tinyurls\Database\StoragePageQueryRestriction;
 use Tx\Tinyurls\Domain\Model\TinyUrl;
 use Tx\Tinyurls\Exception\TinyUrlNotFoundException;
-use Tx\Tinyurls\Utils\UrlUtils;
+use Tx\Tinyurls\Utils\UrlUtilsInterface;
 use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\QueryBuilder;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use Closure;
 
 class TinyUrlDoctrineRepository extends AbstractTinyUrlDatabaseRepository implements TinyUrlRepository
 {
     public function __construct(
         private readonly ConnectionPool $databaseConnectionPool,
         ExtensionConfiguration $extensionConfiguration,
-        UrlUtils $urlUtils
+        UrlUtilsInterface $urlUtils,
     ) {
         parent::__construct($extensionConfiguration, $urlUtils);
     }
@@ -47,8 +49,8 @@ class TinyUrlDoctrineRepository extends AbstractTinyUrlDatabaseRepository implem
             ->where(
                 $queryBuilder->expr()->eq(
                     'uid',
-                    $queryBuilder->createNamedParameter($tinyUrl->getUid(), \PDO::PARAM_INT)
-                )
+                    $queryBuilder->createNamedParameter($tinyUrl->getUid(), ParameterType::INTEGER),
+                ),
             )
             ->executeStatement();
 
@@ -90,15 +92,15 @@ class TinyUrlDoctrineRepository extends AbstractTinyUrlDatabaseRepository implem
             ->where(
                 $queryBuilder->expr()->eq(
                     'target_url_hash',
-                    $queryBuilder->createNamedParameter($this->getTargetUrlHash($targetUrl))
-                )
+                    $queryBuilder->createNamedParameter($this->getTargetUrlHash($targetUrl)),
+                ),
             )
             ->executeQuery()
             ->fetchAssociative();
 
         if (empty($result)) {
             throw new TinyUrlNotFoundException(
-                sprintf('No existing tinyurl was found in the database for the target URL %s.', $targetUrl)
+                sprintf('No existing tinyurl was found in the database for the target URL %s.', $targetUrl),
             );
         }
 
@@ -111,13 +113,13 @@ class TinyUrlDoctrineRepository extends AbstractTinyUrlDatabaseRepository implem
         $result = $queryBuilder
             ->select('*')
             ->from(static::TABLE_URLS)
-            ->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter($uid, \PDO::PARAM_INT)))
+            ->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter($uid, ParameterType::INTEGER)))
             ->executeQuery()
             ->fetchAssociative();
 
         if (empty($result)) {
             throw new TinyUrlNotFoundException(
-                sprintf('The tinyurl with the uid %d was not found in the database.', $uid)
+                sprintf('The tinyurl with the uid %d was not found in the database.', $uid),
             );
         }
 
@@ -137,9 +139,9 @@ class TinyUrlDoctrineRepository extends AbstractTinyUrlDatabaseRepository implem
                     $queryBuilder->expr()->gt('valid_until', 0),
                     $queryBuilder->expr()->lt(
                         'valid_until',
-                        $queryBuilder->createNamedParameter(time(), \PDO::PARAM_INT)
-                    )
-                )
+                        $queryBuilder->createNamedParameter(time(), ParameterType::INTEGER),
+                    ),
+                ),
             )
             ->executeStatement();
     }
@@ -153,7 +155,7 @@ class TinyUrlDoctrineRepository extends AbstractTinyUrlDatabaseRepository implem
         $this->getDatabaseConnection()->update(
             static::TABLE_URLS,
             $newTinyUrlData,
-            ['uid' => $tinyUrl->getUid()]
+            ['uid' => $tinyUrl->getUid()],
         );
 
         $tinyUrl->persistPostProcess();
@@ -183,13 +185,13 @@ class TinyUrlDoctrineRepository extends AbstractTinyUrlDatabaseRepository implem
     {
         $this->getDatabaseConnection()->insert(
             static::TABLE_URLS,
-            $this->getTinyUrlDatabaseData($tinyUrl)
+            $this->getTinyUrlDatabaseData($tinyUrl),
         );
 
-        return (int)$this->getDatabaseConnection()->lastInsertId(static::TABLE_URLS);
+        return (int)$this->getDatabaseConnection()->lastInsertId();
     }
 
-    protected function transactional(\Closure $callback): void
+    protected function transactional(Closure $callback): void
     {
         $this->getDatabaseConnection()->transactional($callback);
     }

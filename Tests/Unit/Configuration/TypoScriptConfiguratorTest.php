@@ -19,6 +19,7 @@ use PHPUnit\Framework\TestCase;
 use Tx\Tinyurls\Configuration\TypoScriptConfigurator;
 use Tx\Tinyurls\Domain\Model\TinyUrl;
 use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
+use DateTimeImmutable;
 
 class TypoScriptConfiguratorTest extends TestCase
 {
@@ -64,11 +65,11 @@ class TypoScriptConfiguratorTest extends TestCase
                     'urlKey' => 'asdf',
                     'urlKey.' => ['case' => 'upper'],
                 ],
-            ]
+            ],
         );
     }
 
-    public function testSetsOptionDeleteOnUseDefaultVlaue(): void
+    public function testSetsOptionDeleteOnUseDefaultValue(): void
     {
         $this->tinyUrlMock->expects(self::once())
             ->method('disableDeleteOnUse');
@@ -76,7 +77,7 @@ class TypoScriptConfiguratorTest extends TestCase
             ->method('enableDeleteOnUse');
 
         $this->initializeConfigFromTyposcript(
-            ['tinyurl.' => []],
+            ['tinyurl.' => ['dummy' => 'value']],
         );
     }
 
@@ -98,7 +99,7 @@ class TypoScriptConfiguratorTest extends TestCase
             ->method('resetCustomUrlKey');
 
         $this->initializeConfigFromTyposcript(
-            ['tinyurl.' => []],
+            ['tinyurl.' => ['dummy' => 'value']],
         );
     }
 
@@ -121,7 +122,7 @@ class TypoScriptConfiguratorTest extends TestCase
             ->method('setValidUntil');
 
         $this->initializeConfigFromTyposcript(
-            ['tinyurl.' => []],
+            ['tinyurl.' => ['dummy' => 'value']],
         );
     }
 
@@ -131,7 +132,7 @@ class TypoScriptConfiguratorTest extends TestCase
             ->method('resetValidUntil');
         $this->tinyUrlMock->expects(self::once())
             ->method('setValidUntil')
-            ->with(self::callback(fn (\DateTimeImmutable $dateTime) => $dateTime->getTimestamp() === 2389));
+            ->with(self::callback(static fn(DateTimeImmutable $dateTime) => $dateTime->getTimestamp() === 2389));
 
         $this->initializeConfigFromTyposcript(
             ['tinyurl.' => ['validUntil' => 2389]],
@@ -143,7 +144,7 @@ class TypoScriptConfiguratorTest extends TestCase
         $this->typoScriptConfigurator->initializeConfigFromTyposcript(
             $this->tinyUrlMock,
             $config,
-            $this->contentObjectRendererMock
+            $this->contentObjectRendererMock,
         );
     }
 }

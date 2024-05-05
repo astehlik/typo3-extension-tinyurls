@@ -16,6 +16,9 @@ namespace Tx\Tinyurls\Tests\Unit\Domain\Model;
 
 use PHPUnit\Framework\TestCase;
 use Tx\Tinyurls\Domain\Model\TinyUrl;
+use DateTime;
+use DateTimeInterface;
+use InvalidArgumentException;
 
 class TinyUrlTest extends TestCase
 {
@@ -59,8 +62,8 @@ class TinyUrlTest extends TestCase
     {
         $tinyUrl = TinyUrl::createFromDatabaseRow($this->getDummyDatabaseRow());
         self::assertSame(
-            (new \DateTime('2017-12-10 12:30:00.000000+0000'))->getTimestamp(),
-            $tinyUrl->getTstamp()->getTimestamp()
+            (new DateTime('2017-12-10 12:30:00.000000+0000'))->getTimestamp(),
+            $tinyUrl->getTstamp()->getTimestamp(),
         );
     }
 
@@ -80,8 +83,8 @@ class TinyUrlTest extends TestCase
     {
         $tinyUrl = TinyUrl::createFromDatabaseRow($this->getDummyDatabaseRow());
         self::assertSame(
-            (new \DateTime('2017-10-10 12:30:00.000000+0000'))->getTimestamp(),
-            $tinyUrl->getValidUntil()->getTimestamp()
+            (new DateTime('2017-10-10 12:30:00.000000+0000'))->getTimestamp(),
+            $tinyUrl->getValidUntil()->getTimestamp(),
         );
     }
 
@@ -107,6 +110,7 @@ class TinyUrlTest extends TestCase
     {
         $tinyUrl = TinyUrl::createNew();
         $tinyUrl2 = TinyUrl::createNew();
+        // @extensionScannerIgnoreLine
         self::assertFalse($tinyUrl->equals($tinyUrl2));
     }
 
@@ -116,6 +120,7 @@ class TinyUrlTest extends TestCase
         $tinyUrl->persistPostProcessInsert(3);
         $tinyUrl2 = TinyUrl::createNew();
         $tinyUrl2->persistPostProcessInsert(4);
+        // @extensionScannerIgnoreLine
         self::assertFalse($tinyUrl->equals($tinyUrl2));
     }
 
@@ -124,6 +129,7 @@ class TinyUrlTest extends TestCase
         $tinyUrl = TinyUrl::createNew();
         $tinyUrl2 = TinyUrl::createNew();
         $tinyUrl2->persistPostProcessInsert(3);
+        // @extensionScannerIgnoreLine
         self::assertFalse($tinyUrl->equals($tinyUrl2));
     }
 
@@ -139,6 +145,7 @@ class TinyUrlTest extends TestCase
         $tinyUrl->persistPostProcessInsert(3);
         $tinyUrl2 = TinyUrl::createNew();
         $tinyUrl2->persistPostProcessInsert(3);
+        // @extensionScannerIgnoreLine
         self::assertTrue($tinyUrl->equals($tinyUrl2));
     }
 
@@ -177,7 +184,7 @@ class TinyUrlTest extends TestCase
     public function testHasValidUntilReturnsTrueIfValidUntilSet(): void
     {
         $tinyUrl = TinyUrl::createNew();
-        $tinyUrl->setValidUntil(new \DateTime());
+        $tinyUrl->setValidUntil(new DateTime());
         self::assertTrue($tinyUrl->hasValidUntil());
         $tinyUrl->resetValidUntil();
         self::assertFalse($tinyUrl->hasValidUntil());
@@ -215,7 +222,7 @@ class TinyUrlTest extends TestCase
 
     public function testPersistPostProcessRefusesZeroUid(): void
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $tinyUrl = TinyUrl::createNew();
         $tinyUrl->persistPostProcessInsert(0);
     }
@@ -251,7 +258,7 @@ class TinyUrlTest extends TestCase
     {
         $tinyUrl = TinyUrl::createNew();
         $tinyUrl->persistPreProcess();
-        self::assertInstanceOf(\DateTimeInterface::class, $tinyUrl->getTstamp());
+        self::assertInstanceOf(DateTimeInterface::class, $tinyUrl->getTstamp());
     }
 
     public function testResetCustomUrlKeySetsCustomUrlKeyToNull(): void
@@ -271,7 +278,7 @@ class TinyUrlTest extends TestCase
 
     public function testSetCustomUrlKeyThrowsExceptionIfKeyIsEmpty(): void
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $tinyUrl = TinyUrl::createNew();
         $tinyUrl->setCustomUrlKey('');
     }

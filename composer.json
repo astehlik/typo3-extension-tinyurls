@@ -10,16 +10,21 @@
         }
     ],
     "require": {
-        "php": "^8.1",
-        "typo3/cms-core": "^12.3"
+        "php": "^8.2",
+        "typo3/cms-core": "~13.1.0"
     },
     "require-dev": {
-        "de-swebhosting/php-codestyle": "^4.0",
-        "de-swebhosting/typo3-extension-buildtools": "dev-TYPO3_12",
-        "ergebnis/composer-normalize": "^2.28",
-        "friendsofphp/php-cs-fixer": "^3.14",
+        "bnf/phpstan-psr-container": "^1.0",
+        "de-swebhosting/php-codestyle": "^5.2",
+        "de-swebhosting/typo3-extension-buildtools": "dev-TYPO3_13",
+        "ergebnis/composer-normalize": "^2.42",
+        "friendsofphp/php-cs-fixer": "^3.54",
+        "friendsoftypo3/phpstan-typo3": "^0.9.0",
         "michielroos/typo3scan": "^1.7",
-        "squizlabs/php_codesniffer": "^3.7"
+        "phpstan/phpstan": "^1.10",
+        "phpstan/phpstan-phpunit": "^1.3",
+        "squizlabs/php_codesniffer": "^3.9",
+        "typo3/testing-framework": "dev-main"
     },
     "autoload": {
         "psr-4": {
@@ -34,11 +39,11 @@
     },
     "config": {
         "allow-plugins": {
-            "typo3/cms-composer-installers": true,
+            "ergebnis/composer-normalize": true,
             "typo3/class-alias-loader": true,
-            "ergebnis/composer-normalize": true
+            "typo3/cms-composer-installers": true
         },
-        "bin-dir": ".Build/bin",
+        "bin-dir": "bin",
         "vendor-dir": ".Build/vendor"
     },
     "extra": {

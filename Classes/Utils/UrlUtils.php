@@ -17,19 +17,21 @@ namespace Tx\Tinyurls\Utils;
 use Tx\Tinyurls\Configuration\ExtensionConfiguration;
 use Tx\Tinyurls\Domain\Model\TinyUrl;
 use Tx\Tinyurls\UrlKeyGenerator\UrlKeyGenerator;
-use TYPO3\CMS\Core\SingletonInterface;
+use TYPO3\CMS\Core\Exception\SiteNotFoundException;
+use TYPO3\CMS\Core\Site\Entity\SiteInterface;
+use TYPO3\CMS\Core\Site\SiteFinder;
 
 /**
  * Contains utilities for creating tiny url keys and url hashes.
  */
-class UrlUtils implements SingletonInterface
+readonly class UrlUtils implements UrlUtilsInterface
 {
     public function __construct(
-        private readonly ExtensionConfiguration $extensionConfiguration,
-        private readonly GeneralUtilityWrapper $generalUtility,
-        private readonly UrlKeyGenerator $urlKeyGenerator
-    ) {
-    }
+        private ExtensionConfiguration $extensionConfiguration,
+        private GeneralUtilityWrapper $generalUtility,
+        private SiteFinder $siteFinder,
+        private UrlKeyGenerator $urlKeyGenerator,
+    ) {}
 
     public function buildTinyUrl(string $tinyUrlKey): string
     {
@@ -38,6 +40,24 @@ class UrlUtils implements SingletonInterface
         }
 
         return $this->createEidUrl($tinyUrlKey);
+    }
+
+    public function buildTinyUrlForPid(string $urlkey, int $pid): string
+    {
+        $site = $this->getSiteByPid($pid);
+
+        return $this->buildTinyUrlForSite($urlkey, $site);
+    }
+
+    public function buildTinyUrlForSite(string $urlkey, ?SiteInterface $site): string
+    {
+        $this->extensionConfiguration->setSite($site);
+
+        $tinyUrl = $this->buildTinyUrl($urlkey);
+
+        $this->extensionConfiguration->reset();
+
+        return $tinyUrl;
     }
 
     /**
@@ -59,8 +79,8 @@ class UrlUtils implements SingletonInterface
         foreach ($matches[1] as $match) {
             $speakingUrl = str_replace(
                 '###' . $match . '###',
-                $this->generalUtility->getIndpEnv($match),
-                $speakingUrl
+                $this->getPlaceholderValue($match),
+                $speakingUrl,
             );
         }
 
@@ -98,7 +118,39 @@ class UrlUtils implements SingletonInterface
 
     protected function createEidUrl(string $tinyUrlKey): string
     {
-        return $this->generalUtility->getIndpEnv('TYPO3_SITE_URL')
+        // @extensionScannerIgnoreLine
+        return $this->getBaseUrl()
             . '?eID=tx_tinyurls&tx_tinyurls[key]=' . $tinyUrlKey;
+    }
+
+    private function getBaseUrl(): string
+    {
+        /** @extensionScannerIgnoreLine */
+        $baseUrl = $this->extensionConfiguration->getBaseUrl();
+
+        if ($baseUrl === null) {
+            return (string)$this->generalUtility->getIndpEnv('TYPO3_SITE_URL');
+        }
+
+        return (string)$baseUrl;
+    }
+
+    private function getPlaceholderValue(string $match): string
+    {
+        if ($match === 'TYPO3_SITE_URL') {
+            // @extensionScannerIgnoreLine
+            return $this->getBaseUrl();
+        }
+
+        return (string)$this->generalUtility->getIndpEnv($match);
+    }
+
+    private function getSiteByPid(int $pid): ?SiteInterface
+    {
+        try {
+            return $this->siteFinder->getSiteByPageId($pid);
+        } catch (SiteNotFoundException) {
+            return null;
+        }
     }
 }

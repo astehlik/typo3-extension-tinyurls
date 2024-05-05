@@ -16,13 +16,14 @@ namespace Tx\Tinyurls\Tests\Unit\ViewHelpers;
 
 use PHPUnit\Framework\MockObject\MockObject;
 use Tx\Tinyurls\Domain\Model\TinyUrl;
-use Tx\Tinyurls\TinyUrl\TinyUrlGenerator;
+use Tx\Tinyurls\TinyUrl\TinyUrlGeneratorInterface;
 use Tx\Tinyurls\ViewHelpers\TinyurlViewHelper;
+use TYPO3\CMS\Core\Site\Entity\SiteInterface;
 use TYPO3\TestingFramework\Core\Unit\UnitTestCase;
 
 class TinyurlViewHelperTest extends UnitTestCase
 {
-    private MockObject|TinyUrlGenerator $tinyUrlGeneratorMock;
+    private MockObject|TinyUrlGeneratorInterface $tinyUrlGeneratorMock;
 
     private TinyurlViewHelper $tinyUrlViewHelper;
 
@@ -30,7 +31,7 @@ class TinyurlViewHelperTest extends UnitTestCase
     {
         parent::setUp();
 
-        $this->tinyUrlGeneratorMock = $this->createMock(TinyUrlGenerator::class);
+        $this->tinyUrlGeneratorMock = $this->createMock(TinyUrlGeneratorInterface::class);
 
         $this->tinyUrlViewHelper = new TinyurlViewHelper($this->tinyUrlGeneratorMock);
     }
@@ -38,8 +39,8 @@ class TinyurlViewHelperTest extends UnitTestCase
     public function testCustomUrlKeyIsPassedToTinyUrlApi(): void
     {
         $this->tinyUrlGeneratorMock->expects(self::once())
-            ->method('generateTinyUrl')
-            ->with(self::callback(fn (TinyUrl $tinyUrl): bool => $tinyUrl->getCustomUrlKey() === 'theurl-key'));
+            ->method('generateTinyUrlForSite')
+            ->with(self::callback(static fn(TinyUrl $tinyUrl): bool => $tinyUrl->getCustomUrlKey() === 'theurl-key'));
 
         $arguments = [
             'url' => 'http://the-url.tld',
@@ -52,8 +53,8 @@ class TinyurlViewHelperTest extends UnitTestCase
     public function testOnlyOneTimeValidSetsDeleteOnUse(): void
     {
         $this->tinyUrlGeneratorMock->expects(self::once())
-            ->method('generateTinyUrl')
-            ->with(self::callback(fn (TinyUrl $tinyUrl): bool => $tinyUrl->getDeleteOnUse() === true));
+            ->method('generateTinyUrlForSite')
+            ->with(self::callback(static fn(TinyUrl $tinyUrl): bool => $tinyUrl->getDeleteOnUse() === true));
 
         $arguments = [
             'url' => 'http://www.url.tld',
@@ -66,21 +67,47 @@ class TinyurlViewHelperTest extends UnitTestCase
     public function testRetrievesUrlFromRenderChildrenIfNotProvidedAsArgument(): void
     {
         $this->tinyUrlGeneratorMock->expects(self::once())
-            ->method('generateTinyUrl')
+            ->method('generateTinyUrlForSite')
             ->with(
                 self::callback(
-                    fn (TinyUrl $tinyUrl): bool => $tinyUrl->getTargetUrl() === 'http://the-children-url.tld'
-                )
+                    static fn(TinyUrl $tinyUrl): bool => $tinyUrl->getTargetUrl() === 'http://the-children-url.tld',
+                ),
             );
 
         $this->callRender(childrenOutput: 'http://the-children-url.tld');
     }
 
+    public function testSiteIsPassedToUrlGenerator(): void
+    {
+        $site = $this->createMock(SiteInterface::class);
+
+        $this->tinyUrlGeneratorMock->expects(self::once())
+            ->method('generateTinyUrlForSite')
+            ->with(self::isInstanceOf(TinyUrl::class), $site);
+
+        $arguments = [
+            'url' => 'http://the-url.tld',
+            'site' => $site,
+        ];
+
+        $this->callRender($arguments);
+    }
+
+    public function testUrlGenerationIsSkippedIfUrlIsEmpty(): void
+    {
+        $this->tinyUrlGeneratorMock->expects(self::never())
+            ->method('generateTinyUrlForSite');
+
+        $this->callRender();
+    }
+
     public function testUrlIsPassedToTinyUrlApi(): void
     {
         $this->tinyUrlGeneratorMock->expects(self::once())
-            ->method('generateTinyUrl')
-            ->with(self::callback(fn (TinyUrl $tinyUrl): bool => $tinyUrl->getTargetUrl() === 'http://the-url.tld'));
+            ->method('generateTinyUrlForSite')
+            ->with(
+                self::callback(static fn(TinyUrl $tinyUrl): bool => $tinyUrl->getTargetUrl() === 'http://the-url.tld'),
+            );
 
         $arguments = ['url' => 'http://the-url.tld'];
         $this->callRender($arguments);
@@ -89,9 +116,11 @@ class TinyurlViewHelperTest extends UnitTestCase
     public function testValidUntilIsPassedToTinyUrlApi(): void
     {
         $this->tinyUrlGeneratorMock->expects(self::once())
-            ->method('generateTinyUrl')
+            ->method('generateTinyUrlForSite')
             ->with(
-                self::callback(fn (TinyUrl $tinyUrl): bool => $tinyUrl->getValidUntil()->getTimestamp() === 3848909)
+                self::callback(
+                    static fn(TinyUrl $tinyUrl): bool => $tinyUrl->getValidUntil()->getTimestamp() === 3848909,
+                ),
             );
 
         $arguments = [
@@ -109,13 +138,14 @@ class TinyurlViewHelperTest extends UnitTestCase
             'onlyOneTimeValid' => false,
             'validUntil' => 0,
             'urlKey' => '',
+            'site' => null,
         ];
 
         $arguments = array_merge($defaultArguments, $arguments);
 
         $this->tinyUrlViewHelper->setArguments($arguments);
 
-        $this->tinyUrlViewHelper->setRenderChildrenClosure(fn () => $childrenOutput);
+        $this->tinyUrlViewHelper->setRenderChildrenClosure(static fn() => $childrenOutput);
 
         $this->tinyUrlViewHelper->render();
     }

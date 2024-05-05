@@ -20,21 +20,21 @@ use Tx\Tinyurls\Domain\Model\TinyUrl;
 use Tx\Tinyurls\Domain\Repository\TinyUrlRepository;
 use Tx\Tinyurls\Exception\TinyUrlNotFoundException;
 use Tx\Tinyurls\Hooks\TceDataMap;
-use Tx\Tinyurls\Utils\UrlUtils;
+use Tx\Tinyurls\Utils\UrlUtilsInterface;
 use TYPO3\CMS\Core\DataHandling\DataHandler;
 
 class TceDataMapTest extends TestCase
 {
     private TceDataMap $tceDataMapHook;
 
-    private TinyUrlRepository|MockObject $tinyUrlRepositoryMock;
+    private MockObject|TinyUrlRepository $tinyUrlRepositoryMock;
 
-    private UrlUtils|MockObject $urlUtilsMock;
+    private MockObject|UrlUtilsInterface $urlUtilsMock;
 
     protected function setUp(): void
     {
         $this->tinyUrlRepositoryMock = $this->createMock(TinyUrlRepository::class);
-        $this->urlUtilsMock = $this->createMock(UrlUtils::class);
+        $this->urlUtilsMock = $this->createMock(UrlUtilsInterface::class);
 
         $this->tceDataMapHook = new TceDataMap($this->tinyUrlRepositoryMock, $this->urlUtilsMock);
     }
@@ -57,7 +57,7 @@ class TceDataMapTest extends TestCase
             'tx_tinyurls_urls',
             '99',
             $fieldArray,
-            $this->getDataHandlerMock()
+            $this->getDataHandlerMock(),
         );
 
         self::assertSame($fieldArrayOriginal, $fieldArray);
@@ -83,7 +83,7 @@ class TceDataMapTest extends TestCase
             'tx_tinyurls_urls',
             '99',
             $fieldArray,
-            $this->getDataHandlerMock()
+            $this->getDataHandlerMock(),
         );
 
         self::assertSame('the new hash', $fieldArray['target_url_hash']);
@@ -114,7 +114,7 @@ class TceDataMapTest extends TestCase
             'tx_tinyurls_urls',
             '99',
             $fieldArray,
-            $this->getDataHandlerMock()
+            $this->getDataHandlerMock(),
         );
 
         self::assertSame('the new key', $fieldArray['urlkey']);
@@ -148,7 +148,7 @@ class TceDataMapTest extends TestCase
             'tx_tinyurls_urls',
             'NEW1234',
             $fieldArray,
-            $dataHandlerMock
+            $dataHandlerMock,
         );
 
         self::assertSame('the hash', $fieldArray['target_url_hash']);
@@ -170,7 +170,7 @@ class TceDataMapTest extends TestCase
             'dummyTable',
             'dummyId',
             $fieldArray,
-            $this->getDataHandlerMock()
+            $this->getDataHandlerMock(),
         );
 
         self::assertSame($fieldArrayOriginal, $fieldArray);
@@ -192,7 +192,7 @@ class TceDataMapTest extends TestCase
             'tx_tinyurls_urls',
             55,
             $fieldArray,
-            $this->getDataHandlerMock()
+            $this->getDataHandlerMock(),
         );
 
         self::assertSame($fieldArrayOriginal, $fieldArray);

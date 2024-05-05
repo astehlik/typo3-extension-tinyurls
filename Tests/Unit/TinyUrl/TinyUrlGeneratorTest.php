@@ -16,30 +16,34 @@ namespace Tx\Tinyurls\Tests\Unit\TinyUrl;
 
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Tx\Tinyurls\Configuration\TypoScriptConfigurator;
+use Tx\Tinyurls\Configuration\ExtensionConfiguration;
 use Tx\Tinyurls\Domain\Model\TinyUrl;
 use Tx\Tinyurls\Domain\Repository\TinyUrlRepository;
 use Tx\Tinyurls\Exception\TinyUrlNotFoundException;
 use Tx\Tinyurls\TinyUrl\TinyUrlGenerator;
-use Tx\Tinyurls\Utils\UrlUtils;
+use Tx\Tinyurls\Utils\UrlUtilsInterface;
+use RuntimeException;
 
 class TinyUrlGeneratorTest extends TestCase
 {
+    private ExtensionConfiguration|MockObject $extensionConfigurationMock;
+
     private TinyUrlGenerator $tinyUrlGenerator;
 
-    private TinyUrlRepository|MockObject $tinyUrlRepositoryMock;
+    private MockObject|TinyUrlRepository $tinyUrlRepositoryMock;
 
-    private UrlUtils|MockObject $urlUtilsMock;
+    private MockObject|UrlUtilsInterface $urlUtilsMock;
 
     protected function setUp(): void
     {
+        $this->extensionConfigurationMock = $this->createMock(ExtensionConfiguration::class);
         $this->tinyUrlRepositoryMock = $this->createMock(TinyUrlRepository::class);
-        $this->urlUtilsMock = $this->createMock(UrlUtils::class);
+        $this->urlUtilsMock = $this->createMock(UrlUtilsInterface::class);
 
         $this->tinyUrlGenerator = new TinyUrlGenerator(
+            $this->extensionConfigurationMock,
             $this->tinyUrlRepositoryMock,
-            new TypoScriptConfigurator(),
-            $this->urlUtilsMock
+            $this->urlUtilsMock,
         );
     }
 
@@ -58,152 +62,44 @@ class TinyUrlGeneratorTest extends TestCase
             ->with('theKey')
             ->willReturn('http://the-tiny.url');
 
-        $generatedUrl = $this->tinyUrlGenerator->getTinyUrl('http://the-target.url');
+        $generatedUrl = $this->tinyUrlGenerator->generateTinyUrl(TinyUrl::createForUrl('http://the-target.url'));
         self::assertSame('http://the-tiny.url', $generatedUrl);
     }
 
     public function testGetTinyUrlBuildsUrlForNonExistingUrl(): void
     {
-        $this->tinyUrlRepositoryMock->expects(self::once())
+        $tinyUrl = TinyUrl::createForUrl('http://the-target.url');
+        $tinyUrl->setGeneratedUrlKey('theKey');
+
+        $this->tinyUrlRepositoryMock->expects(self::exactly(2))
             ->method('findTinyUrlByTargetUrl')
-            ->willThrowException(new TinyUrlNotFoundException());
+            ->willReturnCallback(
+                static function () use ($tinyUrl) {
+                    static $callCount = 0;
+                    $callCount++;
+                    return match ($callCount) {
+                        1 => throw new TinyUrlNotFoundException(),
+                        2 => $tinyUrl,
+                        default => throw new RuntimeException('Unexpected call count: ' . $callCount),
+                    };
+                },
+            );
 
         $this->tinyUrlRepositoryMock->expects(self::once())
             ->method('insertNewTinyUrl')
-            ->with(
-                self::callback(
-                    function (TinyUrl $theNewTinyUrl) {
-                        $theNewTinyUrl->setCustomUrlKey('theKey');
-                        $theNewTinyUrl->persistPreProcess();
-                        $theNewTinyUrl->persistPostProcessInsert(234);
-                        return true;
-                    }
-                )
-            );
+            ->with($tinyUrl);
 
         $this->urlUtilsMock->expects(self::once())
             ->method('buildTinyUrl')
             ->with('theKey')
             ->willReturn('http://the-tiny.url');
 
-        $generatedUrl = $this->tinyUrlGenerator->getTinyUrl('http://the-target.url');
+        $generatedUrl = $this->tinyUrlGenerator->generateTinyUrl($tinyUrl);
         self::assertSame('http://the-tiny.url', $generatedUrl);
-    }
-
-    public function testGetTinyUrlGeneratesNewTinyUrlForNonExistingUrl(): void
-    {
-        $this->tinyUrlRepositoryMock->expects(self::once())
-            ->method('findTinyUrlByTargetUrl')
-            ->willThrowException(new TinyUrlNotFoundException());
-
-        $this->tinyUrlRepositoryMock->expects(self::once())
-            ->method('insertNewTinyUrl');
-
-        $this->tinyUrlGenerator->getTinyUrl('http://the-target.url');
     }
 
     public function testGetTinyUrlReturnsEmptyStringForEmptyTargetUrl(): void
     {
-        self::assertSame('', $this->tinyUrlGenerator->getTinyUrl(''));
-    }
-
-    public function testSetCommentSetsCommentForNewTinyUrl(): void
-    {
-        $this->tinyUrlRepositoryMock->expects(self::once())
-            ->method('findTinyUrlByTargetUrl')
-            ->willThrowException(new TinyUrlNotFoundException());
-
-        $this->tinyUrlRepositoryMock->expects(self::once())
-            ->method('insertNewTinyUrl')
-            ->with(
-                self::callback(
-                    function (TinyUrl $theNewTinyUrl) {
-                        return $theNewTinyUrl->getComment() === 'the comment';
-                    }
-                )
-            );
-
-        $this->tinyUrlGenerator->setComment('the comment');
-        $this->tinyUrlGenerator->getTinyUrl('http://the-url.tld');
-    }
-
-    public function testSetOptionDeleteOnUseSetsDeleteOnUseForNewTinyUrl(): void
-    {
-        $this->tinyUrlRepositoryMock->expects(self::once())
-            ->method('findTinyUrlByTargetUrl')
-            ->willThrowException(new TinyUrlNotFoundException());
-
-        $this->tinyUrlRepositoryMock->expects(self::once())
-            ->method('insertNewTinyUrl')
-            ->with(
-                self::callback(
-                    function (TinyUrl $theNewTinyUrl) {
-                        return $theNewTinyUrl->getDeleteOnUse() === true;
-                    }
-                )
-            );
-
-        $this->tinyUrlGenerator->setOptionDeleteOnUse(true);
-        $this->tinyUrlGenerator->getTinyUrl('http://the-url.tld');
-    }
-
-    public function testSetOptionUrlKeyDoesNotSetCustomUrlKeyForNewTinyUrlIfEmpty(): void
-    {
-        $this->tinyUrlRepositoryMock->expects(self::once())
-            ->method('findTinyUrlByTargetUrl')
-            ->willThrowException(new TinyUrlNotFoundException());
-
-        $this->tinyUrlRepositoryMock->expects(self::once())
-            ->method('insertNewTinyUrl')
-            ->with(
-                self::callback(
-                    function (TinyUrl $theNewTinyUrl) {
-                        return $theNewTinyUrl->hasCustomUrlKey() === false;
-                    }
-                )
-            );
-
-        $this->tinyUrlGenerator->setOptionUrlKey('');
-        $this->tinyUrlGenerator->getTinyUrl('http://the-url.tld');
-    }
-
-    public function testSetOptionUrlKeySetsCustomUrlKeyForNewTinyUrl(): void
-    {
-        $this->tinyUrlRepositoryMock->expects(self::once())
-            ->method('findTinyUrlByTargetUrl')
-            ->willThrowException(new TinyUrlNotFoundException());
-
-        $this->tinyUrlRepositoryMock->expects(self::once())
-            ->method('insertNewTinyUrl')
-            ->with(
-                self::callback(
-                    function (TinyUrl $theNewTinyUrl) {
-                        return $theNewTinyUrl->getCustomUrlKey() === 'the custom key';
-                    }
-                )
-            );
-
-        $this->tinyUrlGenerator->setOptionUrlKey('the custom key');
-        $this->tinyUrlGenerator->getTinyUrl('http://the-url.tld');
-    }
-
-    public function testSetOptionValidUntilSetsValidUntilForNewTinyUrl(): void
-    {
-        $this->tinyUrlRepositoryMock->expects(self::once())
-            ->method('findTinyUrlByTargetUrl')
-            ->willThrowException(new TinyUrlNotFoundException());
-
-        $this->tinyUrlRepositoryMock->expects(self::once())
-            ->method('insertNewTinyUrl')
-            ->with(
-                self::callback(
-                    function (TinyUrl $theNewTinyUrl) {
-                        return $theNewTinyUrl->getValidUntil()->diff(new \DateTime('2027-12-16 03:51:30'))->s === 0;
-                    }
-                )
-            );
-
-        $this->tinyUrlGenerator->setOptionValidUntil(1828929090);
-        $this->tinyUrlGenerator->getTinyUrl('http://the-url.tld');
+        self::assertSame('', $this->tinyUrlGenerator->generateTinyUrl(TinyUrl::createNew()));
     }
 }

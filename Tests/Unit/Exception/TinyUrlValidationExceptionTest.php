@@ -16,10 +16,20 @@ namespace Tx\Tinyurls\Tests\Unit\Exception;
 
 use PHPUnit\Framework\TestCase;
 use Tx\Tinyurls\Exception\TinyUrlValidationException;
+use TYPO3\CMS\Extbase\Error\Error;
 use TYPO3\CMS\Extbase\Error\Result;
 
 class TinyUrlValidationExceptionTest extends TestCase
 {
+    public function testSetInitializesFullErrorMessage(): void
+    {
+        $result = new Result();
+        $result->forProperty('targetUrl')->addError(new Error('The URL is invalid', 123));
+        $validationException = new TinyUrlValidationException();
+        $validationException->setValidationResult($result);
+        self::assertSame('The given tiny URL data is invalid: The URL is invalid', $validationException->getMessage());
+    }
+
     public function testSetResultSetsResult(): void
     {
         $result = new Result();

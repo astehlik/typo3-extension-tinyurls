@@ -14,10 +14,9 @@ namespace Tx\Tinyurls\Tests\Unit\FormEngine;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Tx\Tinyurls\FormEngine\TinyUrlDisplay;
-use Tx\Tinyurls\Utils\UrlUtils;
+use Tx\Tinyurls\Utils\UrlUtilsInterface;
 
 /**
  * Builds the tiny URL for displaying it within Backend forms.
@@ -26,16 +25,15 @@ class TinyUrlDisplayTest extends TestCase
 {
     public function testBuildTinyUrlFormFormElementDataBuildTinyUrlUsingUrlKey(): void
     {
-        $tinyUrlDisplay = new TinyUrlDisplay();
-
-        /** @var MockObject|UrlUtils $tinyUrlGenerator */
-        $tinyUrlGenerator = $this->createMock(UrlUtils::class);
-        $tinyUrlGenerator->expects(self::once())
-            ->method('buildTinyUrl')
-            ->with('the tiny urlkey')
+        $urlUtilsMock = $this->createMock(UrlUtilsInterface::class);
+        $urlUtilsMock->expects(self::once())
+            ->method('buildTinyUrlForPid')
+            ->with('the tiny urlkey', 12)
             ->willReturn('the generated url');
-        $tinyUrlDisplay->injectUrlUtils($tinyUrlGenerator);
 
+        $tinyUrlDisplay = new TinyUrlDisplay($urlUtilsMock);
+
+        $formElementData['databaseRow']['pid'] = '12';
         $formElementData['databaseRow']['urlkey'] = 'the tiny urlkey';
         self::assertSame('the generated url', $tinyUrlDisplay->buildTinyUrlFormFormElementData($formElementData));
     }

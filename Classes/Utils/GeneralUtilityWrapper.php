@@ -15,34 +15,34 @@ namespace Tx\Tinyurls\Utils;
  *                                                                        */
 
 use TYPO3\CMS\Core\Crypto\Random;
-use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use Closure;
 
 /**
  * A wrapper class for GeneralUtility calls. This allows us better mocking in the Unit tests.
  *
  * @codeCoverageIgnore
  */
-class GeneralUtilityWrapper implements SingletonInterface
+class GeneralUtilityWrapper
 {
-    public function callUserFunction(string $funcName, array &$params, &$callingObject)
+    public function callUserFunction(Closure|string $funcName, mixed &$params, ?object $ref = null): mixed
     {
-        return GeneralUtility::callUserFunction($funcName, $params, $callingObject);
+        return GeneralUtility::callUserFunction($funcName, $params, $ref);
     }
 
-    public function getFileAbsFileName(string $filename): string
+    public function getFileAbsFileName(string $fileName): string
     {
-        return GeneralUtility::getFileAbsFileName($filename);
+        return GeneralUtility::getFileAbsFileName($fileName);
     }
 
-    public function getIndpEnv(string $getEnvName): string
+    public function getIndpEnv(string $getEnvName): null|array|bool|string
     {
         return GeneralUtility::getIndpEnv($getEnvName);
     }
 
-    public function getRandomHexString(int $count): string
+    public function getRandomHexString(int $length): string
     {
         $random = GeneralUtility::makeInstance(Random::class);
-        return $random->generateRandomHexString($count);
+        return $random->generateRandomHexString($length);
     }
 }
