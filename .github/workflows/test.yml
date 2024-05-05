@@ -110,6 +110,17 @@ jobs:
       - run: |
           bash bin/t3_run_tests.sh -s lintPhp -p ${{ matrix.php_version }}
 
+  "phpstan":
+    name: "PHPStan"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ./.github/workflows/composer
+        with:
+          php_version: "${{ env.MAIN_PHP_VERSION }}"
+      - run: |
+          bash bin/t3_run_tests.sh -s phpstan -p ${{ env.MAIN_PHP_VERSION }}
+
   "coverage-phpunit":
     name: "Test coverage by Unit Tests"
     runs-on: ubuntu-latest
