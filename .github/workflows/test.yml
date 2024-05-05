@@ -136,7 +136,7 @@ jobs:
       - uses: actions/upload-artifact@v3
         with:
           name: coverage-phpunit
-          path: .Build/Logs/clover-unit.xml
+          path: Logs/clover-unit.xml
           retention-days: 1
 
   "coverage-functional":
@@ -153,7 +153,7 @@ jobs:
       - uses: actions/upload-artifact@v3
         with:
           name: coverage-functional
-          path: .Build/Logs/clover-functional.xml
+          path: Logs/clover-functional.xml
           retention-days: 1
 
   "coverage-upload":
