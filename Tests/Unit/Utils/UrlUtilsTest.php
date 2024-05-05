@@ -22,6 +22,9 @@ use Tx\Tinyurls\Domain\Model\TinyUrl;
 use Tx\Tinyurls\UrlKeyGenerator\UrlKeyGenerator;
 use Tx\Tinyurls\Utils\GeneralUtilityWrapper;
 use Tx\Tinyurls\Utils\UrlUtils;
+use TYPO3\CMS\Core\Exception\SiteNotFoundException;
+use TYPO3\CMS\Core\Http\Uri;
+use TYPO3\CMS\Core\Site\Entity\Site;
 use TYPO3\CMS\Core\Site\SiteFinder;
 
 /**
@@ -85,6 +88,42 @@ class UrlUtilsTest extends TestCase
         self::assertSame('http://base.url/thekey', $this->urlUtils->buildTinyUrl('thekey'));
     }
 
+    public function testBuildTinyUrlForPidSetsAndResetsSiteInExtensionConfiguration(): void
+    {
+        $siteMock = $this->createMock(Site::class);
+
+        $this->extensionConfigurationMock->expects(self::once())
+            ->method('setSite')
+            ->with($siteMock);
+
+        $this->extensionConfigurationMock->expects(self::once())
+            ->method('reset');
+
+        $this->siteFinderMock->expects(self::once())
+            ->method('getSiteByPageId')
+            ->with(123)
+            ->willReturn($siteMock);
+
+        $this->urlUtils->buildTinyUrlForPid('thekey', 123);
+    }
+
+    public function testBuildTinyUrlForPidSetsSiteToNullIfPidHasNoSite(): void
+    {
+        $this->extensionConfigurationMock->expects(self::once())
+            ->method('setSite')
+            ->with(null);
+
+        $this->extensionConfigurationMock->expects(self::once())
+            ->method('reset');
+
+        $this->siteFinderMock->expects(self::once())
+            ->method('getSiteByPageId')
+            ->with(123)
+            ->willThrowException(new SiteNotFoundException());
+
+        $this->urlUtils->buildTinyUrlForPid('thekey', 123);
+    }
+
     public function testCreateSpeakingTinyUrlReplacesIndependentEnvironmentMarker(): void
     {
         $this->extensionConfigurationMock->expects(self::once())
@@ -116,6 +155,23 @@ class UrlUtilsTest extends TestCase
             ->willReturn('###TINY_URL_KEY###');
         $speakingUrl = $this->urlUtils->createSpeakingTinyUrl('testkey');
         self::assertSame('testkey', $speakingUrl);
+    }
+
+    public function testCreateSpeakingTinyUrlUsesBaseUrlForSiteUrlPlaceholder(): void
+    {
+        $this->extensionConfigurationMock
+            ->method('getSpeakingUrlTemplate')
+            ->willReturn('###TYPO3_SITE_URL###/###TINY_URL_KEY###');
+
+        $this->extensionConfigurationMock->expects(self::once())
+            ->method('areSpeakingUrlsEnabled')
+            ->willReturn(true);
+
+        $this->extensionConfigurationMock->expects(self::once())
+            ->method('getBaseUrl')
+            ->willReturn(new Uri('http://base.url.from.config'));
+
+        self::assertSame('http://base.url.from.config/thekey', $this->urlUtils->buildTinyUrl('thekey'));
     }
 
     public function testGenerateTinyurlHashCreatesHash(): void

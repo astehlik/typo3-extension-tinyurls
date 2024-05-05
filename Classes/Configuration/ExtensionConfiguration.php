@@ -16,12 +16,10 @@ namespace Tx\Tinyurls\Configuration;
 
 use Psr\Http\Message\UriInterface;
 use Symfony\Contracts\Service\ResetInterface;
-use Tx\Tinyurls\Exception\InvalidConfigurationException;
 use TYPO3\CMS\Core\Configuration\ExtensionConfiguration as TYPO3ExtensionConfiguration;
 use TYPO3\CMS\Core\Http\Uri;
 use TYPO3\CMS\Core\Site\Entity\Site;
 use TYPO3\CMS\Core\Site\Entity\SiteInterface;
-use TYPO3\CMS\Core\Site\SiteFinder;
 
 /**
  * Contains utilities for getting configuration.
@@ -36,7 +34,7 @@ class ExtensionConfiguration implements ResetInterface
     private ?SiteInterface $site = null;
 
     public function __construct(
-        protected readonly SiteFinder $siteFinder,
+        protected readonly SiteConfigurationInterface $siteConfiguration,
         protected readonly TYPO3ExtensionConfiguration $typo3extensionConfiguration,
     ) {}
 
@@ -72,20 +70,22 @@ class ExtensionConfiguration implements ResetInterface
 
     public function getBaseUrl(): ?UriInterface
     {
+        $extensionConfiguration = $this->getExtensionConfigurationData();
+
         if (
-            $this->extensionConfiguration->baseUrlFromSiteBase
+            $extensionConfiguration->baseUrlFromSiteBase
             && $this->site instanceof Site
         ) {
             return $this->site->getBase();
         }
 
         // @extensionScannerIgnoreLine
-        if ($this->getExtensionConfigurationData()->baseUrl === '') {
+        if ($extensionConfiguration->baseUrl === '') {
             return null;
         }
 
         // @extensionScannerIgnoreLine
-        return new Uri($this->getExtensionConfigurationData()->baseUrl);
+        return new Uri($extensionConfiguration->baseUrl);
     }
 
     public function getMinimalRandomKeyLength(): int
@@ -140,43 +140,6 @@ class ExtensionConfiguration implements ResetInterface
 
     private function loadSiteConfiguration(): array
     {
-        $site = $this->site;
-
-        if (!$site instanceof Site) {
-            return [];
-        }
-
-        $siteConfig = $site->getConfiguration();
-
-        $tinyUrlConfig =  $siteConfig['tinyurls'] ?? [];
-
-        $this->validateSiteConfiguration($tinyUrlConfig);
-
-        return $tinyUrlConfig;
-    }
-
-    private function validateSiteConfiguration(array $config): void
-    {
-        $storagePid = (int)($config[ConfigKeys::URL_RECORD_STORAGE_PID] ?? 0);
-
-        if ($storagePid <= 0) {
-            return;
-        }
-
-        $expectedSite = $this->siteFinder->getSiteByPageId($storagePid);
-
-        if ($expectedSite->getIdentifier() === $this->site->getIdentifier()) {
-            return;
-        }
-
-        throw new InvalidConfigurationException(
-            sprintf(
-                'The site configuration for site "%s" is invalid. The configured %s %d'
-                . ' does not belong to the site.',
-                $this->site->getIdentifier(),
-                ConfigKeys::URL_RECORD_STORAGE_PID,
-                $storagePid,
-            ),
-        );
+        return $this->siteConfiguration->loadSiteConfiguration($this->site);
     }
 }

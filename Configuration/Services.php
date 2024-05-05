@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Tx\Tinyurls\Configuration\ExtensionConfiguration;
+use Tx\Tinyurls\Configuration\SiteConfiguration;
+use Tx\Tinyurls\Configuration\SiteConfigurationInterface;
 use Tx\Tinyurls\Configuration\TypoScriptConfigurator;
 use Tx\Tinyurls\Controller\EidController;
 use Tx\Tinyurls\Domain\Repository\TinyUrlDoctrineRepository;
@@ -30,6 +32,7 @@ return static function (ContainerConfigurator $configurator): void {
         ->defaults()->autowire()->autoconfigure()->public()
 
         // Configure implementations of interfaces.
+        ->set(SiteConfigurationInterface::class, SiteConfiguration::class)
         ->set(UrlKeyGenerator::class, Base62UrlKeyGenerator::class)
         ->set(TinyUrlRepository::class, TinyUrlDoctrineRepository::class)
         ->set(TinyUrlGeneratorInterface::class, TinyUrlGenerator::class)
@@ -37,6 +40,7 @@ return static function (ContainerConfigurator $configurator): void {
 
         // Configure services.
         ->set(ExtensionConfiguration::class, ExtensionConfiguration::class)
+        ->set(SiteConfiguration::class, SiteConfiguration::class)
         ->set(TypoScriptConfigurator::class, TypoScriptConfigurator::class)
         ->set(EidController::class, EidController::class)
         ->set(TinyUrlValidator::class, TinyUrlValidator::class)

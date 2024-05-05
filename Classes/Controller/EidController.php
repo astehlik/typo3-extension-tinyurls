@@ -83,26 +83,13 @@ class EidController
         return $noCacheResponse->withAddedHeader('Pragma', 'no-cache');
     }
 
-    /**
-     * Increases the hit counter for the given tiny URL record.
-     */
-    protected function countUrlHit(TinyUrl $tinyUrl): void
-    {
-        // There is no point in counting the hit of a URL that is already deleted
-        if ($tinyUrl->getDeleteOnUse()) {
-            return;
-        }
-
-        $this->tinyUrlRepository->countTinyUrlHit($tinyUrl);
-    }
-
     protected function getErrorController(): ErrorController
     {
         if ($this->errorController) {
             return $this->errorController;
         }
 
-        return GeneralUtility::makeInstance(ErrorController::class);
+        return GeneralUtility::makeInstance(ErrorController::class); // @codeCoverageIgnore
     }
 
     /**
@@ -137,7 +124,7 @@ class EidController
             return;
         }
 
-        $this->countUrlHit($tinyUrl);
+        $this->tinyUrlRepository->countTinyUrlHit($tinyUrl);
     }
 
     private function getSiteFromRequest(ServerRequestInterface $request): ?SiteInterface

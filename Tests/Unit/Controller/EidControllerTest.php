@@ -29,6 +29,8 @@ use Tx\Tinyurls\Exception\TinyUrlNotFoundException;
 use TYPO3\CMS\Core\Error\Http\BadRequestException;
 use TYPO3\CMS\Core\Http\ServerRequest;
 use TYPO3\CMS\Core\Routing\SiteMatcher;
+use TYPO3\CMS\Core\Routing\SiteRouteResult;
+use TYPO3\CMS\Core\Site\Entity\SiteInterface;
 use TYPO3\CMS\Frontend\Controller\ErrorController;
 
 #[BackupGlobals(true)]
@@ -162,6 +164,8 @@ class EidControllerTest extends TestCase
             ->willThrowException(new TinyUrlNotFoundException('thekey'));
 
         $errorResponse = $this->getMockBuilder(ResponseInterface::class)->getMock();
+        $errorResponse->method('getStatusCode')->willReturn(404);
+
         $this->errorControllerMock->expects(self::once())
             ->method('pageNotFoundAction')
             ->with(
@@ -170,7 +174,7 @@ class EidControllerTest extends TestCase
             )
             ->willReturn($errorResponse);
 
-        self::assertSame($errorResponse, $this->processRequest());
+        self::assertSame($errorResponse, $this->processRequest(404));
     }
 
     public function testRedirectsToTargetUrl(): void
@@ -189,6 +193,29 @@ class EidControllerTest extends TestCase
         self::assertSame(301, $response->getStatusCode());
         self::assertSame('Moved Permanently', $response->getReasonPhrase());
         self::assertSame('http://the-target.url', $response->getHeaderLine('Location'));
+    }
+
+    public function testSiteIsSetAndResetInExtensionConfiguration(): void
+    {
+        $_GET['tx_tinyurls']['key'] = 'thekey';
+
+        $siteMock = $this->createMock(SiteInterface::class);
+
+        $siteMatchResultMock = $this->createMock(SiteRouteResult::class);
+        $siteMatchResultMock->method('getSite')->willReturn($siteMock);
+
+        $this->siteMatcherMock->expects(self::once())
+            ->method('matchRequest')
+            ->willReturn($siteMatchResultMock);
+
+        $this->extensionConfigurationMock->expects(self::once())
+            ->method('setSite')
+            ->with($siteMock);
+
+        $this->extensionConfigurationMock->expects(self::once())
+            ->method('reset');
+
+        $this->processRequest();
     }
 
     #[DataProvider('provideTinyUrlRedirectSendsNoCacheHeadersCases')]
@@ -211,10 +238,12 @@ class EidControllerTest extends TestCase
         self::assertSame($expectedValue, $response->getHeaderLine($headerName));
     }
 
-    private function processRequest(): ResponseInterface
+    private function processRequest(int $expectedStatus = 301): ResponseInterface
     {
         $request = new ServerRequest();
         $request = $request->withQueryParams($_GET);
-        return $this->eidController->tinyUrlRedirect($request);
+        $response =  $this->eidController->tinyUrlRedirect($request);
+        self::assertSame($expectedStatus, $response->getStatusCode());
+        return $response;
     }
 }

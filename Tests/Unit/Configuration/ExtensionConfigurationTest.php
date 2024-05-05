@@ -14,30 +14,32 @@ namespace Tx\Tinyurls\Tests\Unit\Configuration;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
+use GuzzleHttp\Psr7\Uri;
 use PHPUnit\Framework\Attributes\BackupGlobals;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Tx\Tinyurls\Configuration\ConfigKeys;
 use Tx\Tinyurls\Configuration\ExtensionConfiguration;
+use Tx\Tinyurls\Configuration\SiteConfigurationInterface;
 use TYPO3\CMS\Core\Configuration\ExtensionConfiguration as TYPO3ExtensionConfiguration;
-use TYPO3\CMS\Core\Site\SiteFinder;
+use TYPO3\CMS\Core\Site\Entity\Site;
 
 #[BackupGlobals(true)]
 class ExtensionConfigurationTest extends TestCase
 {
     private ExtensionConfiguration $extensionConfiguration;
 
-    private MockObject|SiteFinder $siteFinderMock;
+    private MockObject|SiteConfigurationInterface $siteConfigurationMock;
 
     private MockObject|TYPO3ExtensionConfiguration $typo3ExtensionConfigurationMock;
 
     protected function setUp(): void
     {
-        $this->siteFinderMock = $this->createMock(SiteFinder::class);
+        $this->siteConfigurationMock = $this->createMock(SiteConfigurationInterface::class);
         $this->typo3ExtensionConfigurationMock = $this->createMock(TYPO3ExtensionConfiguration::class);
 
         $this->extensionConfiguration = new ExtensionConfiguration(
-            $this->siteFinderMock,
+            $this->siteConfigurationMock,
             $this->typo3ExtensionConfigurationMock,
         );
     }
@@ -94,6 +96,27 @@ class ExtensionConfigurationTest extends TestCase
         );
     }
 
+    public function testGetBaseUrlResturnsSiteBaseIfConfigured(): void
+    {
+        $this->initConfig([ConfigKeys::BASE_URL_FROM_SITE_BASE => 1]);
+
+        $siteMock = $this->createMock(Site::class);
+        $siteMock->expects(self::once())
+            ->method('getBase')
+            ->willReturn(new Uri('https://base.url.from.site'));
+
+        $this->extensionConfiguration->setSite($siteMock);
+
+        self::assertSame('https://base.url.from.site', (string)$this->extensionConfiguration->getBaseUrl());
+    }
+
+    public function testGetBaseUrlReturnsNullByDefault(): void
+    {
+        $this->initConfig([]);
+
+        self::assertNull($this->extensionConfiguration->getBaseUrl());
+    }
+
     public function testGetMinimalRandomKeyLengthReturnsConfiguredValue(): void
     {
         $this->initConfig([ConfigKeys::MINIMAL_RANDOM_KEY_LENGTH => 56]);
@@ -132,6 +155,16 @@ class ExtensionConfigurationTest extends TestCase
             '###TYPO3_SITE_URL###tinyurl/###TINY_URL_KEY###',
             $this->extensionConfiguration->getSpeakingUrlTemplate(),
         );
+    }
+
+    public function testSiteConfigurationIsMergedIntoExtensionConfiguration(): void
+    {
+        $this->initConfig([ConfigKeys::BASE_URL => 'https://base.url.from.extension']);
+
+        $this->siteConfigurationMock->method('loadSiteConfiguration')
+            ->willReturn([ConfigKeys::BASE_URL => 'https://base.url.from.site']);
+
+        self::assertSame('https://base.url.from.site', (string)$this->extensionConfiguration->getBaseUrl());
     }
 
     private function initConfig(array $array): void
