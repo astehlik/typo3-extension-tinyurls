@@ -132,7 +132,7 @@ jobs:
         with:
           php_version: ${{ env.MAIN_PHP_VERSION }}
       - run: |
-          bash bin/t3_run_tests.sh -s unit -p ${{ env.MAIN_PHP_VERSION }} -x -z coverage -e "--coverage-clover Logs/clover-unit.xml --coverage-filter ../Classes"
+          bash bin/t3_run_tests.sh -s unit -p ${{ env.MAIN_PHP_VERSION }} -X coverage -- --coverage-clover Logs/clover-unit.xml --coverage-filter ../Classes
       - uses: actions/upload-artifact@v3
         with:
           name: coverage-phpunit
@@ -149,7 +149,7 @@ jobs:
         with:
           php_version: ${{ env.MAIN_PHP_VERSION }}
       - run: |
-          bash bin/t3_run_tests.sh -s functional -d mariadb -p ${{ env.MAIN_PHP_VERSION }} -x -z coverage -e "--coverage-clover Logs/clover-functional.xml --coverage-filter ../Classes"
+          bash bin/t3_run_tests.sh -s functional -d mariadb -p ${{ env.MAIN_PHP_VERSION }} -X coverage -- --coverage-clover Logs/clover-functional.xml --coverage-filter ../Classes
       - uses: actions/upload-artifact@v3
         with:
           name: coverage-functional
