@@ -11,7 +11,7 @@
     ],
     "require": {
         "php": "^8.2",
-        "typo3/cms-core": "~13.1.0"
+        "typo3/cms-core": "~13.2.1"
     },
     "require-dev": {
         "bnf/phpstan-psr-container": "^1.0",
