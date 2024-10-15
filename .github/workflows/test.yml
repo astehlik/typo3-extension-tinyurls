@@ -133,7 +133,7 @@ jobs:
           php_version: ${{ env.MAIN_PHP_VERSION }}
       - run: |
           bash bin/t3_run_tests.sh -s unit -p ${{ env.MAIN_PHP_VERSION }} -X coverage -- --coverage-clover Logs/clover-unit.xml --coverage-filter ../Classes
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: coverage-phpunit
           path: Logs/clover-unit.xml
@@ -150,7 +150,7 @@ jobs:
           php_version: ${{ env.MAIN_PHP_VERSION }}
       - run: |
           bash bin/t3_run_tests.sh -s functional -d mariadb -p ${{ env.MAIN_PHP_VERSION }} -X coverage -- --coverage-clover Logs/clover-functional.xml --coverage-filter ../Classes
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: coverage-functional
           path: Logs/clover-functional.xml
@@ -167,10 +167,10 @@ jobs:
       CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: coverage-phpunit
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: coverage-functional
       - run: curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
