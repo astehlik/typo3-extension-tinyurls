@@ -1,0 +1,31 @@
+actor: BackendTester
+
+extensions:
+  enabled:
+    - Tx\Tinyurls\Tests\Acceptance\Support\Extension\BackendTinyurlsEnvironment
+
+
+step_decorators:
+  - \Codeception\Step\ConditionalAssertion
+  - \Codeception\Step\TryTo
+
+modules:
+  enabled:
+    - \TYPO3\TestingFramework\Core\Acceptance\Helper\Acceptance
+    - \De\SWebhosting\Buildtools\Tests\Acceptance\Helper\PasswordLogin
+  config:
+    \De\SWebhosting\Buildtools\Tests\Acceptance\Helper\PasswordLogin:
+      passwords:
+        admin: '%typo3TestingAcceptanceAdminPassword%'
+        editor: '%typo3TestingAcceptanceEditorPassword%'
+
+env:
+  classic:
+    extensions:
+      enabled:
+        - Tx\Tinyurls\Tests\Acceptance\Support\Extension\BackendTinyurlsEnvironment
+  systemplate:
+  sets:
+
+groups:
+  AcceptanceTests-Job-*: AcceptanceTests-Job-*

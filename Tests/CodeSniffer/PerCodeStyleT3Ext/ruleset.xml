@@ -15,7 +15,12 @@
 	</rule>
 
 	<rule ref="Squiz.NamingConventions.ValidVariableName.NotCamelCaps">
+		<exclude-pattern>Tests/Acceptance/*</exclude-pattern>
 		<exclude-pattern>ext_emconf.php</exclude-pattern>
+	</rule>
+
+	<rule ref="PSR2.Methods.MethodDeclaration.Underscore">
+		<exclude-pattern>Tests/Acceptance/*/*Cest.php</exclude-pattern>
 	</rule>
 
 	<!-- Exceptions for classes with empty body -->
