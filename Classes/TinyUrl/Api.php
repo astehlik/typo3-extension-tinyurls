@@ -14,10 +14,10 @@ namespace Tx\Tinyurls\TinyUrl;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
+use DateTimeImmutable;
 use Tx\Tinyurls\Configuration\TypoScriptConfigurator;
 use Tx\Tinyurls\Domain\Model\TinyUrl;
 use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
-use DateTimeImmutable;
 
 /**
  * Use this class for generating tiny URLs in your own extension.

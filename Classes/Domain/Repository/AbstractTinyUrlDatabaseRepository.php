@@ -14,14 +14,14 @@ namespace Tx\Tinyurls\Domain\Repository;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
+use Closure;
+use InvalidArgumentException;
 use Tx\Tinyurls\Configuration\ExtensionConfiguration;
 use Tx\Tinyurls\Domain\Model\TinyUrl;
 use Tx\Tinyurls\Domain\Validator\TinyUrlValidator;
 use Tx\Tinyurls\Exception\TinyUrlValidationException;
 use Tx\Tinyurls\Utils\UrlUtilsInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use Closure;
-use InvalidArgumentException;
 
 abstract class AbstractTinyUrlDatabaseRepository implements TinyUrlRepository
 {

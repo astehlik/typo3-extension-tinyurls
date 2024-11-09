@@ -14,12 +14,12 @@ namespace Tx\Tinyurls\Tests\Unit\Configuration;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
+use DateTimeImmutable;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Tx\Tinyurls\Configuration\TypoScriptConfigurator;
 use Tx\Tinyurls\Domain\Model\TinyUrl;
 use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
-use DateTimeImmutable;
 
 class TypoScriptConfiguratorTest extends TestCase
 {

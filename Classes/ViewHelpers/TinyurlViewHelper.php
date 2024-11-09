@@ -14,11 +14,11 @@ namespace Tx\Tinyurls\ViewHelpers;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
+use DateTimeImmutable;
 use Tx\Tinyurls\Domain\Model\TinyUrl;
 use Tx\Tinyurls\TinyUrl\TinyUrlGeneratorInterface;
 use TYPO3\CMS\Core\Site\Entity\SiteInterface;
 use TYPO3Fluid\Fluid\Core\ViewHelper\AbstractViewHelper;
-use DateTimeImmutable;
 
 /**
  * A view helper for shortening URLs.

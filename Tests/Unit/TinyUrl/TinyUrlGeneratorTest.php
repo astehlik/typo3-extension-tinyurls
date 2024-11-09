@@ -16,13 +16,13 @@ namespace Tx\Tinyurls\Tests\Unit\TinyUrl;
 
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 use Tx\Tinyurls\Configuration\ExtensionConfiguration;
 use Tx\Tinyurls\Domain\Model\TinyUrl;
 use Tx\Tinyurls\Domain\Repository\TinyUrlRepository;
 use Tx\Tinyurls\Exception\TinyUrlNotFoundException;
 use Tx\Tinyurls\TinyUrl\TinyUrlGenerator;
 use Tx\Tinyurls\Utils\UrlUtilsInterface;
-use RuntimeException;
 
 class TinyUrlGeneratorTest extends TestCase
 {
