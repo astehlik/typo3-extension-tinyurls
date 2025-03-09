@@ -13,8 +13,7 @@ use TYPO3\TestingFramework\Core\Functional\FunctionalTestCase;
 
 abstract class AbstractFunctionalTestCase extends FunctionalTestCase
 {
-    protected array $configurationToUseInTestInstance =
-        ['EXTENSIONS' => ['tinyurls' => [ConfigKeys::BASE_URL => 'http://localhost/']]];
+    protected array $configurationToUseInTestInstance = ['EXTENSIONS' => ['tinyurls' => [ConfigKeys::BASE_URL => 'http://localhost/']]];
 
     protected array $testExtensionsToLoad = ['typo3conf/ext/tinyurls'];
 
