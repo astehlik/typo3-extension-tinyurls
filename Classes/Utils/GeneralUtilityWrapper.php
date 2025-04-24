@@ -14,9 +14,9 @@ namespace Tx\Tinyurls\Utils;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
+use Closure;
 use TYPO3\CMS\Core\Crypto\Random;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use Closure;
 
 /**
  * A wrapper class for GeneralUtility calls. This allows us better mocking in the Unit tests.

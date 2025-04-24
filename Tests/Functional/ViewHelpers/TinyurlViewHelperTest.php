@@ -41,7 +41,7 @@ class TinyurlViewHelperTest extends AbstractFunctionalTestCase
         $request = (new InternalRequest())->withPageId(1);
         $response = $this->executeFrontendSubRequest($request);
         self::assertMatchesRegularExpression(
-            '/http:\/\/localhost\/\?eID=tx_tinyurls&amp;tx_tinyurls\[key\]=b-[a-zA-Z0-9]{7}/',
+            '/http:\\/\\/localhost\\/\\?eID=tx_tinyurls&amp;tx_tinyurls\\[key\\]=b-[a-zA-Z0-9]{7}/',
             (string)$response->getBody(),
         );
     }

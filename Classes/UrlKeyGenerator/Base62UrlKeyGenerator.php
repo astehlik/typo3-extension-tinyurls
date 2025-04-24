@@ -53,19 +53,18 @@ readonly class Base62UrlKeyGenerator implements UrlKeyGenerator
             $this->extensionConfiguration->getBase62Dictionary(),
         );
 
-        $numberOfFillupChars =
-            $this->extensionConfiguration->getMinimalTinyurlKeyLength() - strlen($tinyUrlKey);
+        $numberOfFillUpChars = $this->extensionConfiguration->getMinimalTinyurlKeyLength() - strlen($tinyUrlKey);
 
         $minimalRandomKeyLength = $this->extensionConfiguration->getMinimalRandomKeyLength();
-        if ($numberOfFillupChars < $minimalRandomKeyLength) {
-            $numberOfFillupChars = $minimalRandomKeyLength;
+        if ($numberOfFillUpChars < $minimalRandomKeyLength) {
+            $numberOfFillUpChars = $minimalRandomKeyLength;
         }
 
-        if ($numberOfFillupChars < 1) {
+        if ($numberOfFillUpChars < 1) {
             return $tinyUrlKey;
         }
 
-        $tinyUrlKey .= '-' . $this->generalUtility->getRandomHexString($numberOfFillupChars);
+        $tinyUrlKey .= '-' . $this->generalUtility->getRandomHexString($numberOfFillUpChars);
 
         return $tinyUrlKey;
     }

@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Tx\Tinyurls\Domain\Validator;
 
+use DateTime;
 use Tx\Tinyurls\Domain\Model\TinyUrl;
 use Tx\Tinyurls\Domain\Repository\TinyUrlRepository;
 use Tx\Tinyurls\Exception\TinyUrlNotFoundException;
 use TYPO3\CMS\Extbase\Error\Result;
 use TYPO3\CMS\Extbase\Validation\Error;
 use TYPO3\CMS\Extbase\Validation\Validator\ValidatorInterface;
-use DateTime;
 
 class TinyUrlValidator implements ValidatorInterface
 {

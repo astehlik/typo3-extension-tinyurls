@@ -14,11 +14,11 @@ namespace Tx\Tinyurls\Tests\Unit\Domain\Model;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
-use PHPUnit\Framework\TestCase;
-use Tx\Tinyurls\Domain\Model\TinyUrl;
 use DateTime;
 use DateTimeInterface;
 use InvalidArgumentException;
+use PHPUnit\Framework\TestCase;
+use Tx\Tinyurls\Domain\Model\TinyUrl;
 
 class TinyUrlTest extends TestCase
 {

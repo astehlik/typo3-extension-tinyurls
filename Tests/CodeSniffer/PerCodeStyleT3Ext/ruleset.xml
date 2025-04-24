@@ -5,9 +5,15 @@
 
 	<rule ref="PSRDefault"/>
 
+	<rule ref="Generic.Files.LineLength">
+		<properties>
+			<property name="lineLimit" value="140"/>
+		</properties>
+	</rule>
+
 	<!--
 		We disable the CamelCapsMethodName method name sniff for some files because we
-		need to implement API methdods that break this convention.
+		need to implement API methods that break this convention.
 	-->
 	<rule ref="PSR1.Methods.CamelCapsMethodName">
 		<exclude-pattern>Classes/Hooks/TceDataMap.php</exclude-pattern>
@@ -15,7 +21,12 @@
 	</rule>
 
 	<rule ref="Squiz.NamingConventions.ValidVariableName.NotCamelCaps">
+		<exclude-pattern>Tests/Acceptance/*</exclude-pattern>
 		<exclude-pattern>ext_emconf.php</exclude-pattern>
+	</rule>
+
+	<rule ref="PSR2.Methods.MethodDeclaration.Underscore">
+		<exclude-pattern>Tests/Acceptance/*/*Cest.php</exclude-pattern>
 	</rule>
 
 	<!-- Exceptions for classes with empty body -->

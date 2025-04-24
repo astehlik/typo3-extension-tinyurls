@@ -12,3 +12,6 @@ parameters:
   paths:
     - ../../Classes
     - ../../Tests
+
+  excludePaths:
+    - ../../Tests/Acceptance

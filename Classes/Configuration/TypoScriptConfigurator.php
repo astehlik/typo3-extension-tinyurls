@@ -14,9 +14,9 @@ namespace Tx\Tinyurls\Configuration;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
+use DateTimeImmutable;
 use Tx\Tinyurls\Domain\Model\TinyUrl;
 use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
-use DateTimeImmutable;
 
 class TypoScriptConfigurator
 {

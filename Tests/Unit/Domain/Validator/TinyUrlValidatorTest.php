@@ -14,14 +14,14 @@ namespace Tx\Tinyurls\Tests\Unit\Domain\Validator;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
+use DateInterval;
+use DateTime;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Tx\Tinyurls\Domain\Model\TinyUrl;
 use Tx\Tinyurls\Domain\Repository\TinyUrlRepository;
 use Tx\Tinyurls\Domain\Validator\TinyUrlValidator;
 use Tx\Tinyurls\Exception\TinyUrlNotFoundException;
-use DateInterval;
-use DateTime;
 
 class TinyUrlValidatorTest extends TestCase
 {

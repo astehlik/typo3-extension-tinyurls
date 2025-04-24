@@ -54,7 +54,7 @@ class ApiTest extends AbstractFunctionalTestCase
         $this->tinyUrlsApi->setUrlKey('mydomain');
         $tinyUrl = $this->tinyUrlsApi->getTinyUrl('http://mydomain.tld');
         self::assertMatchesRegularExpression(
-            '/http:\/\/.+\/\?eID=tx_tinyurls&tx_tinyurls\[key\]=mydomain/',
+            '/http:\\/\\/.+\\/\\?eID=tx_tinyurls&tx_tinyurls\\[key\\]=mydomain/',
             $tinyUrl,
         );
     }
