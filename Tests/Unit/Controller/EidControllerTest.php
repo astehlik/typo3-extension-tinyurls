@@ -63,28 +63,6 @@ class EidControllerTest extends TestCase
         $GLOBALS['EXEC_TIME'] = time();
     }
 
-    public static function provideTinyUrlRedirectSendsNoCacheHeadersCases(): iterable
-    {
-        return [
-            [
-                'Expires',
-                '0',
-            ],
-            [
-                'Last-Modified',
-                'gmdate',
-            ],
-            [
-                'Cache-Control',
-                'no-cache, must-revalidate',
-            ],
-            [
-                'Pragma',
-                'no-cache',
-            ],
-        ];
-    }
-
     public function testBadRequestExceptionIfNoUrlKeyIsProvided(): void
     {
         $this->expectException(BadRequestException::class);
@@ -236,6 +214,28 @@ class EidControllerTest extends TestCase
         }
 
         self::assertSame($expectedValue, $response->getHeaderLine($headerName));
+    }
+
+    public static function provideTinyUrlRedirectSendsNoCacheHeadersCases(): iterable
+    {
+        return [
+            [
+                'Expires',
+                '0',
+            ],
+            [
+                'Last-Modified',
+                'gmdate',
+            ],
+            [
+                'Cache-Control',
+                'no-cache, must-revalidate',
+            ],
+            [
+                'Pragma',
+                'no-cache',
+            ],
+        ];
     }
 
     private function processRequest(int $expectedStatus = 301): ResponseInterface
