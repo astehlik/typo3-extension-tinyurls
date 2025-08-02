@@ -16,9 +16,9 @@ jobs:
     name: 'Testing and linting'
     uses: astehlik/typo3-extension-buildtools/.github/workflows/extension-test.yml@TYPO3_13
 
-  extension-cc-coverage:
-    name: 'Code Climate coverage'
-    uses: astehlik/typo3-extension-buildtools/.github/workflows/extension-cc-coverage.yml@TYPO3_13
+  extension-qltysh-coverage:
+    name: 'Qlty coverage'
+    uses: astehlik/typo3-extension-buildtools/.github/workflows/extension-qltysh-coverage.yml@TYPO3_13
     if: github.ref == 'refs/heads/develop'
     secrets:
-      CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
+      QLTY_COVERAGE_TOKEN: ${{ secrets.QLTY_COVERAGE_TOKEN }}
