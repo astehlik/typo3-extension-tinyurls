@@ -35,7 +35,7 @@ class GeneralUtilityWrapper
         return GeneralUtility::getFileAbsFileName($fileName);
     }
 
-    public function getIndpEnv(string $getEnvName): null|array|bool|string
+    public function getIndpEnv(string $getEnvName): array|bool|string|null
     {
         return GeneralUtility::getIndpEnv($getEnvName);
     }
