@@ -14,7 +14,8 @@
         "typo3/cms-core": "~13.4.0"
     },
     "require-dev": {
-        "de-swebhosting/typo3-extension-buildtools": "dev-TYPO3_13"
+        "de-swebhosting/typo3-extension-buildtools": "dev-TYPO3_13",
+        "phpunit/phpunit": "^11.5.33"
     },
     "autoload": {
         "psr-4": {
