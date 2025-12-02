@@ -145,14 +145,10 @@ class DatabaseRecordListTest extends TestCase
             ->getMock();
 
         $queryBuilder->method('quote')->willReturnCallback(
-            static function (string $value) {
-                return "'" . $value . "'";
-            },
+            static fn(string $value) => "'" . $value . "'",
         );
         $queryBuilder->method('quoteIdentifier')->willReturnCallback(
-            static function (string $value) {
-                return '`' . $value . '`';
-            },
+            static fn(string $value) => '`' . $value . '`',
         );
 
         return $queryBuilder;

@@ -65,20 +65,18 @@ class TinyUrlDoctrineRepositoryTest extends TestCase
         $this->databaseQueryBuilderMock->expects(self::any())
             ->method(
                 new Callback(
-                    static function (string $methodName) {
-                        return in_array(
-                            $methodName,
-                            [
-                                'delete',
-                                'from',
-                                'select',
-                                'set',
-                                'update',
-                                'where',
-                            ],
-                            true,
-                        );
-                    },
+                    static fn(string $methodName) => in_array(
+                        $methodName,
+                        [
+                            'delete',
+                            'from',
+                            'select',
+                            'set',
+                            'update',
+                            'where',
+                        ],
+                        true,
+                    ),
                 ),
             )
             ->willReturnSelf();
@@ -226,9 +224,7 @@ class TinyUrlDoctrineRepositoryTest extends TestCase
             ->method('add')
             ->with(
                 self::callback(
-                    static function (StoragePageQueryRestriction $queryRestriction) {
-                        return $queryRestriction->getStoragePageUid() === 389484;
-                    },
+                    static fn(StoragePageQueryRestriction $queryRestriction) => $queryRestriction->getStoragePageUid() === 389484,
                 ),
             );
         $this->doctrineRepository->deleteTinyUrlByKey('key');
@@ -324,9 +320,7 @@ class TinyUrlDoctrineRepositoryTest extends TestCase
             ->with(
                 TinyUrlRepository::TABLE_URLS,
                 self::callback(
-                    static function (array $databaseRow) {
-                        return $databaseRow['urlkey'] === 'the-generated-key';
-                    },
+                    static fn(array $databaseRow) => $databaseRow['urlkey'] === 'the-generated-key',
                 ),
             );
 
