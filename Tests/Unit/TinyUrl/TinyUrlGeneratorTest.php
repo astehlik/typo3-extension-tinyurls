@@ -53,11 +53,11 @@ class TinyUrlGeneratorTest extends TestCase
         $tinyUrl->setCustomUrlKey('theKey');
         $tinyUrl->persistPreProcess();
 
-        $this->tinyUrlRepositoryMock->expects(self::once())
+        $this->tinyUrlRepositoryMock->expects($this->once())
             ->method('findTinyUrlByTargetUrl')
             ->willReturn($tinyUrl);
 
-        $this->urlUtilsMock->expects(self::once())
+        $this->urlUtilsMock->expects($this->once())
             ->method('buildTinyUrl')
             ->with('theKey')
             ->willReturn('http://the-tiny.url');
@@ -71,7 +71,7 @@ class TinyUrlGeneratorTest extends TestCase
         $tinyUrl = TinyUrl::createForUrl('http://the-target.url');
         $tinyUrl->setGeneratedUrlKey('theKey');
 
-        $this->tinyUrlRepositoryMock->expects(self::exactly(2))
+        $this->tinyUrlRepositoryMock->expects($this->exactly(2))
             ->method('findTinyUrlByTargetUrl')
             ->willReturnCallback(
                 static function () use ($tinyUrl) {
@@ -85,11 +85,11 @@ class TinyUrlGeneratorTest extends TestCase
                 },
             );
 
-        $this->tinyUrlRepositoryMock->expects(self::once())
+        $this->tinyUrlRepositoryMock->expects($this->once())
             ->method('insertNewTinyUrl')
             ->with($tinyUrl);
 
-        $this->urlUtilsMock->expects(self::once())
+        $this->urlUtilsMock->expects($this->once())
             ->method('buildTinyUrl')
             ->with('theKey')
             ->willReturn('http://the-tiny.url');

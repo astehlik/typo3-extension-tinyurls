@@ -54,7 +54,7 @@ class TinyUrlValidatorTest extends TestCase
         $tinyUrl = TinyUrl::createNew();
         $tinyUrl->setCustomUrlKey('the custom key');
         $existingTinyUrl = TinyUrl::createNew();
-        $this->tinyUrlRepositoryMock->expects(self::once())
+        $this->tinyUrlRepositoryMock->expects($this->once())
             ->method('findTinyUrlByKey')
             ->with('the custom key')
             ->willReturn($existingTinyUrl);
@@ -76,7 +76,7 @@ class TinyUrlValidatorTest extends TestCase
     {
         $tinyUrl = TinyUrl::createNew();
         $tinyUrl->setCustomUrlKey('the custom key');
-        $this->tinyUrlRepositoryMock->expects(self::once())
+        $this->tinyUrlRepositoryMock->expects($this->once())
             ->method('findTinyUrlByKey')
             ->with('the custom key')
             ->willThrowException(new TinyUrlNotFoundException());
@@ -91,7 +91,7 @@ class TinyUrlValidatorTest extends TestCase
         $tinyUrl->setCustomUrlKey('the custom key');
         $existingTinyUrl = TinyUrl::createNew();
         $existingTinyUrl->persistPostProcessInsert(2);
-        $this->tinyUrlRepositoryMock->expects(self::once())
+        $this->tinyUrlRepositoryMock->expects($this->once())
             ->method('findTinyUrlByKey')
             ->with('the custom key')
             ->willReturn($existingTinyUrl);

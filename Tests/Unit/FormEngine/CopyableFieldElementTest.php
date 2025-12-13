@@ -56,7 +56,7 @@ class CopyableFieldElementTest extends TestCase
 
         $this->createCopyableFieldElement($data);
 
-        $this->generalUtilityWrapperMock->expects(self::once())
+        $this->generalUtilityWrapperMock->expects($this->once())
             ->method('callUserFunction')
             ->with('thefunc', $data, $this->copyableFieldElement);
 
@@ -66,7 +66,7 @@ class CopyableFieldElementTest extends TestCase
     public function testRenderAssignsExpectedVariablesToTemplate(): void
     {
         $this->formFieldViewMock
-            ->expects(self::exactly(3))
+            ->expects($this->exactly(3))
             ->method('assign')
             ->willReturnCallback(
                 static fn(string $name, string $value) => match (true) {
@@ -82,7 +82,7 @@ class CopyableFieldElementTest extends TestCase
 
     public function testRenderCreatesSmallClipboardIcon(): void
     {
-        $this->iconFactoryMock->expects(self::once())
+        $this->iconFactoryMock->expects($this->once())
             ->method('getIcon')
             ->with('actions-edit-copy', IconSize::SMALL);
 
@@ -99,12 +99,12 @@ class CopyableFieldElementTest extends TestCase
 
     public function testRenderInitializesTemplatePathInFormFieldView(): void
     {
-        $this->generalUtilityWrapperMock->expects(self::once())
+        $this->generalUtilityWrapperMock->expects($this->once())
             ->method('getFileAbsFileName')
             ->with(CopyableFieldElement::TEMPLATE_PATH)
             ->willReturn('the template path');
 
-        $this->formFieldViewMock->expects(self::once())
+        $this->formFieldViewMock->expects($this->once())
             ->method('setTemplatePathAndFilename')
             ->with('the template path');
 
@@ -132,7 +132,7 @@ class CopyableFieldElementTest extends TestCase
 
     public function testRenderReturnsRenderedFieldTemplate(): void
     {
-        $this->formFieldViewMock->expects(self::once())
+        $this->formFieldViewMock->expects($this->once())
             ->method('render')
             ->willReturn('The final html');
 

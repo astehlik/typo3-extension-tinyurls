@@ -53,7 +53,7 @@ class TypoLinkTest extends TestCase
 
     public function testApiGetTinyUrlIsCalledWithOriginalUrl(): void
     {
-        $this->tinyUrlGeneratorMock->expects(self::once())
+        $this->tinyUrlGeneratorMock->expects($this->once())
             ->method('generateTinyUrlForSite')
             ->with(
                 self::callback(static fn(TinyUrl $tinyUrl) => $tinyUrl->getTargetUrl() === self::TARGET_URL),
@@ -70,7 +70,7 @@ class TypoLinkTest extends TestCase
 
         $event = $this->getAfterLinkCreatedEvent(tinyUrlConfig: ['the' => 'config']);
 
-        $this->typoScriptConfigurator->expects(self::once())
+        $this->typoScriptConfigurator->expects($this->once())
             ->method('initializeConfigFromTyposcript')
             ->with(
                 self::isInstanceOf(TinyUrl::class),
@@ -83,14 +83,14 @@ class TypoLinkTest extends TestCase
 
     public function testSkipsProcessingForMailtoUrl(): void
     {
-        $this->tinyUrlGeneratorMock->expects(self::never())->method('generateTinyUrlForSite');
+        $this->tinyUrlGeneratorMock->expects($this->never())->method('generateTinyUrlForSite');
 
         $this->typoLinkHook->__invoke($this->getAfterLinkCreatedEvent(LinkService::TYPE_EMAIL));
     }
 
     public function testSkipsProcessingIfDisabled(): void
     {
-        $this->tinyUrlGeneratorMock->expects(self::never())->method('generateTinyUrlForSite');
+        $this->tinyUrlGeneratorMock->expects($this->never())->method('generateTinyUrlForSite');
 
         $this->typoLinkHook->__invoke($this->getAfterLinkCreatedEvent(tinyUrlEnabled: false));
     }

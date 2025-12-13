@@ -81,7 +81,7 @@ class DatabaseRecordListTest extends TestCase
         $this->expectBuildTinyUrlCall();
 
         $queryBuilder = $this->createQueryBuilderMock();
-        $queryBuilder->expects(self::once())
+        $queryBuilder->expects($this->once())
             ->method('addSelectLiteral')
             ->with("CONCAT('https://myurl.tld/goto/', `urlkey`) as urldisplay");
 
@@ -93,7 +93,7 @@ class DatabaseRecordListTest extends TestCase
         $this->expectBuildTinyUrlCall();
 
         $queryBuilder = $this->createQueryBuilderMock();
-        $queryBuilder->expects(self::exactly(2))
+        $queryBuilder->expects($this->exactly(2))
             ->method('addSelectLiteral')
             ->with("CONCAT('https://myurl.tld/goto/', `urlkey`) as urldisplay");
 
@@ -108,7 +108,7 @@ class DatabaseRecordListTest extends TestCase
         $this->expectBuildTinyUrlCall('https://myurl.tld/goto/###urlkey###/suffix');
 
         $queryBuilder = $this->createQueryBuilderMock();
-        $queryBuilder->expects(self::once())
+        $queryBuilder->expects($this->once())
             ->method('addSelectLiteral')
             ->with("CONCAT('https://myurl.tld/goto/', `urlkey`, '/suffix') as urldisplay");
 
@@ -117,7 +117,7 @@ class DatabaseRecordListTest extends TestCase
 
     private function assertQueryDoesNotChange(MockObject|Typo3QueryBuilder $queryBuilder): void
     {
-        $queryBuilder->expects(self::never())->method('addSelectLiteral');
+        $queryBuilder->expects($this->never())->method('addSelectLiteral');
     }
 
     private function callModifyQuery(
@@ -156,7 +156,7 @@ class DatabaseRecordListTest extends TestCase
 
     private function expectBuildTinyUrlCall(string $returnValue = 'https://myurl.tld/goto/###urlkey###'): void
     {
-        $this->urlUtilsMock->expects(self::once())
+        $this->urlUtilsMock->expects($this->once())
             ->method('buildTinyUrlForPid')
             ->with('###urlkey###', 12)
             ->willReturn($returnValue);

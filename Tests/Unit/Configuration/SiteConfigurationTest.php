@@ -39,7 +39,7 @@ class SiteConfigurationTest extends TestCase
     {
         $siteMock = $this->createSiteMock(0);
 
-        $this->siteFinderMock->expects(self::never())
+        $this->siteFinderMock->expects($this->never())
             ->method('getSiteByPageId');
 
         self::assertSame(
@@ -88,7 +88,7 @@ class SiteConfigurationTest extends TestCase
         $pidSiteMock->method('getIdentifier')
             ->willReturn($siteIdentifier);
 
-        $this->siteFinderMock->expects(self::once())
+        $this->siteFinderMock->expects($this->once())
             ->method('getSiteByPageId')
             ->with(123)
             ->willReturn($pidSiteMock);

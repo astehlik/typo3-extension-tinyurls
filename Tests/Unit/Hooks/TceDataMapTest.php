@@ -45,11 +45,11 @@ class TceDataMapTest extends TestCase
         $tinyUrlMock = $this->createMock(TinyUrl::class);
         $tinyUrlMock->method('getTargetUrlHasChanged')->willReturn(false);
 
-        $this->tinyUrlRepositoryMock->expects(self::once())
+        $this->tinyUrlRepositoryMock->expects($this->once())
             ->method('findTinyUrlByUid')
             ->willReturn($tinyUrlMock);
 
-        $this->tinyUrlRepositoryMock->expects(self::never())
+        $this->tinyUrlRepositoryMock->expects($this->never())
             ->method('updateTinyUrl');
 
         $this->tceDataMapHook->processDatamap_afterDatabaseOperations(
@@ -70,11 +70,11 @@ class TceDataMapTest extends TestCase
         $tinyUrlMock->method('getTargetUrlHasChanged')->willReturn(true);
         $tinyUrlMock->method('getTargetUrlHash')->willReturn('the new hash');
 
-        $this->tinyUrlRepositoryMock->expects(self::once())
+        $this->tinyUrlRepositoryMock->expects($this->once())
             ->method('findTinyUrlByUid')
             ->willReturn($tinyUrlMock);
 
-        $this->tinyUrlRepositoryMock->expects(self::once())
+        $this->tinyUrlRepositoryMock->expects($this->once())
             ->method('updateTinyUrl')
             ->with($tinyUrlMock);
 
@@ -97,15 +97,15 @@ class TceDataMapTest extends TestCase
         $tinyUrlMock->method('getTargetUrlHasChanged')->willReturn(true);
         $tinyUrlMock->method('getUrlKey')->willReturn('the new key');
 
-        $this->urlUtilsMock->expects(self::once())
+        $this->urlUtilsMock->expects($this->once())
             ->method('regenerateUrlKey')
             ->with($tinyUrlMock);
 
-        $this->tinyUrlRepositoryMock->expects(self::once())
+        $this->tinyUrlRepositoryMock->expects($this->once())
             ->method('findTinyUrlByUid')
             ->willReturn($tinyUrlMock);
 
-        $this->tinyUrlRepositoryMock->expects(self::once())
+        $this->tinyUrlRepositoryMock->expects($this->once())
             ->method('updateTinyUrl')
             ->with($tinyUrlMock);
 
@@ -129,14 +129,14 @@ class TceDataMapTest extends TestCase
         $tinyUrlMock->method('getTargetUrlHasChanged')->willReturn(true);
         $tinyUrlMock->method('getUrlKey')->willReturn('the key');
 
-        $this->urlUtilsMock->expects(self::once())
+        $this->urlUtilsMock->expects($this->once())
             ->method('regenerateUrlKey');
 
-        $this->tinyUrlRepositoryMock->expects(self::once())
+        $this->tinyUrlRepositoryMock->expects($this->once())
             ->method('findTinyUrlByUid')
             ->willReturn($tinyUrlMock);
 
-        $this->tinyUrlRepositoryMock->expects(self::once())
+        $this->tinyUrlRepositoryMock->expects($this->once())
             ->method('updateTinyUrl')
             ->with($tinyUrlMock);
 
@@ -159,10 +159,10 @@ class TceDataMapTest extends TestCase
     {
         $fieldArray = $fieldArrayOriginal = ['the field' => 'the value'];
 
-        $this->tinyUrlRepositoryMock->expects(self::never())
+        $this->tinyUrlRepositoryMock->expects($this->never())
             ->method('findTinyUrlByUid');
 
-        $this->tinyUrlRepositoryMock->expects(self::never())
+        $this->tinyUrlRepositoryMock->expects($this->never())
             ->method('updateTinyUrl');
 
         $this->tceDataMapHook->processDatamap_afterDatabaseOperations(
@@ -180,11 +180,11 @@ class TceDataMapTest extends TestCase
     {
         $fieldArray = $fieldArrayOriginal = ['the field' => 'the value'];
 
-        $this->tinyUrlRepositoryMock->expects(self::once())
+        $this->tinyUrlRepositoryMock->expects($this->once())
             ->method('findTinyUrlByUid')
             ->willThrowException(new TinyUrlNotFoundException('not found'));
 
-        $this->tinyUrlRepositoryMock->expects(self::never())
+        $this->tinyUrlRepositoryMock->expects($this->never())
             ->method('updateTinyUrl');
 
         $this->tceDataMapHook->processDatamap_afterDatabaseOperations(

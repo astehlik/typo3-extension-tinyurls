@@ -77,11 +77,11 @@ class EidControllerTest extends TestCase
         $tinyUrlMock->method('getDeleteOnUse')->willReturn(true);
         $tinyUrlMock->method('getUrlkey')->willReturn('thekey');
 
-        $this->tinyUrlRepositoryMock->expects(self::once())
+        $this->tinyUrlRepositoryMock->expects($this->once())
             ->method('findTinyUrlByKey')
             ->willReturn($tinyUrlMock);
 
-        $this->tinyUrlRepositoryMock->expects(self::once())
+        $this->tinyUrlRepositoryMock->expects($this->once())
             ->method('deleteTinyUrlByKey')
             ->with('thekey');
 
@@ -95,11 +95,11 @@ class EidControllerTest extends TestCase
         $tinyUrlMock->method('getUid')->willReturn(999);
         $tinyUrlMock->method('getDeleteOnUse')->willReturn(false);
 
-        $this->tinyUrlRepositoryMock->expects(self::once())
+        $this->tinyUrlRepositoryMock->expects($this->once())
             ->method('findTinyUrlByKey')
             ->willReturn($tinyUrlMock);
 
-        $this->tinyUrlRepositoryMock->expects(self::once())
+        $this->tinyUrlRepositoryMock->expects($this->once())
             ->method('countTinyUrlHit')
             ->with($tinyUrlMock);
 
@@ -112,11 +112,11 @@ class EidControllerTest extends TestCase
         $tinyUrlMock = $this->createMock(TinyUrl::class);
         $tinyUrlMock->method('getDeleteOnUse')->willReturn(true);
 
-        $this->tinyUrlRepositoryMock->expects(self::once())
+        $this->tinyUrlRepositoryMock->expects($this->once())
             ->method('findTinyUrlByKey')
             ->willReturn($tinyUrlMock);
 
-        $this->tinyUrlRepositoryMock->expects(self::never())
+        $this->tinyUrlRepositoryMock->expects($this->never())
             ->method('countTinyUrlHit');
 
         $this->processRequest();
@@ -126,7 +126,7 @@ class EidControllerTest extends TestCase
     {
         $this->expectException(NoTinyUrlKeySubmittedException::class);
 
-        $this->tinyUrlRepositoryMock->expects(self::once())
+        $this->tinyUrlRepositoryMock->expects($this->once())
             ->method('purgeInvalidUrls');
 
         $this->processRequest();
@@ -136,7 +136,7 @@ class EidControllerTest extends TestCase
     {
         $_GET['tx_tinyurls']['key'] = 'thekey';
 
-        $this->tinyUrlRepositoryMock->expects(self::once())
+        $this->tinyUrlRepositoryMock->expects($this->once())
             ->method('findTinyUrlByKey')
             ->with('thekey')
             ->willThrowException(new TinyUrlNotFoundException('thekey'));
@@ -144,7 +144,7 @@ class EidControllerTest extends TestCase
         $errorResponse = $this->getMockBuilder(ResponseInterface::class)->getMock();
         $errorResponse->method('getStatusCode')->willReturn(404);
 
-        $this->errorControllerMock->expects(self::once())
+        $this->errorControllerMock->expects($this->once())
             ->method('pageNotFoundAction')
             ->with(
                 self::isInstanceOf(ServerRequestInterface::class),
@@ -163,7 +163,7 @@ class EidControllerTest extends TestCase
         $tinyUrlMock->method('getTargetUrl')->willReturn('http://the-target.url');
         $tinyUrlMock->method('getDeleteOnUse')->willReturn(false);
 
-        $this->tinyUrlRepositoryMock->expects(self::once())
+        $this->tinyUrlRepositoryMock->expects($this->once())
             ->method('findTinyUrlByKey')
             ->willReturn($tinyUrlMock);
 
@@ -182,15 +182,15 @@ class EidControllerTest extends TestCase
         $siteMatchResultMock = $this->createMock(SiteRouteResult::class);
         $siteMatchResultMock->method('getSite')->willReturn($siteMock);
 
-        $this->siteMatcherMock->expects(self::once())
+        $this->siteMatcherMock->expects($this->once())
             ->method('matchRequest')
             ->willReturn($siteMatchResultMock);
 
-        $this->extensionConfigurationMock->expects(self::once())
+        $this->extensionConfigurationMock->expects($this->once())
             ->method('setSite')
             ->with($siteMock);
 
-        $this->extensionConfigurationMock->expects(self::once())
+        $this->extensionConfigurationMock->expects($this->once())
             ->method('reset');
 
         $this->processRequest();
@@ -203,7 +203,7 @@ class EidControllerTest extends TestCase
         $tinyUrlMock = $this->createMock(TinyUrl::class);
         $tinyUrlMock->method('getDeleteOnUse')->willReturn(true);
 
-        $this->tinyUrlRepositoryMock->expects(self::once())
+        $this->tinyUrlRepositoryMock->expects($this->once())
             ->method('findTinyUrlByKey')
             ->willReturn($tinyUrlMock);
 

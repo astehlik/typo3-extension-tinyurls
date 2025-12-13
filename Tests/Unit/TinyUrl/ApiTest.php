@@ -39,7 +39,7 @@ class ApiTest extends TestCase
 
     public function testGetTinyUrlUsesTinyUrlGeneratorForCreatingUrl(): void
     {
-        $this->tinyUrlGeneratorMock->expects(self::once())
+        $this->tinyUrlGeneratorMock->expects($this->once())
             ->method('generateTinyUrl')
             ->willReturn('http://the-tiny.url');
 
@@ -53,7 +53,7 @@ class ApiTest extends TestCase
         /** @var ContentObjectRenderer $contentObjectRendererMock */
         $contentObjectRendererMock = $this->createMock(ContentObjectRenderer::class);
 
-        $this->typoScriptConfiguratorMock->expects(self::once())
+        $this->typoScriptConfiguratorMock->expects($this->once())
             ->method('initializeConfigFromTyposcript')
             ->with($this->tinyUrlApi->getTinyUrlInstance(), $config, $contentObjectRendererMock);
 

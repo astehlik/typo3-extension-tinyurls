@@ -101,7 +101,7 @@ class ExtensionConfigurationTest extends TestCase
         $this->initConfig([ConfigKeys::BASE_URL_FROM_SITE_BASE => 1]);
 
         $siteMock = $this->createMock(Site::class);
-        $siteMock->expects(self::once())
+        $siteMock->expects($this->once())
             ->method('getBase')
             ->willReturn(new Uri('https://base.url.from.site'));
 
@@ -172,7 +172,7 @@ class ExtensionConfigurationTest extends TestCase
 
     private function initConfig(array $array): void
     {
-        $this->typo3ExtensionConfigurationMock->expects(self::once())
+        $this->typo3ExtensionConfigurationMock->expects($this->once())
             ->method('get')
             ->with('tinyurls')
             ->willReturn($array);

@@ -26,7 +26,7 @@ class TinyUrlDisplayTest extends TestCase
     public function testBuildTinyUrlFormFormElementDataBuildTinyUrlUsingUrlKey(): void
     {
         $urlUtilsMock = $this->createMock(UrlUtilsInterface::class);
-        $urlUtilsMock->expects(self::once())
+        $urlUtilsMock->expects($this->once())
             ->method('buildTinyUrlForPid')
             ->with('the tiny urlkey', 12)
             ->willReturn('the generated url');
