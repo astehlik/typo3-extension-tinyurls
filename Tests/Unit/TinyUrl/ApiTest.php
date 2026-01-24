@@ -43,7 +43,7 @@ class ApiTest extends TestCase
             ->method('generateTinyUrl')
             ->willReturn('http://the-tiny.url');
 
-        self::assertSame('http://the-tiny.url', $this->tinyUrlApi->getTinyUrl('http://the-url.tld'));
+        $this->assertSame('http://the-tiny.url', $this->tinyUrlApi->getTinyUrl('http://the-url.tld'));
     }
 
     public function testInitializeConfigFromTypoScriptUsesTypoScriptConfiguratorForSettingConfig(): void
@@ -66,41 +66,41 @@ class ApiTest extends TestCase
 
         $this->tinyUrlApi->reset();
 
-        self::assertNotSame($instance, $this->tinyUrlApi->getTinyUrlInstance());
+        $this->assertNotSame($instance, $this->tinyUrlApi->getTinyUrlInstance());
     }
 
     public function testSetCommentSetsCommentInUrlGenerator(): void
     {
         $this->tinyUrlApi->setComment('the comment');
 
-        self::assertSame('the comment', $this->tinyUrlApi->getTinyUrlInstance()->getComment());
+        $this->assertSame('the comment', $this->tinyUrlApi->getTinyUrlInstance()->getComment());
     }
 
     public function testSetDeleteOnUseSetsDeleteOnUseOptionToFalse(): void
     {
         $this->tinyUrlApi->setDeleteOnUse(false);
 
-        self::assertFalse($this->tinyUrlApi->getTinyUrlInstance()->getDeleteOnUse());
+        $this->assertFalse($this->tinyUrlApi->getTinyUrlInstance()->getDeleteOnUse());
     }
 
     public function testSetDeleteOnUseSetsDeleteOnUseOptionToTrue(): void
     {
         $this->tinyUrlApi->setDeleteOnUse(true);
 
-        self::assertTrue($this->tinyUrlApi->getTinyUrlInstance()->getDeleteOnUse());
+        $this->assertTrue($this->tinyUrlApi->getTinyUrlInstance()->getDeleteOnUse());
     }
 
     public function testSetUrlKeySetsUrlKeyOptionInUrlGenerator(): void
     {
         $this->tinyUrlApi->setUrlKey('the url key');
 
-        self::assertSame('the url key', $this->tinyUrlApi->getTinyUrlInstance()->getCustomUrlKey());
+        $this->assertSame('the url key', $this->tinyUrlApi->getTinyUrlInstance()->getCustomUrlKey());
     }
 
     public function testSetValidUntilSetsValidUntilOptionInUrlGenerator(): void
     {
         $this->tinyUrlApi->setValidUntil(12434);
 
-        self::assertSame(12434, $this->tinyUrlApi->getTinyUrlInstance()->getValidUntil()->getTimestamp());
+        $this->assertSame(12434, $this->tinyUrlApi->getTinyUrlInstance()->getValidUntil()->getTimestamp());
     }
 }

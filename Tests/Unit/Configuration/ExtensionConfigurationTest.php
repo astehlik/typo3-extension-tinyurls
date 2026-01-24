@@ -47,50 +47,50 @@ class ExtensionConfigurationTest extends TestCase
     public function testAppendPidQueryAppendsAndStatementForNonEmptyQuery(): void
     {
         $this->initConfig([ConfigKeys::URL_RECORD_STORAGE_PID => 0]);
-        self::assertSame('a=1 AND pid=0', $this->extensionConfiguration->appendPidQuery('a=1'));
+        $this->assertSame('a=1 AND pid=0', $this->extensionConfiguration->appendPidQuery('a=1'));
     }
 
     public function testAppendPidQueryAppendsConfiguredPid(): void
     {
         $this->initConfig([]);
-        self::assertSame('pid=0', $this->extensionConfiguration->appendPidQuery(''));
+        $this->assertSame('pid=0', $this->extensionConfiguration->appendPidQuery(''));
     }
 
     public function testAppendPidQueryAppendsDefaultPid(): void
     {
         $this->initConfig([ConfigKeys::URL_RECORD_STORAGE_PID => 999]);
-        self::assertSame('pid=999', $this->extensionConfiguration->appendPidQuery(''));
+        $this->assertSame('pid=999', $this->extensionConfiguration->appendPidQuery(''));
     }
 
     public function testAreSpeakingUrlsEnabledReturnsFalseByDefault(): void
     {
         $this->initConfig([]);
-        self::assertFalse($this->extensionConfiguration->areSpeakingUrlsEnabled());
+        $this->assertFalse($this->extensionConfiguration->areSpeakingUrlsEnabled());
     }
 
     public function testAreSpeakingUrlsEnabledReturnsFalseIfConfigured(): void
     {
         $this->initConfig([ConfigKeys::CREATE_SPEAKING_URLS => 0]);
-        self::assertFalse($this->extensionConfiguration->areSpeakingUrlsEnabled());
+        $this->assertFalse($this->extensionConfiguration->areSpeakingUrlsEnabled());
     }
 
     public function testAreSpeakingUrlsEnabledReturnsTrueIfConfigured(): void
     {
         $this->initConfig([ConfigKeys::CREATE_SPEAKING_URLS => 1]);
-        self::assertTrue($this->extensionConfiguration->areSpeakingUrlsEnabled());
+        $this->assertTrue($this->extensionConfiguration->areSpeakingUrlsEnabled());
     }
 
     public function testGetBase62DictionaryReturnsConfiguredValue(): void
     {
         $this->initConfig([ConfigKeys::BASE62_DICTIONARY => 'asfduew']);
-        self::assertSame('asfduew', $this->extensionConfiguration->getBase62Dictionary());
+        $this->assertSame('asfduew', $this->extensionConfiguration->getBase62Dictionary());
     }
 
     public function testGetBase62DictionaryReturnsDefault(): void
     {
         $this->initConfig([]);
 
-        self::assertSame(
+        $this->assertSame(
             'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789',
             $this->extensionConfiguration->getBase62Dictionary(),
         );
@@ -108,7 +108,7 @@ class ExtensionConfigurationTest extends TestCase
         $this->extensionConfiguration->setSite($siteMock);
 
         // @extensionScannerIgnoreLine
-        self::assertSame('https://base.url.from.site', (string)$this->extensionConfiguration->getBaseUrl());
+        $this->assertSame('https://base.url.from.site', (string)$this->extensionConfiguration->getBaseUrl());
     }
 
     public function testGetBaseUrlReturnsNullByDefault(): void
@@ -116,44 +116,44 @@ class ExtensionConfigurationTest extends TestCase
         $this->initConfig([]);
 
         // @extensionScannerIgnoreLine
-        self::assertNull($this->extensionConfiguration->getBaseUrl());
+        $this->assertNull($this->extensionConfiguration->getBaseUrl());
     }
 
     public function testGetMinimalRandomKeyLengthReturnsConfiguredValue(): void
     {
         $this->initConfig([ConfigKeys::MINIMAL_RANDOM_KEY_LENGTH => 56]);
-        self::assertSame(56, $this->extensionConfiguration->getMinimalRandomKeyLength());
+        $this->assertSame(56, $this->extensionConfiguration->getMinimalRandomKeyLength());
     }
 
     public function testGetMinimalRandomKeyLengthReturnsDefault(): void
     {
         $this->initConfig([]);
-        self::assertSame(2, $this->extensionConfiguration->getMinimalRandomKeyLength());
+        $this->assertSame(2, $this->extensionConfiguration->getMinimalRandomKeyLength());
     }
 
     public function testGetMinimalTinyurlKeyLengthReturnsConfiguredValue(): void
     {
         $this->initConfig([ConfigKeys::MINIMAL_TINYURL_KEY_LENGTH => 75]);
-        self::assertSame(75, $this->extensionConfiguration->getMinimalTinyurlKeyLength());
+        $this->assertSame(75, $this->extensionConfiguration->getMinimalTinyurlKeyLength());
     }
 
     public function testGetMinimalTinyurlKeyLengthReturnsDefault(): void
     {
         $this->initConfig([]);
-        self::assertSame(2, $this->extensionConfiguration->getMinimalRandomKeyLength());
+        $this->assertSame(2, $this->extensionConfiguration->getMinimalRandomKeyLength());
     }
 
     public function testGetSpeakingUrlTemplateReturnsConfiguredValue(): void
     {
         $this->initConfig([ConfigKeys::SPEAKING_URL_TEMPLATE => 'koaidp']);
-        self::assertSame('koaidp', $this->extensionConfiguration->getSpeakingUrlTemplate());
+        $this->assertSame('koaidp', $this->extensionConfiguration->getSpeakingUrlTemplate());
     }
 
     public function testGetSpeakingUrlTemplateReturnsDefault(): void
     {
         $this->initConfig([]);
 
-        self::assertSame(
+        $this->assertSame(
             '###TYPO3_SITE_URL###tinyurl/###TINY_URL_KEY###',
             $this->extensionConfiguration->getSpeakingUrlTemplate(),
         );
@@ -167,7 +167,7 @@ class ExtensionConfigurationTest extends TestCase
             ->willReturn([ConfigKeys::BASE_URL => 'https://base.url.from.site']);
 
         // @extensionScannerIgnoreLine
-        self::assertSame('https://base.url.from.site', (string)$this->extensionConfiguration->getBaseUrl());
+        $this->assertSame('https://base.url.from.site', (string)$this->extensionConfiguration->getBaseUrl());
     }
 
     private function initConfig(array $array): void

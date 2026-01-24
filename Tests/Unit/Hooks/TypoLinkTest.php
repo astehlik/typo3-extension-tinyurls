@@ -56,7 +56,7 @@ class TypoLinkTest extends TestCase
         $this->tinyUrlGeneratorMock->expects($this->once())
             ->method('generateTinyUrlForSite')
             ->with(
-                self::callback(static fn(TinyUrl $tinyUrl) => $tinyUrl->getTargetUrl() === self::TARGET_URL),
+                $this->callback(static fn(TinyUrl $tinyUrl) => $tinyUrl->getTargetUrl() === self::TARGET_URL),
                 null,
             )
             ->willReturn('the tiny url');
@@ -73,7 +73,7 @@ class TypoLinkTest extends TestCase
         $this->typoScriptConfigurator->expects($this->once())
             ->method('initializeConfigFromTyposcript')
             ->with(
-                self::isInstanceOf(TinyUrl::class),
+                $this->isInstanceOf(TinyUrl::class),
                 $this->linkInstructions,
                 $this->contentObjectRendererMock,
             );
@@ -102,7 +102,7 @@ class TypoLinkTest extends TestCase
         $event = $this->getAfterLinkCreatedEvent();
         $this->typoLinkHook->__invoke($event);
 
-        self::assertSame('http://the-tiny-url', $event->getLinkResult()->getUrl());
+        $this->assertSame('http://the-tiny-url', $event->getLinkResult()->getUrl());
     }
 
     protected function getAfterLinkCreatedEvent(

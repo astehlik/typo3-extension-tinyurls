@@ -35,6 +35,6 @@ class TinyUrlDisplayTest extends TestCase
 
         $formElementData['databaseRow']['pid'] = '12';
         $formElementData['databaseRow']['urlkey'] = 'the tiny urlkey';
-        self::assertSame('the generated url', $tinyUrlDisplay->buildTinyUrlFormFormElementData($formElementData));
+        $this->assertSame('the generated url', $tinyUrlDisplay->buildTinyUrlFormFormElementData($formElementData));
     }
 }

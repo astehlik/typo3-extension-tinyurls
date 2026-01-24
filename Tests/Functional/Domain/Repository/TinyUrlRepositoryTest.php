@@ -24,11 +24,11 @@ class TinyUrlRepositoryTest extends AbstractFunctionalTestCase
         $this->importCSVDataSet(__DIR__ . '/../../Fixtures/Database/tinyurl.csv');
 
         $tinyUrl = $this->tinyUrlRepository->findTinyUrlByKey('9499fjf');
-        self::assertSame(0, $tinyUrl->getCounter());
+        $this->assertSame(0, $tinyUrl->getCounter());
 
         $tinyUrl = $this->tinyUrlRepository->countTinyUrlHit($tinyUrl);
         $tinyUrl = $this->tinyUrlRepository->countTinyUrlHit($tinyUrl);
 
-        self::assertSame(2, $tinyUrl->getCounter());
+        $this->assertSame(2, $tinyUrl->getCounter());
     }
 }

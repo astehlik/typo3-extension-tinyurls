@@ -133,7 +133,7 @@ class TinyUrlDoctrineRepositoryTest extends TestCase
             ->method('executeQuery')
             ->willReturn($resultMock);
         $tinyUrl = $this->doctrineRepository->findTinyUrlByKey('the key to find');
-        self::assertSame(945, $tinyUrl->getUid());
+        $this->assertSame(945, $tinyUrl->getUid());
     }
 
     public function testFindTinyUrlByKeyThrowsNotFoundExceptionForEmptyResult(): void
@@ -159,7 +159,7 @@ class TinyUrlDoctrineRepositoryTest extends TestCase
             ->method('executeQuery')
             ->willReturn($resultMock);
         $tinyUrl = $this->doctrineRepository->findTinyUrlByTargetUrl('http://the-url-to-find.tld');
-        self::assertSame(945, $tinyUrl->getUid());
+        $this->assertSame(945, $tinyUrl->getUid());
     }
 
     public function testFindTinyUrlByTargetUrlThrowsNotFoundExceptionForEmptyResult(): void
@@ -185,7 +185,7 @@ class TinyUrlDoctrineRepositoryTest extends TestCase
             ->method('executeQuery')
             ->willReturn($resultMock);
         $tinyUrl = $this->doctrineRepository->findTinyUrlByUid(945);
-        self::assertSame(945, $tinyUrl->getUid());
+        $this->assertSame(945, $tinyUrl->getUid());
     }
 
     public function testFindTinyUrlByUidThrowsNotFoundExceptionForEmptyResult(): void
@@ -212,7 +212,7 @@ class TinyUrlDoctrineRepositoryTest extends TestCase
     {
         $this->databaseQueryRestrictionsContainerMock->expects($this->once())
             ->method('add')
-            ->with(self::isInstanceOf(StoragePageQueryRestriction::class));
+            ->with($this->isInstanceOf(StoragePageQueryRestriction::class));
         $this->doctrineRepository->deleteTinyUrlByKey('key');
     }
 
@@ -223,7 +223,7 @@ class TinyUrlDoctrineRepositoryTest extends TestCase
         $this->databaseQueryRestrictionsContainerMock->expects($this->once())
             ->method('add')
             ->with(
-                self::callback(
+                $this->callback(
                     static fn(StoragePageQueryRestriction $queryRestriction) => $queryRestriction->getStoragePageUid() === 389484,
                 ),
             );
@@ -240,7 +240,7 @@ class TinyUrlDoctrineRepositoryTest extends TestCase
         $this->prepareInsertQuery(2323);
 
         $this->doctrineRepository->insertNewTinyUrl($tinyUrl);
-        self::assertSame('customkey', $tinyUrl->getUrlkey());
+        $this->assertSame('customkey', $tinyUrl->getUrlkey());
     }
 
     public function testInsertNewTinyUrlPostProcessesTinyUrl(): void
@@ -252,13 +252,13 @@ class TinyUrlDoctrineRepositoryTest extends TestCase
         $tinyUrl = TinyUrl::createNew();
         $tinyUrl->setCustomUrlKey('custom-key');
         $tinyUrl->setTargetUrl('http://the-target-url.tld');
-        self::assertTrue($tinyUrl->getTargetUrlHasChanged());
+        $this->assertTrue($tinyUrl->getTargetUrlHasChanged());
 
         $this->doctrineRepository->insertNewTinyUrl($tinyUrl);
 
-        self::assertSame($tinyUrlUid, $tinyUrl->getUid());
-        self::assertFalse($tinyUrl->getTargetUrlHasChanged());
-        self::assertFalse($tinyUrl->hasCustomUrlKey());
+        $this->assertSame($tinyUrlUid, $tinyUrl->getUid());
+        $this->assertFalse($tinyUrl->getTargetUrlHasChanged());
+        $this->assertFalse($tinyUrl->hasCustomUrlKey());
     }
 
     public function testInsertNewTinyUrlPreProcessesTinyUrl(): void
@@ -281,7 +281,7 @@ class TinyUrlDoctrineRepositoryTest extends TestCase
         $this->prepareInsertQuery(2323);
 
         $this->doctrineRepository->insertNewTinyUrl($tinyUrl);
-        self::assertSame('the-generated-key', $tinyUrl->getUrlkey());
+        $this->assertSame('the-generated-key', $tinyUrl->getUrlkey());
     }
 
     public function testInsertNewTinyUrlSetsStoragePid(): void
@@ -293,7 +293,7 @@ class TinyUrlDoctrineRepositoryTest extends TestCase
         $tinyUrl = TinyUrl::createNew();
         $this->doctrineRepository->insertNewTinyUrl($tinyUrl);
 
-        self::assertSame(58923, $tinyUrl->getPid());
+        $this->assertSame(58923, $tinyUrl->getPid());
     }
 
     public function testInsertNewTinyUrlThrowsValidationExceptionForInvalidData(): void
@@ -319,7 +319,7 @@ class TinyUrlDoctrineRepositoryTest extends TestCase
             ->method('update')
             ->with(
                 TinyUrlRepository::TABLE_URLS,
-                self::callback(
+                $this->callback(
                     static fn(array $databaseRow) => $databaseRow['urlkey'] === 'the-generated-key',
                 ),
             );
@@ -334,7 +334,7 @@ class TinyUrlDoctrineRepositoryTest extends TestCase
         $this->prepareInsertQuery(4894949);
 
         $this->doctrineRepository->insertNewTinyUrl($tinyUrl);
-        self::assertSame(4894949, $tinyUrl->getUid());
+        $this->assertSame(4894949, $tinyUrl->getUid());
     }
 
     public function testPurgeInvalidUrlsExecutesDeleteQuery(): void
@@ -365,7 +365,7 @@ class TinyUrlDoctrineRepositoryTest extends TestCase
             ->method('update')
             ->with(
                 TinyUrlRepository::TABLE_URLS,
-                self::callback(static fn(array $databaseRow) => array_diff_assoc($tinyUrlData, $databaseRow) === []),
+                $this->callback(static fn(array $databaseRow) => array_diff_assoc($tinyUrlData, $databaseRow) === []),
                 ['uid' => 945],
             );
 
@@ -379,13 +379,13 @@ class TinyUrlDoctrineRepositoryTest extends TestCase
         $tinyUrl->setTargetUrl('http://the-target-url.tld');
         $tinyUrl->setCustomUrlKey('the-custom-key');
 
-        self::assertTrue($tinyUrl->getTargetUrlHasChanged());
-        self::assertTrue($tinyUrl->hasCustomUrlKey());
+        $this->assertTrue($tinyUrl->getTargetUrlHasChanged());
+        $this->assertTrue($tinyUrl->hasCustomUrlKey());
 
         $this->doctrineRepository->updateTinyUrl($tinyUrl);
 
-        self::assertFalse($tinyUrl->getTargetUrlHasChanged());
-        self::assertFalse($tinyUrl->hasCustomUrlKey());
+        $this->assertFalse($tinyUrl->getTargetUrlHasChanged());
+        $this->assertFalse($tinyUrl->hasCustomUrlKey());
     }
 
     public function testUpdateTinyUrlPreProcessesTinyUrl(): void
@@ -399,8 +399,8 @@ class TinyUrlDoctrineRepositoryTest extends TestCase
 
         $this->doctrineRepository->updateTinyUrl($tinyUrl);
 
-        self::assertSame('custom-key', $tinyUrl->getUrlkey());
-        self::assertNotSame($tstampOriginal, $tinyUrl->getTstamp());
+        $this->assertSame('custom-key', $tinyUrl->getUrlkey());
+        $this->assertNotSame($tstampOriginal, $tinyUrl->getTstamp());
     }
 
     public function testUpdateTinyUrlThrowsExceptionForNewTinyUrl(): void

@@ -39,21 +39,21 @@ class ApiTest extends AbstractFunctionalTestCase
     {
         $this->tinyUrlsApi->getTinyUrl('http://mydomain.tld');
         $tinyUrlRow = $this->getTinyUrlRow();
-        self::assertEmpty($tinyUrlRow['delete_on_use']);
+        $this->assertEmpty($tinyUrlRow['delete_on_use']);
     }
 
     public function testApiDoesNotSetValidationDateByDefault(): void
     {
         $this->tinyUrlsApi->getTinyUrl('http://mydomain.tld');
         $tinyUrlRow = $this->getTinyUrlRow();
-        self::assertEmpty($tinyUrlRow['valid_until']);
+        $this->assertEmpty($tinyUrlRow['valid_until']);
     }
 
     public function testApiRespectsCustomUrlKey(): void
     {
         $this->tinyUrlsApi->setUrlKey('mydomain');
         $tinyUrl = $this->tinyUrlsApi->getTinyUrl('http://mydomain.tld');
-        self::assertMatchesRegularExpression(
+        $this->assertMatchesRegularExpression(
             '/http:\\/\\/.+\\/\\?eID=tx_tinyurls&tx_tinyurls\\[key\\]=mydomain/',
             $tinyUrl,
         );
@@ -64,7 +64,7 @@ class ApiTest extends AbstractFunctionalTestCase
         $this->tinyUrlsApi->setComment('My test comment');
         $this->tinyUrlsApi->getTinyUrl('http://mydomain.tld');
         $tinyUrlRow = $this->getTinyUrlRow();
-        self::assertSame('My test comment', $tinyUrlRow['comment']);
+        $this->assertSame('My test comment', $tinyUrlRow['comment']);
     }
 
     public function testApiSetsDeleteOnUseIfConfiguredInTypoScript(): void
@@ -76,7 +76,7 @@ class ApiTest extends AbstractFunctionalTestCase
         $this->tinyUrlsApi->initializeConfigFromTyposcript($typoScript, $contentObject);
         $this->tinyUrlsApi->getTinyUrl('http://mydomain.tld');
         $tinyUrlRow = $this->getTinyUrlRow();
-        self::assertNotEmpty($tinyUrlRow['delete_on_use']);
+        $this->assertNotEmpty($tinyUrlRow['delete_on_use']);
     }
 
     public function testApiSetsDeleteOnUseIfRequested(): void
@@ -84,7 +84,7 @@ class ApiTest extends AbstractFunctionalTestCase
         $this->tinyUrlsApi->setDeleteOnUse(true);
         $this->tinyUrlsApi->getTinyUrl('http://mydomain.tld');
         $tinyUrlRow = $this->getTinyUrlRow();
-        self::assertNotEmpty($tinyUrlRow['delete_on_use']);
+        $this->assertNotEmpty($tinyUrlRow['delete_on_use']);
     }
 
     public function testApiSetsValidationDateIfRequested(): void
@@ -93,7 +93,7 @@ class ApiTest extends AbstractFunctionalTestCase
         $this->tinyUrlsApi->setValidUntil($validUntilTimestamp);
         $this->tinyUrlsApi->getTinyUrl('http://mydomain.tld');
         $tinyUrlRow = $this->getTinyUrlRow();
-        self::assertSame($validUntilTimestamp, (int)$tinyUrlRow['valid_until']);
+        $this->assertSame($validUntilTimestamp, (int)$tinyUrlRow['valid_until']);
     }
 
     public function testApiSetsValidUntilIfConfiguredInTypoScript(): void
@@ -106,6 +106,6 @@ class ApiTest extends AbstractFunctionalTestCase
         $this->tinyUrlsApi->initializeConfigFromTyposcript($typoScript, $contentObject);
         $this->tinyUrlsApi->getTinyUrl('http://mydomain.tld');
         $tinyUrlRow = $this->getTinyUrlRow();
-        self::assertSame($validUntilTimestamp, (int)$tinyUrlRow['valid_until']);
+        $this->assertSame($validUntilTimestamp, (int)$tinyUrlRow['valid_until']);
     }
 }

@@ -36,7 +36,7 @@ class StoragePageQueryRestrictionTest extends TestCase
     protected function setUp(): void
     {
         if (!interface_exists('TYPO3\\CMS\\Core\\Database\\Query\\Restriction\\QueryRestrictionInterface')) {
-            self::markTestSkipped('The new Doctrine DBAL QueryRestrictionInterface does not exist.');
+            $this->markTestSkipped('The new Doctrine DBAL QueryRestrictionInterface does not exist.');
         }
         $this->expressionBuilderMock = $this->createMock(ExpressionBuilder::class);
         $this->storagePageQueryRestriction = new StoragePageQueryRestriction(38);
@@ -51,7 +51,7 @@ class StoragePageQueryRestrictionTest extends TestCase
             ['the_table' => 'the_alias'],
             $this->expressionBuilderMock,
         );
-        self::assertSame(0, $expression->count());
+        $this->assertSame(0, $expression->count());
     }
 
     public function testBuildExpressionReturnsStoragePageContraintForTinyUrlTable(): void
@@ -74,7 +74,7 @@ class StoragePageQueryRestrictionTest extends TestCase
             $this->expressionBuilderMock,
         );
 
-        self::assertSame($andContraintMock, $expression);
+        $this->assertSame($andContraintMock, $expression);
     }
 
     public function testBuildExpressionUsesTableNameIfAliasIsEmpty(): void

@@ -27,7 +27,7 @@ class TinyUrlValidationExceptionTest extends TestCase
         $result->forProperty('targetUrl')->addError(new Error('The URL is invalid', 123));
         $validationException = new TinyUrlValidationException();
         $validationException->setValidationResult($result);
-        self::assertSame('The given tiny URL data is invalid: The URL is invalid', $validationException->getMessage());
+        $this->assertSame('The given tiny URL data is invalid: The URL is invalid', $validationException->getMessage());
     }
 
     public function testSetResultSetsResult(): void
@@ -35,6 +35,6 @@ class TinyUrlValidationExceptionTest extends TestCase
         $result = new Result();
         $validationException = new TinyUrlValidationException();
         $validationException->setValidationResult($result);
-        self::assertSame($result, $validationException->getResult());
+        $this->assertSame($result, $validationException->getResult());
     }
 }

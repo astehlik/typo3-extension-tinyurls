@@ -40,6 +40,6 @@ class TinyUrlGeneratorTest extends AbstractFunctionalTestCase
     {
         $this->tinyUrlGenerator->generateTinyUrl(TinyUrl::createForUrl('http://mydomain.tld'));
         $tinyUrlRow = $this->getTinyUrlRow();
-        self::assertGreaterThanOrEqual($GLOBALS['EXEC_TIME'], $tinyUrlRow['tstamp']);
+        $this->assertGreaterThanOrEqual($GLOBALS['EXEC_TIME'], $tinyUrlRow['tstamp']);
     }
 }

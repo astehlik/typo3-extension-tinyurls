@@ -63,7 +63,7 @@ class TinyUrlGeneratorTest extends TestCase
             ->willReturn('http://the-tiny.url');
 
         $generatedUrl = $this->tinyUrlGenerator->generateTinyUrl(TinyUrl::createForUrl('http://the-target.url'));
-        self::assertSame('http://the-tiny.url', $generatedUrl);
+        $this->assertSame('http://the-tiny.url', $generatedUrl);
     }
 
     public function testGetTinyUrlBuildsUrlForNonExistingUrl(): void
@@ -95,11 +95,11 @@ class TinyUrlGeneratorTest extends TestCase
             ->willReturn('http://the-tiny.url');
 
         $generatedUrl = $this->tinyUrlGenerator->generateTinyUrl($tinyUrl);
-        self::assertSame('http://the-tiny.url', $generatedUrl);
+        $this->assertSame('http://the-tiny.url', $generatedUrl);
     }
 
     public function testGetTinyUrlReturnsEmptyStringForEmptyTargetUrl(): void
     {
-        self::assertSame('', $this->tinyUrlGenerator->generateTinyUrl(TinyUrl::createNew()));
+        $this->assertSame('', $this->tinyUrlGenerator->generateTinyUrl(TinyUrl::createNew()));
     }
 }

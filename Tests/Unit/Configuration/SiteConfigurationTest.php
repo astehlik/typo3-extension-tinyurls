@@ -42,7 +42,7 @@ class SiteConfigurationTest extends TestCase
         $this->siteFinderMock->expects($this->never())
             ->method('getSiteByPageId');
 
-        self::assertSame(
+        $this->assertSame(
             [ConfigKeys::URL_RECORD_STORAGE_PID => 0],
             $this->siteConfiguration->loadSiteConfiguration($siteMock),
         );
@@ -54,7 +54,7 @@ class SiteConfigurationTest extends TestCase
 
         $this->initializeSiteFinderMock('site-identifier');
 
-        self::assertSame(
+        $this->assertSame(
             [ConfigKeys::URL_RECORD_STORAGE_PID => 123],
             $this->siteConfiguration->loadSiteConfiguration($siteMock),
         );

@@ -29,6 +29,6 @@ class UrlUtilsTest extends AbstractFunctionalTestCase
         $_SERVER['REMOTE_ADDR'] = '127.0.0.1';
         $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['tinyurls'][ConfigKeys::SPEAKING_URL_TEMPLATE] = '###REMOTE_ADDR###';
         $urlUtils = GeneralUtility::makeInstance(UrlUtils::class);
-        self::assertSame('127.0.0.1', $urlUtils->createSpeakingTinyUrl('test'));
+        $this->assertSame('127.0.0.1', $urlUtils->createSpeakingTinyUrl('test'));
     }
 }

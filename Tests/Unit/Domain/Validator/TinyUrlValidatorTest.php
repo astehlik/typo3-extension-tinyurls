@@ -38,7 +38,7 @@ class TinyUrlValidatorTest extends TestCase
     public function testGetOptionsReturnsEmptyArray(): void
     {
         // @extensionScannerIgnoreLine
-        self::assertSame([], $this->tinyUrlValidator->getOptions());
+        $this->assertSame([], $this->tinyUrlValidator->getOptions());
     }
 
     public function testValidateReturnsErrorIdValidUntilIsInThePast(): void
@@ -46,7 +46,7 @@ class TinyUrlValidatorTest extends TestCase
         $tinyUrl = TinyUrl::createNew();
         $tinyUrl->setValidUntil(new DateTime('2000-08-10'));
         $result = $this->tinyUrlValidator->validate($tinyUrl);
-        self::assertSame(1488307858, $result->forProperty('validUntil')->getFirstError()->getCode());
+        $this->assertSame(1488307858, $result->forProperty('validUntil')->getFirstError()->getCode());
     }
 
     public function testValidateReturnsErrorIfCustomUrlKeyExists(): void
@@ -59,7 +59,7 @@ class TinyUrlValidatorTest extends TestCase
             ->with('the custom key')
             ->willReturn($existingTinyUrl);
         $result = $this->tinyUrlValidator->validate($tinyUrl);
-        self::assertSame(1488317930, $result->forProperty('customUrlKey')->getFirstError()->getCode());
+        $this->assertSame(1488317930, $result->forProperty('customUrlKey')->getFirstError()->getCode());
     }
 
     public function testValidateReturnsNoErrorIdValidUntilIsInTheFuture(): void
@@ -69,7 +69,7 @@ class TinyUrlValidatorTest extends TestCase
         $tinyUrl = TinyUrl::createNew();
         $tinyUrl->setValidUntil($tomorrow);
         $result = $this->tinyUrlValidator->validate($tinyUrl);
-        self::assertEmpty($result->forProperty('validUntil')->getFlattenedErrors());
+        $this->assertEmpty($result->forProperty('validUntil')->getFlattenedErrors());
     }
 
     public function testValidateReturnsNoErrorIfCustomUrlKeyDoesNotExist(): void
@@ -81,7 +81,7 @@ class TinyUrlValidatorTest extends TestCase
             ->with('the custom key')
             ->willThrowException(new TinyUrlNotFoundException());
         $result = $this->tinyUrlValidator->validate($tinyUrl);
-        self::assertEmpty($result->forProperty('customUrlKey')->getFlattenedErrors());
+        $this->assertEmpty($result->forProperty('customUrlKey')->getFlattenedErrors());
     }
 
     public function testValidateReturnsNoErrorIfCustomUrlKeyExistsAndBelongsToSameUrl(): void
@@ -96,6 +96,6 @@ class TinyUrlValidatorTest extends TestCase
             ->with('the custom key')
             ->willReturn($existingTinyUrl);
         $result = $this->tinyUrlValidator->validate($tinyUrl);
-        self::assertEmpty($result->forProperty('customUrlKey')->getFlattenedErrors());
+        $this->assertEmpty($result->forProperty('customUrlKey')->getFlattenedErrors());
     }
 }

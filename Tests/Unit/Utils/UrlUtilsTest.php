@@ -69,7 +69,7 @@ class UrlUtilsTest extends TestCase
             ->method('areSpeakingUrlsEnabled')
             ->willReturn(false);
 
-        self::assertSame(
+        $this->assertSame(
             'http://the-site.url/?eID=tx_tinyurls&tx_tinyurls[key]=thekey',
             $this->urlUtils->buildTinyUrl('thekey'),
         );
@@ -85,7 +85,7 @@ class UrlUtilsTest extends TestCase
             ->method('areSpeakingUrlsEnabled')
             ->willReturn(true);
 
-        self::assertSame('http://base.url/thekey', $this->urlUtils->buildTinyUrl('thekey'));
+        $this->assertSame('http://base.url/thekey', $this->urlUtils->buildTinyUrl('thekey'));
     }
 
     public function testBuildTinyUrlForPidSetsAndResetsSiteInExtensionConfiguration(): void
@@ -133,7 +133,7 @@ class UrlUtilsTest extends TestCase
             ->method('getIndpEnv')
             ->willReturn('replacedvalue');
         $speakingUrl = $this->urlUtils->createSpeakingTinyUrl('testkey');
-        self::assertSame('replacedvalue', $speakingUrl);
+        $this->assertSame('replacedvalue', $speakingUrl);
     }
 
     public function testCreateSpeakingTinyUrlReplacesMultipleIndependentEnvironmentMarkers(): void
@@ -145,7 +145,7 @@ class UrlUtilsTest extends TestCase
             ->method('getIndpEnv')
             ->willReturnOnConsecutiveCalls('myenvvalue1', 'myenvvalue2');
         $speakingUrl = $this->urlUtils->createSpeakingTinyUrl('testkey');
-        self::assertSame('myenvvalue1/myenvvalue2', $speakingUrl);
+        $this->assertSame('myenvvalue1/myenvvalue2', $speakingUrl);
     }
 
     public function testCreateSpeakingTinyUrlReplacesTinyUrlMarker(): void
@@ -154,7 +154,7 @@ class UrlUtilsTest extends TestCase
             ->method('getSpeakingUrlTemplate')
             ->willReturn('###TINY_URL_KEY###');
         $speakingUrl = $this->urlUtils->createSpeakingTinyUrl('testkey');
-        self::assertSame('testkey', $speakingUrl);
+        $this->assertSame('testkey', $speakingUrl);
     }
 
     public function testCreateSpeakingTinyUrlUsesBaseUrlForSiteUrlPlaceholder(): void
@@ -171,13 +171,13 @@ class UrlUtilsTest extends TestCase
             ->method('getBaseUrl')
             ->willReturn(new Uri('http://base.url.from.config'));
 
-        self::assertSame('http://base.url.from.config/thekey', $this->urlUtils->buildTinyUrl('thekey'));
+        $this->assertSame('http://base.url.from.config/thekey', $this->urlUtils->buildTinyUrl('thekey'));
     }
 
     public function testGenerateTinyurlHashCreatesHash(): void
     {
         /** @noinspection PhpDeprecationInspection */
-        self::assertSame(
+        $this->assertSame(
             'ee85c8ee5b024efa864c06a98ed613286d134aad',
             $this->urlUtils->generateTinyurlHash('http://the-url.tld'),
         );
@@ -191,7 +191,7 @@ class UrlUtilsTest extends TestCase
             ->willReturn('thekey');
 
         /** @noinspection PhpDeprecationInspection */
-        self::assertSame('thekey', $this->urlUtils->generateTinyurlKeyForUid(132));
+        $this->assertSame('thekey', $this->urlUtils->generateTinyurlKeyForUid(132));
     }
 
     public function testRegenerateUrlKeyUpdatesKey(): void
@@ -206,6 +206,6 @@ class UrlUtilsTest extends TestCase
         $this->urlUtils->regenerateUrlKey($tinyUrl);
 
         /** @noinspection PhpDeprecationInspection */
-        self::assertSame('thekey', $tinyUrl->getUrlkey());
+        $this->assertSame('thekey', $tinyUrl->getUrlkey());
     }
 }

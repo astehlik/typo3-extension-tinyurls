@@ -92,9 +92,9 @@ class CopyableFieldElementTest extends TestCase
     public function testRenderInitializesResultArray(): void
     {
         // Test for some common array keys. This way we do not need to mock the test subject.
-        self::assertArrayHasKey('additionalInlineLanguageLabelFiles', $this->copyableFieldElement->render());
-        self::assertArrayHasKey('javaScriptModules', $this->copyableFieldElement->render());
-        self::assertArrayHasKey('inlineData', $this->copyableFieldElement->render());
+        $this->assertArrayHasKey('additionalInlineLanguageLabelFiles', $this->copyableFieldElement->render());
+        $this->assertArrayHasKey('javaScriptModules', $this->copyableFieldElement->render());
+        $this->assertArrayHasKey('inlineData', $this->copyableFieldElement->render());
     }
 
     public function testRenderInitializesTemplatePathInFormFieldView(): void
@@ -113,7 +113,7 @@ class CopyableFieldElementTest extends TestCase
 
     public function testRenderLoadsAdditionalLanguageLabels(): void
     {
-        self::assertSame(
+        $this->assertSame(
             ['EXT:tinyurls/Resources/Private/Language/locallang_db_js.xlf'],
             $this->copyableFieldElement->render()['additionalInlineLanguageLabelFiles'],
         );
@@ -121,13 +121,13 @@ class CopyableFieldElementTest extends TestCase
 
     public function testRenderLoadsCopyToClipboardJsModule(): void
     {
-        self::assertCount(1, $this->copyableFieldElement->render()['javaScriptModules']);
+        $this->assertCount(1, $this->copyableFieldElement->render()['javaScriptModules']);
 
         $instruction = $this->copyableFieldElement->render()['javaScriptModules'][0];
 
-        self::assertInstanceOf(JavaScriptModuleInstruction::class, $instruction);
+        $this->assertInstanceOf(JavaScriptModuleInstruction::class, $instruction);
 
-        self::assertSame('@de-swebhosting/tinyurls/copy-to-clipboard.js', $instruction->getName());
+        $this->assertSame('@de-swebhosting/tinyurls/copy-to-clipboard.js', $instruction->getName());
     }
 
     public function testRenderReturnsRenderedFieldTemplate(): void
@@ -137,7 +137,7 @@ class CopyableFieldElementTest extends TestCase
             ->willReturn('The final html');
 
         $result = $this->copyableFieldElement->render();
-        self::assertSame('The final html', $result['html']);
+        $this->assertSame('The final html', $result['html']);
     }
 
     protected function createCopyableFieldElement(array $data): void

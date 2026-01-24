@@ -24,15 +24,15 @@ class EidControllerTest extends AbstractFunctionalTestCase
         $this->getTinyUrlGenerator()->generateTinyUrl($tinyUrl);
 
         $tinyUrl = $this->getTinyUrlRepository()->findTinyUrlByTargetUrl($targetUrl);
-        self::assertSame(0, $tinyUrl->getPid());
+        $this->assertSame(0, $tinyUrl->getPid());
 
         $request = (new InternalRequest())->withQueryParameter('eID', 'tx_tinyurls')
             ->withQueryParameter('tx_tinyurls[key]', 'b-1234567');
 
         $response = $this->executeFrontendSubRequest($request);
 
-        self::assertSame(301, $response->getStatusCode());
-        self::assertSame('https://www.example.com', $response->getHeaderLine('Location'));
+        $this->assertSame(301, $response->getStatusCode());
+        $this->assertSame('https://www.example.com', $response->getHeaderLine('Location'));
     }
 
     public function testEidControllerUsesSiteConfiguration(): void
@@ -51,7 +51,7 @@ class EidControllerTest extends AbstractFunctionalTestCase
         $tinyUrl = $this->getTinyUrlRepository()->findTinyUrlByTargetUrl($targetUrl);
         $this->getExtensionConfiguration()->reset();
 
-        self::assertSame(1, $tinyUrl->getPid());
+        $this->assertSame(1, $tinyUrl->getPid());
 
         $request = (new InternalRequest())
             ->withQueryParameter('eID', 'tx_tinyurls')
@@ -59,8 +59,8 @@ class EidControllerTest extends AbstractFunctionalTestCase
 
         $response = $this->executeFrontendSubRequest($request);
 
-        self::assertSame(301, $response->getStatusCode());
-        self::assertSame('https://www.example.com', $response->getHeaderLine('Location'));
+        $this->assertSame(301, $response->getStatusCode());
+        $this->assertSame('https://www.example.com', $response->getHeaderLine('Location'));
     }
 
     private function getExtensionConfiguration(): ExtensionConfiguration

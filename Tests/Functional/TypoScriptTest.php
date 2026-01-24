@@ -44,7 +44,7 @@ class TypoScriptTest extends AbstractFunctionalTestCase
         $request = (new InternalRequest())->withPageId(1);
         $response = $this->executeFrontendSubRequest($request);
         $urlPrefix = 'https://my-custom-base.tld/?eID=tx_tinyurls&amp;tx_tinyurls[key]=b-';
-        self::assertMatchesRegularExpression(
+        $this->assertMatchesRegularExpression(
             '/' . preg_quote($urlPrefix, '/') . '[a-zA-Z0-9]{7}/',
             (string)$response->getBody(),
         );

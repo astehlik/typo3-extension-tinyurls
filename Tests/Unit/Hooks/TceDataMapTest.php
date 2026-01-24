@@ -60,7 +60,7 @@ class TceDataMapTest extends TestCase
             $this->getDataHandlerMock(),
         );
 
-        self::assertSame($fieldArrayOriginal, $fieldArray);
+        $this->assertSame($fieldArrayOriginal, $fieldArray);
     }
 
     public function testGeneratesHashForChangedUrl(): void
@@ -86,7 +86,7 @@ class TceDataMapTest extends TestCase
             $this->getDataHandlerMock(),
         );
 
-        self::assertSame('the new hash', $fieldArray['target_url_hash']);
+        $this->assertSame('the new hash', $fieldArray['target_url_hash']);
     }
 
     public function testGeneratesKeyForChangedUrl(): void
@@ -117,7 +117,7 @@ class TceDataMapTest extends TestCase
             $this->getDataHandlerMock(),
         );
 
-        self::assertSame('the new key', $fieldArray['urlkey']);
+        $this->assertSame('the new key', $fieldArray['urlkey']);
     }
 
     public function testGeneratesKeyForNewRecord(): void
@@ -151,8 +151,8 @@ class TceDataMapTest extends TestCase
             $dataHandlerMock,
         );
 
-        self::assertSame('the hash', $fieldArray['target_url_hash']);
-        self::assertSame('the key', $fieldArray['urlkey']);
+        $this->assertSame('the hash', $fieldArray['target_url_hash']);
+        $this->assertSame('the key', $fieldArray['urlkey']);
     }
 
     public function testSkippsProcessingForNonTinyUrlTable(): void
@@ -173,7 +173,7 @@ class TceDataMapTest extends TestCase
             $this->getDataHandlerMock(),
         );
 
-        self::assertSame($fieldArrayOriginal, $fieldArray);
+        $this->assertSame($fieldArrayOriginal, $fieldArray);
     }
 
     public function testSkipsProcessingIfTinyUrlIsNotFoundInDatabase(): void
@@ -195,7 +195,7 @@ class TceDataMapTest extends TestCase
             $this->getDataHandlerMock(),
         );
 
-        self::assertSame($fieldArrayOriginal, $fieldArray);
+        $this->assertSame($fieldArrayOriginal, $fieldArray);
     }
 
     private function getDataHandlerMock(): DataHandler|MockObject

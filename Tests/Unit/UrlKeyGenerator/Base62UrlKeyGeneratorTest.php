@@ -51,7 +51,7 @@ class Base62UrlKeyGeneratorTest extends TestCase
         $tinyUrl = TinyUrl::createNew();
         $tinyUrl->persistPostProcessInsert(1243);
         $key = $this->base62UrlKeyGenerator->generateTinyurlKeyForTinyUrl($tinyUrl);
-        self::assertSame('ud', $key);
+        $this->assertSame('ud', $key);
     }
 
     public function testGenerateTinyurlKeyForUidEncodesIntegerIfNoMinimalLengthIsConfigured(): void
@@ -62,7 +62,7 @@ class Base62UrlKeyGeneratorTest extends TestCase
         $tinyUrl = TinyUrl::createNew();
         $tinyUrl->persistPostProcessInsert(1243);
         $key = $this->base62UrlKeyGenerator->generateTinyurlKeyForUid(1243);
-        self::assertSame('ud', $key);
+        $this->assertSame('ud', $key);
     }
 
     public function testGenerateTinyurlKeyForUidFillsUpKeyUpToConfiguredMinimalLength(): void
@@ -78,7 +78,7 @@ class Base62UrlKeyGeneratorTest extends TestCase
             ->willReturn('ag');
 
         $key = $this->base62UrlKeyGenerator->generateTinyurlKeyForUid(1243);
-        self::assertSame('ud-ag', $key);
+        $this->assertSame('ud-ag', $key);
     }
 
     public function testGenerateTinyurlKeyForUidFillsUpKeyWithConfiguredMinimalRandomPart(): void
@@ -97,7 +97,7 @@ class Base62UrlKeyGeneratorTest extends TestCase
             ->willReturn('ag');
 
         $key = $this->base62UrlKeyGenerator->generateTinyurlKeyForUid(1243);
-        self::assertSame('ud-ag', $key);
+        $this->assertSame('ud-ag', $key);
     }
 
     public function testGenerateTinyurlKeyForUidWorksWithShorterDictionary(): void
@@ -108,6 +108,6 @@ class Base62UrlKeyGeneratorTest extends TestCase
         $tinyUrl = TinyUrl::createNew();
         $tinyUrl->persistPostProcessInsert(1243);
         $key = $this->base62UrlKeyGenerator->generateTinyurlKeyForUid(1243);
-        self::assertSame('baäbcä', $key);
+        $this->assertSame('baäbcä', $key);
     }
 }

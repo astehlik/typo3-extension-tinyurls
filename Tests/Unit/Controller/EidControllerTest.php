@@ -147,12 +147,12 @@ class EidControllerTest extends TestCase
         $this->errorControllerMock->expects($this->once())
             ->method('pageNotFoundAction')
             ->with(
-                self::isInstanceOf(ServerRequestInterface::class),
+                $this->isInstanceOf(ServerRequestInterface::class),
                 'The tinyurl with the key thekey was not found.',
             )
             ->willReturn($errorResponse);
 
-        self::assertSame($errorResponse, $this->processRequest(404));
+        $this->assertSame($errorResponse, $this->processRequest(404));
     }
 
     public function testRedirectsToTargetUrl(): void
@@ -168,9 +168,9 @@ class EidControllerTest extends TestCase
             ->willReturn($tinyUrlMock);
 
         $response = $this->processRequest();
-        self::assertSame(301, $response->getStatusCode());
-        self::assertSame('Moved Permanently', $response->getReasonPhrase());
-        self::assertSame('http://the-target.url', $response->getHeaderLine('Location'));
+        $this->assertSame(301, $response->getStatusCode());
+        $this->assertSame('Moved Permanently', $response->getReasonPhrase());
+        $this->assertSame('http://the-target.url', $response->getHeaderLine('Location'));
     }
 
     public function testSiteIsSetAndResetInExtensionConfiguration(): void
@@ -213,7 +213,7 @@ class EidControllerTest extends TestCase
             $expectedValue = gmdate('D, d M Y H:i:s', $GLOBALS['EXEC_TIME']) . ' GMT';
         }
 
-        self::assertSame($expectedValue, $response->getHeaderLine($headerName));
+        $this->assertSame($expectedValue, $response->getHeaderLine($headerName));
     }
 
     public static function provideTinyUrlRedirectSendsNoCacheHeadersCases(): iterable
@@ -243,7 +243,7 @@ class EidControllerTest extends TestCase
         $request = new ServerRequest();
         $request = $request->withQueryParams($_GET);
         $response =  $this->eidController->tinyUrlRedirect($request);
-        self::assertSame($expectedStatus, $response->getStatusCode());
+        $this->assertSame($expectedStatus, $response->getStatusCode());
         return $response;
     }
 }
