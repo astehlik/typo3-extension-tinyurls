@@ -15,7 +15,7 @@
     },
     "require-dev": {
         "de-swebhosting/typo3-extension-buildtools": "dev-TYPO3_13",
-        "phpunit/phpunit": "^11.5.33"
+        "phpunit/phpunit": "^11.5.50"
     },
     "autoload": {
         "psr-4": {
