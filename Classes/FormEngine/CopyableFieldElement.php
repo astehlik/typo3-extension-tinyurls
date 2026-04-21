@@ -22,7 +22,9 @@ use TYPO3\CMS\Core\Imaging\IconSize;
 use TYPO3\CMS\Core\Localization\LanguageService;
 use TYPO3\CMS\Core\Page\JavaScriptModuleInstruction;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Fluid\View\StandaloneView;
+use TYPO3\CMS\Core\View\ViewFactoryData;
+use TYPO3\CMS\Core\View\ViewFactoryInterface;
+use TYPO3\CMS\Core\View\ViewInterface;
 
 /**
  * A custom TCA field type that renders a read only field of which the value
@@ -34,11 +36,11 @@ class CopyableFieldElement extends AbstractNode implements NodeInterface
 
     private const LLL_DB_PREFIX = 'LLL:EXT:tinyurls/Resources/Private/Language/locallang_db.xlf:tx_tinyurls_urls.';
 
-    protected ?StandaloneView $formFieldView = null;
-
     protected ?GeneralUtilityWrapper $generalUtility = null;
 
     protected ?IconFactory $iconFactory = null;
+
+    protected ViewFactoryInterface $viewFactory;
 
     public function injectGeneralUtilityWrapper(GeneralUtilityWrapper $generalUtility): void
     {
@@ -48,6 +50,11 @@ class CopyableFieldElement extends AbstractNode implements NodeInterface
     public function injectIconFactory(IconFactory $iconFactory): void
     {
         $this->iconFactory = $iconFactory;
+    }
+
+    public function injectViewFactory(ViewFactoryInterface $viewFactory): void
+    {
+        $this->viewFactory = $viewFactory;
     }
 
     /**
@@ -60,7 +67,6 @@ class CopyableFieldElement extends AbstractNode implements NodeInterface
         $result = $this->initializeResultArray();
 
         $template = $this->getFormFieldView();
-        $this->initializeFormFieldViewTemplatePath($template);
         $template->assign('fieldValue', $this->getFieldValue());
         $template->assign('clipboardButtonLabel', $this->getClipboardButtonLabel());
         $template->assign('clipboardIcon', $this->getClipboardIcon());
@@ -73,11 +79,6 @@ class CopyableFieldElement extends AbstractNode implements NodeInterface
         $result['additionalInlineLanguageLabelFiles'][] = 'EXT:tinyurls/Resources/Private/Language/locallang_db_js.xlf';
 
         return $result;
-    }
-
-    public function setFormFieldView(StandaloneView $formFieldView): void
-    {
-        $this->formFieldView = $formFieldView;
     }
 
     /**
@@ -114,12 +115,13 @@ class CopyableFieldElement extends AbstractNode implements NodeInterface
     /**
      * @codeCoverageIgnore
      */
-    protected function getFormFieldView(): StandaloneView
+    protected function getFormFieldView(): ViewInterface
     {
-        if ($this->formFieldView === null) {
-            $this->formFieldView = GeneralUtility::makeInstance(StandaloneView::class);
-        }
-        return $this->formFieldView;
+        $templatePathAndFilename = $this->generalUtility->getFileAbsFileName(self::TEMPLATE_PATH);
+
+        $viewFactoryData = new ViewFactoryData(templatePathAndFilename: $templatePathAndFilename);
+
+        return $this->viewFactory->create($viewFactoryData);
     }
 
     /**
@@ -142,13 +144,6 @@ class CopyableFieldElement extends AbstractNode implements NodeInterface
             $this->iconFactory = GeneralUtility::makeInstance(IconFactory::class);
         }
         return $this->iconFactory;
-    }
-
-    protected function initializeFormFieldViewTemplatePath(StandaloneView $template): void
-    {
-        $template->setTemplatePathAndFilename(
-            $this->getGeneralUtility()->getFileAbsFileName(static::TEMPLATE_PATH),
-        );
     }
 
     private function getClipboardButtonLabel(): string
