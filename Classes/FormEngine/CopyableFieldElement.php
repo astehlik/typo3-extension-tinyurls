@@ -117,7 +117,7 @@ class CopyableFieldElement extends AbstractNode implements NodeInterface
      */
     protected function getFormFieldView(): ViewInterface
     {
-        $templatePathAndFilename = $this->generalUtility->getFileAbsFileName(self::TEMPLATE_PATH);
+        $templatePathAndFilename = $this->getGeneralUtility()->getFileAbsFileName(self::TEMPLATE_PATH);
 
         $viewFactoryData = new ViewFactoryData(templatePathAndFilename: $templatePathAndFilename);
 
