@@ -11,11 +11,11 @@ use Tx\Tinyurls\Controller\EidController;
 use Tx\Tinyurls\Domain\Repository\TinyUrlDoctrineRepository;
 use Tx\Tinyurls\Domain\Repository\TinyUrlRepository;
 use Tx\Tinyurls\Domain\Validator\TinyUrlValidator;
+use Tx\Tinyurls\FormEngine\CopyableFieldElement;
 use Tx\Tinyurls\FormEngine\TinyUrlDisplay;
 use Tx\Tinyurls\Hooks\DatabaseRecordList;
 use Tx\Tinyurls\Hooks\TceDataMap;
 use Tx\Tinyurls\Hooks\TypoLink;
-use Tx\Tinyurls\TinyUrl\Api;
 use Tx\Tinyurls\TinyUrl\TinyUrlGenerator;
 use Tx\Tinyurls\TinyUrl\TinyUrlGeneratorInterface;
 use Tx\Tinyurls\UrlKeyGenerator\Base62UrlKeyGenerator;
@@ -46,7 +46,7 @@ return static function (ContainerConfigurator $configurator): void {
         ->set(TinyUrlValidator::class, TinyUrlValidator::class)
         ->set(TinyUrlDisplay::class, TinyUrlDisplay::class)
         ->set(TceDataMap::class, TceDataMap::class)
-        ->set(Api::class, Api::class)
+        ->set(CopyableFieldElement::class, CopyableFieldElement::class)
         ->set(TinyUrlGenerator::class, TinyUrlGenerator::class)
         ->set(GeneralUtilityWrapper::class, GeneralUtilityWrapper::class)
         ->set(UrlUtils::class, UrlUtils::class)
