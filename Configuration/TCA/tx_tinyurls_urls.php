@@ -14,7 +14,6 @@ return [
         'default_sortby' => 'ORDER BY target_url',
         'enablecolumns' => ['endtime' => 'valid_until'],
         'iconfile' => 'EXT:tinyurls/Resources/Public/Icons/Extension.gif',
-        'searchFields' => 'urlkey,target_url,target_url_hash',
         'rootLevel' => -1,
     ],
     'columns' => [
@@ -25,6 +24,7 @@ return [
                 'type' => 'input',
                 'size' => 6,
                 'readOnly' => 1,
+                'searchable' => false,
             ],
         ],
         'comment' => [
@@ -89,6 +89,7 @@ return [
                 'type' => 'datetime',
                 'format' => 'datetime',
                 'default' => 0,
+                'searchable' => false,
             ],
         ],
     ],
