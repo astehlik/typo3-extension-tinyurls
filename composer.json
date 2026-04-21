@@ -16,9 +16,26 @@
     },
     "require-dev": {
         "de-swebhosting/typo3-extension-buildtools": "dev-TYPO3_14",
+        "michielroos/typo3scan": "dev-master as 1.7.99",
         "phpunit/phpunit": "^11.5.33",
         "typo3/testing-framework": "dev-main"
     },
+    "repositories": [
+        {
+            "type": "package",
+            "package": {
+                "name": "michielroos/typo3scan",
+                "version": "dev-master",
+                "bin": [
+                    "typo3scan"
+                ],
+                "dist": {
+                    "type": "file",
+                    "url": "https://github.com/mschwemer/typo3scan-src/raw/refs/heads/master/typo3scan"
+                }
+            }
+        }
+    ],
     "autoload": {
         "psr-4": {
             "Tx\\Tinyurls\\": "Classes/"

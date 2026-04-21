@@ -54,6 +54,7 @@ readonly class ExtensionConfigurationData
     private function toArray(): array
     {
         return [
+            /** @extensionScannerIgnoreLine */
             ConfigKeys::BASE_URL => $this->baseUrl,
             ConfigKeys::BASE_URL_FROM_SITE_BASE => $this->baseUrlFromSiteBase,
             ConfigKeys::CREATE_SPEAKING_URLS => $this->createSpeakingUrls,
