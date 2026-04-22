@@ -4,7 +4,7 @@ name: Publish to TER
 on:
   push:
     tags:
-      - '*'
+      - 'v*'
 jobs:
   publish:
     name: Publish new version to TER
