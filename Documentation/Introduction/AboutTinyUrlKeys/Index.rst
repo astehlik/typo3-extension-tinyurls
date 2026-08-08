@@ -1,4 +1,6 @@
-﻿.. _introduction-about-tinyurl-keys:
+﻿.. include:: /Includes.rst.txt
+
+.. _introduction-about-tinyurl-keys:
 
 About Tiny URL Keys
 ===================

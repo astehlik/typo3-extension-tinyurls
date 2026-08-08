@@ -1,4 +1,6 @@
-﻿.. _developer:
+﻿.. include:: /Includes.rst.txt
+
+.. _developer:
 
 Developer Corner
 ================
