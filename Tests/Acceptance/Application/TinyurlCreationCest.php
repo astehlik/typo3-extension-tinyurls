@@ -16,7 +16,7 @@ class TinyurlCreationCest
 
     public function tinyurlCanBeCreated(BackendTester $I, PageTree $pageTree): void
     {
-        $I->click('List');
+        $I->click('Records');
 
         $pageTree->openPath(['New TYPO3 site']);
 

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<guides xmlns="https://www.phpdoc.org/guides" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="https://www.phpdoc.org/guides ../vendor/phpdocumentor/guides-cli/resources/schema/guides.xsd"
+        links-are-relative="true">
+    <extension class="\T3Docs\Typo3DocsTheme\DependencyInjection\Typo3DocsThemeExtension"
+               project-home="https://extensions.typo3.org/extension/tinyurls/"
+               project-repository="https://github.com/astehlik/typo3-extension-tinyurls"
+               project-issues="https://github.com/astehlik/typo3-extension-tinyurls/issues"
+               edit-on-github-branch="main"
+               edit-on-github="astehlik/typo3-extension-tinyurls"
+               interlink-shortcode="de-swebhosting-typo3-extension/tinyurls"
+    />
+    <project title="URL shortener / TinyURLs"
+             copyright="by Alexander Stehlik"
+    />
+    <inventory id="t3tsref" url="https://docs.typo3.org/m/typo3/reference-typoscript/main/en-us/"/>
+</guides>

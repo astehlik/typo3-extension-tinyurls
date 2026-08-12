@@ -17,7 +17,6 @@ namespace Tx\Tinyurls\Tests\Functional\Utils;
 use Tx\Tinyurls\Configuration\ConfigKeys;
 use Tx\Tinyurls\Tests\Functional\AbstractFunctionalTestCase;
 use Tx\Tinyurls\Utils\UrlUtils;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * Functional tests for the tinyurls API.
@@ -28,7 +27,7 @@ class UrlUtilsTest extends AbstractFunctionalTestCase
     {
         $_SERVER['REMOTE_ADDR'] = '127.0.0.1';
         $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['tinyurls'][ConfigKeys::SPEAKING_URL_TEMPLATE] = '###REMOTE_ADDR###';
-        $urlUtils = GeneralUtility::makeInstance(UrlUtils::class);
+        $urlUtils = $this->getContainer()->get(UrlUtils::class);
         $this->assertSame('127.0.0.1', $urlUtils->createSpeakingTinyUrl('test'));
     }
 }

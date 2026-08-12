@@ -129,7 +129,7 @@ readonly class UrlUtils implements UrlUtilsInterface
         $baseUrl = $this->extensionConfiguration->getBaseUrl();
 
         if ($baseUrl === null) {
-            return (string)$this->generalUtility->getIndpEnv('TYPO3_SITE_URL');
+            return $this->generalUtility->getNormalizedParams()->getSiteUrl();
         }
 
         return (string)$baseUrl;
@@ -142,7 +142,35 @@ readonly class UrlUtils implements UrlUtilsInterface
             return $this->getBaseUrl();
         }
 
-        return (string)$this->generalUtility->getIndpEnv($match);
+        $normalizedParams = $this->generalUtility->getNormalizedParams();
+
+        return match ($match) {
+            'HTTP_HOST' => $normalizedParams->getHttpHost(),
+            'HTTP_REFERER' => $normalizedParams->getHttpReferer(),
+            'HTTP_USER_AGENT' => $normalizedParams->getHttpUserAgent(),
+            'HTTP_ACCEPT_ENCODING' => $normalizedParams->getHttpAcceptEncoding(),
+            'HTTP_ACCEPT_LANGUAGE' => $normalizedParams->getHttpAcceptLanguage(),
+            'PATH_INFO' => $normalizedParams->getPathInfo(),
+            'QUERY_STRING' => $normalizedParams->getQueryString(),
+            'REMOTE_ADDR' => $normalizedParams->getRemoteAddress(),
+            'REMOTE_HOST' => $normalizedParams->getRemoteHost(),
+            // @extensionScannerIgnoreLine
+            'REQUEST_URI' => $normalizedParams->getRequestUri(),
+            'SCRIPT_FILENAME' => $normalizedParams->getScriptFilename(),
+            'SCRIPT_NAME' => $normalizedParams->getScriptName(),
+            'TYPO3_DOCUMENT_ROOT' => $normalizedParams->getDocumentRoot(),
+            'TYPO3_HOST_ONLY' => $normalizedParams->getRequestHostOnly(),
+            'TYPO3_PORT' => (string)$normalizedParams->getRequestPort(),
+            'TYPO3_REQUEST_DIR' => $normalizedParams->getRequestDir(),
+            'TYPO3_REQUEST_HOST' => $normalizedParams->getRequestHost(),
+            'TYPO3_REQUEST_SCRIPT' => $normalizedParams->getRequestScript(),
+            'TYPO3_REQUEST_URL' => $normalizedParams->getRequestUrl(),
+            'TYPO3_REV_PROXY', 'TYPO3_PROXY' => $normalizedParams->isBehindReverseProxy() ? '1' : '',
+            'TYPO3_SITE_PATH' => $normalizedParams->getSitePath(),
+            'TYPO3_SITE_SCRIPT' => $normalizedParams->getSiteScript(),
+            'TYPO3_SSL' => $normalizedParams->isHttps() ? '1' : '',
+            default => '',
+        };
     }
 
     private function getSiteByPid(int $pid): ?SiteInterface

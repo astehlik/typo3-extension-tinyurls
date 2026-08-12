@@ -11,12 +11,30 @@
     ],
     "require": {
         "php": "^8.2",
-        "typo3/cms-core": "~13.4.0"
+        "typo3/cms-core": "~14.3.0",
+        "typo3/cms-redirects": "~14.3.0"
     },
     "require-dev": {
-        "de-swebhosting/typo3-extension-buildtools": "dev-TYPO3_13",
-        "phpunit/phpunit": "^11.5.50"
+        "de-swebhosting/typo3-extension-buildtools": "dev-TYPO3_14",
+        "m12r/typo3scan": "dev-master as 1.7.99",
+        "phpunit/phpunit": "^11.5.33"
     },
+    "repositories": [
+        {
+            "type": "package",
+            "package": {
+                "name": "m12r/typo3scan",
+                "version": "dev-master",
+                "bin": [
+                    "typo3scan"
+                ],
+                "dist": {
+                    "type": "file",
+                    "url": "https://github.com/mschwemer/typo3scan-src/raw/refs/heads/master/typo3scan"
+                }
+            }
+        }
+    ],
     "autoload": {
         "psr-4": {
             "Tx\\Tinyurls\\": "Classes/"
@@ -29,6 +47,7 @@
     },
     "config": {
         "allow-plugins": {
+            "de-swebhosting/typo3-extension-buildtools": true,
             "ergebnis/composer-normalize": true,
             "typo3/class-alias-loader": true,
             "typo3/cms-composer-installers": true
@@ -37,6 +56,13 @@
         "vendor-dir": ".Build/vendor"
     },
     "extra": {
+        "typo3-extension-buildtools": {
+            "typo3scan-ignore": [
+                "108277",
+                "87193",
+                "101175"
+            ]
+        },
         "typo3/class-alias-loader": {
             "always-add-alias-loader": true
         },

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tx\Tinyurls\Domain\Validator;
 
 use DateTime;
+use Psr\Http\Message\ServerRequestInterface;
 use Tx\Tinyurls\Domain\Model\TinyUrl;
 use Tx\Tinyurls\Domain\Repository\TinyUrlRepository;
 use Tx\Tinyurls\Exception\TinyUrlNotFoundException;
@@ -16,6 +17,8 @@ class TinyUrlValidator implements ValidatorInterface
 {
     protected Result $result;
 
+    private ?ServerRequestInterface $request = null;
+
     public function __construct(protected readonly TinyUrlRepository $tinyUrlRepository) {}
 
     /**
@@ -26,12 +29,22 @@ class TinyUrlValidator implements ValidatorInterface
         return [];
     }
 
+    public function getRequest(): ?ServerRequestInterface
+    {
+        return $this->request;
+    }
+
     /**
      * @codeCoverageIgnore
      *
-     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @SuppressWarnings("PHPMD.UnusedFormalParameter")
      */
     public function setOptions(array $options): void {}
+
+    public function setRequest(?ServerRequestInterface $request): void
+    {
+        $this->request = $request;
+    }
 
     /**
      * Checks if the given value is valid according to the validator, and returns

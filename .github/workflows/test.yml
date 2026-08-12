@@ -5,7 +5,6 @@ on:
   push:
     branches:
       - main
-      - develop
   pull_request:
   workflow_dispatch:
   schedule:
@@ -14,11 +13,11 @@ on:
 jobs:
   extension-test:
     name: 'Testing and linting'
-    uses: astehlik/typo3-extension-buildtools/.github/workflows/extension-test.yml@TYPO3_13
+    uses: astehlik/typo3-extension-buildtools/.github/workflows/extension-test.yml@TYPO3_14
 
   extension-qltysh-coverage:
     name: 'Qlty coverage'
-    uses: astehlik/typo3-extension-buildtools/.github/workflows/extension-qltysh-coverage.yml@TYPO3_13
-    if: github.ref == 'refs/heads/develop'
+    uses: astehlik/typo3-extension-buildtools/.github/workflows/extension-qltysh-coverage.yml@TYPO3_14
+    if: github.ref == 'refs/heads/main'
     secrets:
       QLTY_COVERAGE_TOKEN: ${{ secrets.QLTY_COVERAGE_TOKEN }}

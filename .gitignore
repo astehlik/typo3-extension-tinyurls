@@ -1,6 +1,6 @@
 /.Build/*
 /.cache
-/.php-cs-fixer.cache
 /.phpunit.result.cache
 /bin
+/var
 /composer.lock

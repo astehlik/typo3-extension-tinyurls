@@ -1,0 +1,10 @@
+"pages",,,
+,"uid","pid","title"
+,1,0,"Storage page 1"
+,2,0,"Storage page 2"
+"tx_tinyurls_urls",,,,,,,,,,,
+,"uid","pid","tstamp","counter","comment","urlkey","urldisplay","target_url","target_url_hash","delete_on_use","valid_until"
+,1,1,1600000000,5,"Normal URL","abc123",1,"https://example.com/normal","hash1",0,0
+,2,1,1600000001,2,"Expired URL","exp456",1,"https://example.com/expired","hash2",0,1000000000
+,3,1,1600000002,0,"One time URL","otu789",1,"https://example.com/onetime","hash3",1,0
+,4,2,1600000003,1,"Other storage","oth999",1,"https://example.com/other-storage","hash4",0,0

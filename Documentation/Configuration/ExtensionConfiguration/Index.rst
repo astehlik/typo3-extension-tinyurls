@@ -1,4 +1,4 @@
-﻿.. include:: ../../Includes.txt
+﻿.. include:: /Includes.rst.txt
 
 .. _configuration-extension-configuration:
 
@@ -62,7 +62,7 @@ Extension configuration
 
    Description
          The template that is used for creating a speaking URL (only relevant if createSpeakingURLs is set to 1).
-         You can use all available keys for :code:`\TYPO3\CMS\Core\Utility\GeneraulUtility::getIndpEnv()`
+         You can use all available keys for :code:`\TYPO3\CMS\Core\Http\NormalizedParams`
          as template markers (e.g. :php:`###TYPO3_SITE_URL###`  and the :code:`###TINY_URL_KEY###`
          template marker will be replaced with the shortened URL key.
 

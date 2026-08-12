@@ -1,4 +1,4 @@
-﻿.. include:: ../Includes.txt
+﻿.. include:: /Includes.rst.txt
 
 .. _admin-manual:
 
@@ -59,3 +59,4 @@ Further information
    :maxdepth: 3
 
    SpeakingUrlConfiguration/Index
+   Migration/Index

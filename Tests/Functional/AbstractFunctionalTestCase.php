@@ -15,6 +15,8 @@ abstract class AbstractFunctionalTestCase extends FunctionalTestCase
 {
     protected array $configurationToUseInTestInstance = ['EXTENSIONS' => ['tinyurls' => [ConfigKeys::BASE_URL => 'http://localhost/']]];
 
+    protected array $coreExtensionsToLoad = ['typo3/cms-redirects'];
+
     protected array $testExtensionsToLoad = ['typo3conf/ext/tinyurls'];
 
     protected function getTinyUrlRow(): array

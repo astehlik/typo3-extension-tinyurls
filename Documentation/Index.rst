@@ -1,7 +1,7 @@
-﻿.. every .rst file should include Includes.txt
+﻿.. every .rst file should include Includes.rst.txt
 .. use correct path!
 
-.. include:: Includes.txt
+.. include:: /Includes.rst.txt
 
 .. Every manual should have a start label for cross-referencing to
 .. start page. Do not remove this!
@@ -36,4 +36,10 @@ This extensions allows you to cut down long URLs. It basically works like bitly 
    Configuration/Index
    Developer/Index
    ChangeLog/Index
-   Targets
+
+.. Meta Menu
+
+.. toctree::
+   :hidden:
+
+   Sitemap

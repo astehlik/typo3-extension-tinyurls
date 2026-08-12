@@ -14,7 +14,6 @@ namespace Tx\Tinyurls\Tests\Unit\FormEngine;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
-use LogicException;
 use PHPUnit\Framework\Attributes\BackupGlobals;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -25,18 +24,22 @@ use TYPO3\CMS\Core\Imaging\IconFactory;
 use TYPO3\CMS\Core\Imaging\IconSize;
 use TYPO3\CMS\Core\Localization\LanguageService;
 use TYPO3\CMS\Core\Page\JavaScriptModuleInstruction;
-use TYPO3\CMS\Fluid\View\StandaloneView;
+use TYPO3\CMS\Core\View\ViewFactoryData;
+use TYPO3\CMS\Core\View\ViewFactoryInterface;
+use TYPO3\CMS\Core\View\ViewInterface;
 
 #[BackupGlobals(true)]
 class CopyableFieldElementTest extends TestCase
 {
     private CopyableFieldElement $copyableFieldElement;
 
-    private MockObject|StandaloneView $formFieldViewMock;
-
     private GeneralUtilityWrapper|MockObject $generalUtilityWrapperMock;
 
     private IconFactory|MockObject $iconFactoryMock;
+
+    private ViewFactoryInterface|MockObject $viewFactoryMock;
+
+    private MockObject|ViewInterface $viewMock;
 
     protected function setUp(): void
     {
@@ -65,17 +68,10 @@ class CopyableFieldElementTest extends TestCase
 
     public function testRenderAssignsExpectedVariablesToTemplate(): void
     {
-        $this->formFieldViewMock
+        $this->viewMock
             ->expects($this->exactly(3))
             ->method('assign')
-            ->willReturnCallback(
-                static fn(string $name, string $value) => match (true) {
-                    $name === 'fieldValue' && $value === 'testval' => 1,
-                    $name === 'clipboardIcon' && $value === 'icon html' => 2,
-                    $name === 'clipboardButtonLabel' && $value === '' => 3,
-                    default => throw new LogicException('Unexpected name or value: ' . $name . ' => ' . $value),
-                },
-            );
+            ->willReturn($this->viewMock);
 
         $this->copyableFieldElement->render();
     }
@@ -104,9 +100,9 @@ class CopyableFieldElementTest extends TestCase
             ->with(CopyableFieldElement::TEMPLATE_PATH)
             ->willReturn('the template path');
 
-        $this->formFieldViewMock->expects($this->once())
-            ->method('setTemplatePathAndFilename')
-            ->with('the template path');
+        $this->viewFactoryMock->expects($this->once())
+            ->method('create')
+            ->with(new ViewFactoryData(templatePathAndFilename: 'the template path'));
 
         $this->copyableFieldElement->render();
     }
@@ -132,7 +128,7 @@ class CopyableFieldElementTest extends TestCase
 
     public function testRenderReturnsRenderedFieldTemplate(): void
     {
-        $this->formFieldViewMock->expects($this->once())
+        $this->viewMock->expects($this->once())
             ->method('render')
             ->willReturn('The final html');
 
@@ -147,13 +143,17 @@ class CopyableFieldElementTest extends TestCase
 
         $this->copyableFieldElement->injectGeneralUtilityWrapper($this->getGeneralUtilityWrapperMock());
         $this->copyableFieldElement->injectIconFactory($this->getIconFactoryMock());
-        $this->copyableFieldElement->setFormFieldView($this->createFormFieldViewMock());
+        $this->copyableFieldElement->injectViewFactory($this->createViewFactoryMock());
     }
 
-    private function createFormFieldViewMock(): MockObject|StandaloneView
+    private function createViewFactoryMock(): MockObject|ViewFactoryInterface
     {
-        $this->formFieldViewMock = $this->createMock(StandaloneView::class);
-        return $this->formFieldViewMock;
+        $this->viewMock = $this->createMock(ViewInterface::class);
+
+        $this->viewFactoryMock = $this->createMock(ViewFactoryInterface::class);
+        $this->viewFactoryMock->method('create')->willReturn($this->viewMock);
+
+        return $this->viewFactoryMock;
     }
 
     private function getGeneralUtilityWrapperMock(): GeneralUtilityWrapper|MockObject
