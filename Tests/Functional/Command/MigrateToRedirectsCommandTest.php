@@ -36,8 +36,8 @@ class MigrateToRedirectsCommandTest extends AbstractFunctionalTestCase
         $tester->execute(['--pid' => '1', '--url-template' => '/###TINY_URL_KEY###', '--dry-run' => true]);
 
         $this->assertSame(0, $tester->getStatusCode());
-        $this->assertStringContainsString('Dry run completed.', $tester->getDisplay());
-        $this->assertStringContainsString('2 records migrated', $tester->getDisplay());
+        $this->assertDisplayContains('Dry run completed.', $tester);
+        $this->assertDisplayContains('2 records migrated', $tester);
         $this->assertSame([], $this->getAllRedirects());
     }
 
@@ -48,7 +48,7 @@ class MigrateToRedirectsCommandTest extends AbstractFunctionalTestCase
         $tester->execute([]);
 
         $this->assertSame(1, $tester->getStatusCode());
-        $this->assertStringContainsString('--pid option is required', $tester->getDisplay());
+        $this->assertDisplayContains('--pid option is required', $tester);
     }
 
     public function testFailsWithoutUrlTemplateWhenNotDerivable(): void
@@ -61,7 +61,7 @@ class MigrateToRedirectsCommandTest extends AbstractFunctionalTestCase
         $tester->execute(['--pid' => '1']);
 
         $this->assertSame(1, $tester->getStatusCode());
-        $this->assertStringContainsString('--url-template option is required', $tester->getDisplay());
+        $this->assertDisplayContains('--url-template option is required', $tester);
         $this->assertSame([], $this->getAllRedirects());
     }
 
@@ -86,12 +86,12 @@ class MigrateToRedirectsCommandTest extends AbstractFunctionalTestCase
         $tester->execute(['--pid' => '1', '--url-template' => '/###TINY_URL_KEY###']);
 
         $this->assertSame(0, $tester->getStatusCode());
-        $this->assertStringContainsString('620 records migrated', $tester->getDisplay());
+        $this->assertDisplayContains('620 records migrated', $tester);
         $this->assertCount(620, $this->getAllRedirects());
 
         // Re-running must not create duplicates, even across the chunk boundary.
         $tester->execute(['--pid' => '1', '--url-template' => '/###TINY_URL_KEY###']);
-        $this->assertStringContainsString('620 already migrated', $tester->getDisplay());
+        $this->assertDisplayContains('620 already migrated', $tester);
         $this->assertCount(620, $this->getAllRedirects());
     }
 
@@ -126,7 +126,7 @@ class MigrateToRedirectsCommandTest extends AbstractFunctionalTestCase
         $tester->execute(['--pid' => '999', '--url-template' => '/###TINY_URL_KEY###']);
 
         $this->assertSame(0, $tester->getStatusCode());
-        $this->assertStringContainsString('No tinyurls found', $tester->getDisplay());
+        $this->assertDisplayContains('No tinyurls found', $tester);
         $this->assertSame([], $this->getAllRedirects());
     }
 
@@ -139,7 +139,7 @@ class MigrateToRedirectsCommandTest extends AbstractFunctionalTestCase
         $tester->execute(['--pid' => '1', '--url-template' => '/###TINY_URL_KEY###']);
 
         $this->assertCount(2, $this->getAllRedirects());
-        $this->assertStringContainsString('2 already migrated', $tester->getDisplay());
+        $this->assertDisplayContains('2 already migrated', $tester);
     }
 
     public function testSkipsRecordsFromOtherStoragePid(): void
@@ -170,6 +170,17 @@ class MigrateToRedirectsCommandTest extends AbstractFunctionalTestCase
         $this->assertNotNull($redirect);
         $this->assertSame('example.org', $redirect['source_host']);
         $this->assertSame(5, (int)$redirect['pid']);
+    }
+
+    /**
+     * SymfonyStyle word-wraps block text (success/error/note) to the terminal width, which
+     * is narrower and unset in CI (no TTY) than locally, so long summary sentences can wrap
+     * mid-phrase. Collapsing whitespace makes the assertion independent of that wrapping.
+     */
+    private function assertDisplayContains(string $needle, CommandTester $tester): void
+    {
+        $normalizedDisplay = preg_replace('/\\s+/', ' ', $tester->getDisplay());
+        $this->assertStringContainsString($needle, $normalizedDisplay);
     }
 
     private function enableSpeakingUrls(): void
