@@ -14,7 +14,10 @@ class BackendTinyurlsEnvironment extends BackendEnvironment
     public function __construct(array $config, array $options)
     {
         $this->localConfig = [
-            'coreExtensionsToLoad' => AcceptanceHelper::getExtensionsForMinimalUsableSystem(),
+            'coreExtensionsToLoad' => [
+                ...AcceptanceHelper::getExtensionsForMinimalUsableSystem(),
+                'redirects',
+            ],
             'testExtensionsToLoad' => ['typo3conf/ext/tinyurls'],
             'csvDatabaseFixtures' => [__DIR__ . '/../../Fixtures/BackendEnvironment.csv'],
         ];
