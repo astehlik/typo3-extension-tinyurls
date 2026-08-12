@@ -14,8 +14,6 @@ jobs:
   extension-test:
     name: 'Testing and linting'
     uses: astehlik/typo3-extension-buildtools/.github/workflows/extension-test.yml@TYPO3_14
-    with:
-      typo3-scan-ignore: '108277,87193,101175'
 
   extension-qltysh-coverage:
     name: 'Qlty coverage'

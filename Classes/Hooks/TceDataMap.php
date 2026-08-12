@@ -44,8 +44,8 @@ readonly class TceDataMap
      *
      * @see DataHandler::hook_processDatamap_afterDatabaseOperations()
      *
-     * @SuppressWarnings(PHPMD.CamelCaseMethodName)
-     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @SuppressWarnings("PHPMD.CamelCaseMethodName")
+     * @SuppressWarnings("PHPMD.UnusedFormalParameter")
      */
     public function processDatamap_afterDatabaseOperations(
         /** @noinspection PhpUnusedParameterInspection */

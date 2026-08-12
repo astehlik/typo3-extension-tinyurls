@@ -16,15 +16,14 @@
     },
     "require-dev": {
         "de-swebhosting/typo3-extension-buildtools": "dev-TYPO3_14",
-        "michielroos/typo3scan": "dev-master as 1.7.99",
-        "phpunit/phpunit": "^11.5.33",
-        "typo3/testing-framework": "dev-main"
+        "m12r/typo3scan": "dev-master as 1.7.99",
+        "phpunit/phpunit": "^11.5.33"
     },
     "repositories": [
         {
             "type": "package",
             "package": {
-                "name": "michielroos/typo3scan",
+                "name": "m12r/typo3scan",
                 "version": "dev-master",
                 "bin": [
                     "typo3scan"
@@ -48,6 +47,7 @@
     },
     "config": {
         "allow-plugins": {
+            "de-swebhosting/typo3-extension-buildtools": true,
             "ergebnis/composer-normalize": true,
             "typo3/class-alias-loader": true,
             "typo3/cms-composer-installers": true
@@ -56,6 +56,13 @@
         "vendor-dir": ".Build/vendor"
     },
     "extra": {
+        "typo3-extension-buildtools": {
+            "typo3scan-ignore": [
+                "108277",
+                "87193",
+                "101175"
+            ]
+        },
         "typo3/class-alias-loader": {
             "always-add-alias-loader": true
         },

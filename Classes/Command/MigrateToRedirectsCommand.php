@@ -111,7 +111,12 @@ class MigrateToRedirectsCommand extends Command
             ->executeQuery()
             ->iterateAssociative();
 
-        $stats = ['success' => 0, 'skipped' => 0, 'alreadyMigrated' => 0, 'errors' => 0];
+        $stats = [
+            'success' => 0,
+            'skipped' => 0,
+            'alreadyMigrated' => 0,
+            'errors' => 0,
+        ];
         $now = time();
         $chunk = [];
 

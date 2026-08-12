@@ -37,7 +37,7 @@ class TinyUrlValidator implements ValidatorInterface
     /**
      * @codeCoverageIgnore
      *
-     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @SuppressWarnings("PHPMD.UnusedFormalParameter")
      */
     public function setOptions(array $options): void {}
 

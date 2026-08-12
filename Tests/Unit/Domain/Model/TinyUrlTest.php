@@ -15,7 +15,7 @@ namespace Tx\Tinyurls\Tests\Unit\Domain\Model;
  *                                                                        */
 
 use DateTime;
-use DateTimeInterface;
+use DateTimeImmutable;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Tx\Tinyurls\Domain\Model\TinyUrl;
@@ -258,7 +258,7 @@ class TinyUrlTest extends TestCase
     {
         $tinyUrl = TinyUrl::createNew();
         $tinyUrl->persistPreProcess();
-        $this->assertInstanceOf(DateTimeInterface::class, $tinyUrl->getTstamp());
+        $this->assertInstanceOf(DateTimeImmutable::class, $tinyUrl->getTstamp());
     }
 
     public function testResetCustomUrlKeySetsCustomUrlKeyToNull(): void
