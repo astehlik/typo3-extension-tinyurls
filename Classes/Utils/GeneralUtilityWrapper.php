@@ -15,7 +15,9 @@ namespace Tx\Tinyurls\Utils;
  *                                                                        */
 
 use Closure;
+use Psr\Http\Message\ServerRequestInterface;
 use TYPO3\CMS\Core\Crypto\Random;
+use TYPO3\CMS\Core\Http\NormalizedParams;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
@@ -35,9 +37,19 @@ class GeneralUtilityWrapper
         return GeneralUtility::getFileAbsFileName($fileName);
     }
 
-    public function getIndpEnv(string $getEnvName): array|bool|string|null
+    public function getNormalizedParams(): NormalizedParams
     {
-        return GeneralUtility::getIndpEnv($getEnvName);
+        $request = $GLOBALS['TYPO3_REQUEST'] ?? null;
+
+        if ($request instanceof ServerRequestInterface) {
+            $normalizedParams = $request->getAttribute('normalizedParams');
+
+            if ($normalizedParams instanceof NormalizedParams) {
+                return $normalizedParams;
+            }
+        }
+
+        return NormalizedParams::createFromServerParams($_SERVER);
     }
 
     public function getRandomHexString(int $length): string

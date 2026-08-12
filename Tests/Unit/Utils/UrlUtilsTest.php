@@ -23,6 +23,7 @@ use Tx\Tinyurls\UrlKeyGenerator\UrlKeyGenerator;
 use Tx\Tinyurls\Utils\GeneralUtilityWrapper;
 use Tx\Tinyurls\Utils\UrlUtils;
 use TYPO3\CMS\Core\Exception\SiteNotFoundException;
+use TYPO3\CMS\Core\Http\NormalizedParams;
 use TYPO3\CMS\Core\Http\Uri;
 use TYPO3\CMS\Core\Site\Entity\Site;
 use TYPO3\CMS\Core\Site\SiteFinder;
@@ -60,10 +61,14 @@ class UrlUtilsTest extends TestCase
     #[BackupGlobals(true)]
     public function testBuildTinyUrlCreatesEidUrlIfSpeakingUrlsAreDisabled(): void
     {
-        $this->generalUtilityMock->expects($this->once())
-            ->method('getIndpEnv')
-            ->with('TYPO3_SITE_URL')
+        $normalizedParamsMock = $this->createMock(NormalizedParams::class);
+        $normalizedParamsMock->expects($this->once())
+            ->method('getSiteUrl')
             ->willReturn('http://the-site.url/');
+
+        $this->generalUtilityMock->expects($this->once())
+            ->method('getNormalizedParams')
+            ->willReturn($normalizedParamsMock);
 
         $this->extensionConfigurationMock->expects($this->once())
             ->method('areSpeakingUrlsEnabled')
@@ -124,28 +129,41 @@ class UrlUtilsTest extends TestCase
         $this->urlUtils->buildTinyUrlForPid('thekey', 123);
     }
 
-    public function testCreateSpeakingTinyUrlReplacesIndependentEnvironmentMarker(): void
+    public function testCreateSpeakingTinyUrlReplacesMultipleNormalizedParamsMarkers(): void
     {
-        $this->extensionConfigurationMock->expects($this->once())
-            ->method('getSpeakingUrlTemplate')
-            ->willReturn('###MY_ENV_MARKER###');
-        $this->generalUtilityMock->expects($this->once())
-            ->method('getIndpEnv')
-            ->willReturn('replacedvalue');
-        $speakingUrl = $this->urlUtils->createSpeakingTinyUrl('testkey');
-        $this->assertSame('replacedvalue', $speakingUrl);
-    }
+        $normalizedParamsMock = $this->createMock(NormalizedParams::class);
+        $normalizedParamsMock->expects($this->once())
+            ->method('getRemoteAddress')
+            ->willReturn('myenvvalue1');
+        $normalizedParamsMock->expects($this->once())
+            ->method('getHttpUserAgent')
+            ->willReturn('myenvvalue2');
 
-    public function testCreateSpeakingTinyUrlReplacesMultipleIndependentEnvironmentMarkers(): void
-    {
         $this->extensionConfigurationMock->expects($this->once())
             ->method('getSpeakingUrlTemplate')
-            ->willReturn('###MY_ENV_MARKER1###/###MY_ENV_MARKER2###');
+            ->willReturn('###REMOTE_ADDR###/###HTTP_USER_AGENT###');
         $this->generalUtilityMock->expects($this->exactly(2))
-            ->method('getIndpEnv')
-            ->willReturnOnConsecutiveCalls('myenvvalue1', 'myenvvalue2');
+            ->method('getNormalizedParams')
+            ->willReturn($normalizedParamsMock);
         $speakingUrl = $this->urlUtils->createSpeakingTinyUrl('testkey');
         $this->assertSame('myenvvalue1/myenvvalue2', $speakingUrl);
+    }
+
+    public function testCreateSpeakingTinyUrlReplacesNormalizedParamsMarker(): void
+    {
+        $normalizedParamsMock = $this->createMock(NormalizedParams::class);
+        $normalizedParamsMock->expects($this->once())
+            ->method('getRemoteAddress')
+            ->willReturn('replacedvalue');
+
+        $this->extensionConfigurationMock->expects($this->once())
+            ->method('getSpeakingUrlTemplate')
+            ->willReturn('###REMOTE_ADDR###');
+        $this->generalUtilityMock->expects($this->once())
+            ->method('getNormalizedParams')
+            ->willReturn($normalizedParamsMock);
+        $speakingUrl = $this->urlUtils->createSpeakingTinyUrl('testkey');
+        $this->assertSame('replacedvalue', $speakingUrl);
     }
 
     public function testCreateSpeakingTinyUrlReplacesTinyUrlMarker(): void
@@ -155,6 +173,18 @@ class UrlUtilsTest extends TestCase
             ->willReturn('###TINY_URL_KEY###');
         $speakingUrl = $this->urlUtils->createSpeakingTinyUrl('testkey');
         $this->assertSame('testkey', $speakingUrl);
+    }
+
+    public function testCreateSpeakingTinyUrlReplacesUnknownMarkerWithEmptyString(): void
+    {
+        $this->extensionConfigurationMock->expects($this->once())
+            ->method('getSpeakingUrlTemplate')
+            ->willReturn('###UNKNOWN_MARKER###');
+        $this->generalUtilityMock->expects($this->once())
+            ->method('getNormalizedParams')
+            ->willReturn($this->createMock(NormalizedParams::class));
+        $speakingUrl = $this->urlUtils->createSpeakingTinyUrl('testkey');
+        $this->assertSame('', $speakingUrl);
     }
 
     public function testCreateSpeakingTinyUrlUsesBaseUrlForSiteUrlPlaceholder(): void
